@@ -5,10 +5,11 @@ import { useFonts, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk
 import { DMSans_400Regular, DMSans_500Medium } from '@expo-google-fonts/dm-sans';
 import EcranDuree from './src/screens/EcranDuree';
 import EcranInterets from './src/screens/EcranInterets';
+import EcranBudget from './src/screens/EcranBudget';
 import { couleurs } from './src/theme';
 import { Reponses } from './src/types/parcours';
 
-type Etape = 'duree' | 'interets';
+type Etape = 'duree' | 'interets' | 'budget';
 
 export default function App() {
   const [policesPretes] = useFonts({
@@ -46,7 +47,16 @@ export default function App() {
             valeurs={reponses.interets}
             onBasculer={basculerInteret}
             onRetour={() => setEtape('duree')}
-            onSuivant={() => console.log('Prochaine étape : budget', reponses)}
+            onSuivant={() => setEtape('budget')}
+          />
+        )}
+
+        {etape === 'budget' && (
+          <EcranBudget
+            valeur={reponses.budget}
+            onChoisir={(budget) => setReponses({ ...reponses, budget })}
+            onRetour={() => setEtape('interets')}
+            onSuivant={() => console.log('Prochaine étape : résultats', reponses)}
           />
         )}
       </SafeAreaView>
