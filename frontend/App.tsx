@@ -4,8 +4,11 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
 import { DMSans_400Regular, DMSans_500Medium } from '@expo-google-fonts/dm-sans';
 import EcranDuree from './src/screens/EcranDuree';
+import EcranInterets from './src/screens/EcranInterets';
 import { couleurs } from './src/theme';
 import { Reponses } from './src/types/parcours';
+
+type Etape = 'duree' | 'interets';
 
 export default function App() {
   const [policesPretes] = useFonts({
@@ -13,19 +16,39 @@ export default function App() {
     DMSans_400Regular,
     DMSans_500Medium,
   });
+  const [etape, setEtape] = useState<Etape>('duree');
   const [reponses, setReponses] = useState<Reponses>({ interets: [] });
 
   if (!policesPretes) return null;
+
+  const basculerInteret = (valeur: string) => {
+    const interets = reponses.interets.includes(valeur)
+      ? reponses.interets.filter((i) => i !== valeur)
+      : [...reponses.interets, valeur];
+    setReponses({ ...reponses, interets });
+  };
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: couleurs.fond }}>
         <StatusBar style="light" />
-        <EcranDuree
-          valeur={reponses.duree}
-          onChoisir={(duree) => setReponses({ ...reponses, duree })}
-          onSuivant={() => console.log('Prochaine étape : intérêts', reponses)}
-        />
+
+        {etape === 'duree' && (
+          <EcranDuree
+            valeur={reponses.duree}
+            onChoisir={(duree) => setReponses({ ...reponses, duree })}
+            onSuivant={() => setEtape('interets')}
+          />
+        )}
+
+        {etape === 'interets' && (
+          <EcranInterets
+            valeurs={reponses.interets}
+            onBasculer={basculerInteret}
+            onRetour={() => setEtape('duree')}
+            onSuivant={() => console.log('Prochaine étape : budget', reponses)}
+          />
+        )}
       </SafeAreaView>
     </SafeAreaProvider>
   );
