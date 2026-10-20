@@ -5,14 +5,15 @@ type Props = {
   libelle: string;
   selectionne: boolean;
   onPress: () => void;
+  multiple?: boolean;
 };
 
-export default function BoutonChoix({ libelle, selectionne, onPress }: Props) {
+export default function BoutonChoix({ libelle, selectionne, onPress, multiple = false }: Props) {
   return (
     <Pressable
       onPress={onPress}
-      accessibilityRole="radio"
-      accessibilityState={{ selected: selectionne }}
+      accessibilityRole={multiple ? 'checkbox' : 'radio'}
+      accessibilityState={multiple ? { checked: selectionne } : { selected: selectionne }}
       style={[styles.bouton, selectionne && styles.selectionne]}
     >
       <Text style={[styles.texte, selectionne && styles.texteSelectionne]}>
@@ -24,7 +25,7 @@ export default function BoutonChoix({ libelle, selectionne, onPress }: Props) {
 
 const styles = StyleSheet.create({
   bouton: {
-    minHeight: 62, // zone cliquable > 44 px
+    minHeight: 62,
     borderRadius: 31,
     borderWidth: 2,
     borderColor: couleurs.primaire,
