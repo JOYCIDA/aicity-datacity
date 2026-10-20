@@ -7,10 +7,12 @@ import EcranDuree from './src/screens/EcranDuree';
 import EcranInterets from './src/screens/EcranInterets';
 import EcranBudget from './src/screens/EcranBudget';
 import EcranResultats from './src/screens/EcranResultats';
+import EcranFiche from './src/screens/EcranFiche';
 import { couleurs } from './src/theme';
 import { Reponses } from './src/types/parcours';
+import { Activite } from './src/types/activite';
 
-type Etape = 'duree' | 'interets' | 'budget' | 'resultats';
+type Etape = 'duree' | 'interets' | 'budget' | 'resultats' | 'fiche';
 
 export default function App() {
   const [policesPretes] = useFonts({
@@ -20,6 +22,7 @@ export default function App() {
   });
   const [etape, setEtape] = useState<Etape>('duree');
   const [reponses, setReponses] = useState<Reponses>({ interets: [] });
+  const [activiteChoisie, setActiviteChoisie] = useState<Activite | null>(null);
 
   if (!policesPretes) return null;
 
@@ -62,7 +65,18 @@ export default function App() {
         )}
 
         {etape === 'resultats' && (
-          <EcranResultats reponses={reponses} onRetour={() => setEtape('budget')} />
+          <EcranResultats
+            reponses={reponses}
+            onRetour={() => setEtape('budget')}
+            onOuvrir={(activite) => {
+              setActiviteChoisie(activite);
+              setEtape('fiche');
+            }}
+          />
+        )}
+
+        {etape === 'fiche' && activiteChoisie && (
+          <EcranFiche activite={activiteChoisie} onRetour={() => setEtape('resultats')} />
         )}
       </SafeAreaView>
     </SafeAreaProvider>

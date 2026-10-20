@@ -37,9 +37,10 @@ function filtrer(activites: Activite[], reponses: Reponses): Activite[] {
 type Props = {
   reponses: Reponses;
   onRetour: () => void;
+  onOuvrir: (activite: Activite) => void;
 };
 
-export default function EcranResultats({ reponses, onRetour }: Props) {
+export default function EcranResultats({ reponses, onRetour, onOuvrir }: Props) {
   const resultats = filtrer(activitesExemple, reponses);
   const n = resultats.length;
   const resume = [
@@ -75,7 +76,7 @@ export default function EcranResultats({ reponses, onRetour }: Props) {
         <FlatList
           data={resultats}
           keyExtractor={(a) => a.id}
-          renderItem={({ item }) => <CarteActivite activite={item} />}
+          renderItem={({ item }) => ( <CarteActivite activite={item} onPress={() => onOuvrir(item)} />)}
           contentContainerStyle={{ paddingTop: 16, paddingBottom: 24 }}
         />
       )}
