@@ -1,28 +1,18 @@
-import 'dotenv/config';
-import express from 'express';
-import type { Request, Response } from 'express';
-import cors from 'cors';
-import { db } from './prisma/db.js';
+import { createApp } from './app.js';
+import { env } from './config/env.js';
+import { prisma } from './prisma/client.js';
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-app.get('/api/health', (req: Request, res: Response) => {
-  res.json({ status: 'ok', message: 'AiCity backend opérationnel' });
+const app = createApp();
+const server = app.listen(env.PORT, () => {
+  console.log(`AiCity API prête sur http://localhost:${env.PORT}/api`);
 });
 
-// Exemple d'utilisation de Prisma (à adapter selon ton schéma)
-app.get('/api/test-db', async (req: Request, res: Response) => {
-  try {
-    // Ici tu pourras faire des requêtes une fois le schéma défini
-    res.json({ message: 'Connexion Prisma prête' });
-  } catch (error) {
-    res.status(500).json({ error: 'Erreur base de données' });
-  }
-});
-
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Serveur lancé sur http://localhost:${PORT}`);
-});
+async function arreter(signal: string) {
+  console.log(`${signal} reçu, arrêt en cours...`);
+  server.close(async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  });
+}
+process.on('SIGINT', () => void arreter('SIGINT'));
+process.on('SIGTERM', () => void arreter('SIGTERM'));

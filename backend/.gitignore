@@ -1,3 +1,15 @@
 node_modules/
 dist/
+coverage/
+
+# Variables d'environnement : seul .env.example est versionné
 .env
+.env.*
+!.env.example
+
+# Fichiers téléversés (le dossier reste versionné grâce au .gitkeep)
+uploads/*
+!uploads/.gitkeep
+
+# Client Prisma généré (npm run prisma:generate)
+src/generated/

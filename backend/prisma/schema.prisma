@@ -1,0 +1,241 @@
+// AiCity : modèles de données (analyse UML, annexe A)
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CITOYEN
+  ENTREPRISE
+  ADMIN
+}
+
+enum Langue {
+  FR
+  EN
+}
+
+enum StatutCompte {
+  EN_ATTENTE
+  ACTIF
+  REFUSE
+  SUSPENDU
+}
+
+enum StatutOffre {
+  EN_ATTENTE
+  VALIDE
+  REFUSE
+  EN_PAUSE
+  EXPIREE
+}
+
+enum SourceOffre {
+  ENTREPRISE
+  OPENAGENDA
+  DATA_GOUV
+  PARIS_OPEN_DATA
+}
+
+enum StatutBorne {
+  ACTIVE
+  HORS_LIGNE
+  DESACTIVEE
+}
+
+enum StatutSession {
+  ACTIVE
+  TERMINEE
+  EXPIREE
+}
+
+enum DecisionModeration {
+  VALIDE
+  REFUSE
+  SUSPENDU
+  REACTIVE
+}
+
+model Utilisateur {
+  id             String       @id @default(uuid())
+  email          String       @unique
+  motDePasseHash String
+  role           Role         @default(CITOYEN)
+  langue         Langue       @default(FR)
+  creeLe         DateTime     @default(now())
+
+  entreprise     Entreprise?
+  preference     Preference?
+  favoris        Favori[]
+  recherches     Recherche[]
+  decisions      JournalModeration[] @relation("DecisionAdmin")
+}
+
+model Entreprise {
+  id              String       @id @default(uuid())
+  utilisateurId   String       @unique
+  nom             String
+  typeActivite    String
+  adresse         String
+  justificatifUrl String?
+  statut          StatutCompte @default(EN_ATTENTE)
+
+  utilisateur     Utilisateur  @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  offres          Offre[]
+  journal         JournalModeration[]
+}
+
+model Categorie {
+  id         String  @id @default(uuid())
+  code       String  @unique
+  libelleFr  String
+  libelleEn  String
+  picto      String?
+
+  offres      Offre[]
+  preferences Preference[]
+}
+
+model Offre {
+  id            String      @id @default(uuid())
+  entrepriseId  String?
+  categorieId   String
+  titre         String
+  description   String?
+  lieu          String
+  adresse       String?
+  latitude      Float
+  longitude     Float
+  debut         DateTime
+  fin           DateTime?
+  horaires      String?
+  dureeMinutes  Int
+  prix          Decimal?    @db.Decimal(8, 2)
+  gratuit       Boolean     @default(false)
+  photoUrl      String?
+  source        SourceOffre @default(ENTREPRISE)
+  sourceUrl     String?
+  idExterne     String?
+  statut        StatutOffre @default(EN_ATTENTE)
+  vues          Int         @default(0)
+  majLe         DateTime    @default(now()) @updatedAt
+
+  entreprise      Entreprise?       @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
+  categorie       Categorie         @relation(fields: [categorieId], references: [id])
+  favoris         Favori[]
+  recommandations Recommandation[]
+  journal         JournalModeration[]
+
+  @@unique([source, idExterne])
+  @@index([statut, fin])
+  @@index([latitude, longitude])
+  @@index([categorieId])
+}
+
+model Preference {
+  id            String      @id @default(uuid())
+  utilisateurId String      @unique
+  budgetMax     Decimal?    @db.Decimal(8, 2)
+
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  categories    Categorie[]
+}
+
+model Favori {
+  utilisateurId String
+  offreId       String
+  ajouteLe      DateTime @default(now())
+
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  offre         Offre       @relation(fields: [offreId], references: [id], onDelete: Cascade)
+
+  @@id([utilisateurId, offreId])
+}
+
+model Borne {
+  id          String      @id @default(uuid())
+  nom         String
+  emplacement String
+  latitude    Float
+  longitude   Float
+  cleApiHash  String
+  statut      StatutBorne @default(ACTIVE)
+  dernierPing DateTime?
+
+  sessions    SessionBorne[]
+}
+
+model SessionBorne {
+  id        String        @id @default(uuid())
+  borneId   String
+  langue    Langue        @default(FR)
+  statut    StatutSession @default(ACTIVE)
+  debutLe   DateTime      @default(now())
+  expireLe  DateTime
+
+  borne      Borne         @relation(fields: [borneId], references: [id], onDelete: Cascade)
+  recherches Recherche[]
+
+  @@index([statut, expireLe])
+}
+
+model Recherche {
+  id                String   @id @default(uuid())
+  sessionId         String?
+  utilisateurId     String?
+  tempsLibreMinutes Int
+  budgetMax         Decimal? @db.Decimal(8, 2)
+  categories        String[]
+  rayonM            Int
+  elargie           Boolean  @default(false)
+  creeLe            DateTime @default(now())
+
+  session           SessionBorne? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  utilisateur       Utilisateur?  @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  recommandations   Recommandation[]
+}
+
+model Recommandation {
+  id           String @id @default(uuid())
+  rechercheId  String
+  offreId      String
+  score        Int
+  rang         Int
+  explication  String
+
+  recherche    Recherche @relation(fields: [rechercheId], references: [id], onDelete: Cascade)
+  offre        Offre     @relation(fields: [offreId], references: [id], onDelete: Cascade)
+
+  @@index([rechercheId, rang])
+}
+
+model JournalModeration {
+  id            String             @id @default(uuid())
+  adminId       String
+  offreId       String?
+  entrepriseId  String?
+  decision      DecisionModeration
+  motif         String?
+  creeLe        DateTime           @default(now())
+
+  admin         Utilisateur  @relation("DecisionAdmin", fields: [adminId], references: [id])
+  offre         Offre?       @relation(fields: [offreId], references: [id], onDelete: SetNull)
+  entreprise    Entreprise?  @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
+
+  @@index([creeLe])
+}
+
+model ImportRapport {
+  id          String      @id @default(uuid())
+  source      SourceOffre
+  debutLe     DateTime
+  finLe       DateTime?
+  nbCrees     Int         @default(0)
+  nbMisAJour  Int         @default(0)
+  nbRejetes   Int         @default(0)
+}
