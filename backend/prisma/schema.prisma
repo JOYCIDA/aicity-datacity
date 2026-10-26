@@ -54,6 +54,12 @@ enum StatutSession {
   EXPIREE
 }
 
+enum StatutImport {
+  EN_COURS
+  TERMINE
+  ECHEC
+}
+
 enum DecisionModeration {
   VALIDE
   REFUSE
@@ -84,10 +90,14 @@ model Entreprise {
   adresse         String
   justificatifUrl String?
   statut          StatutCompte @default(EN_ATTENTE)
+  motifRefus      String?
+  creeLe          DateTime     @default(now())
 
   utilisateur     Utilisateur  @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
   offres          Offre[]
   journal         JournalModeration[]
+
+  @@index([statut])
 }
 
 model Categorie {
@@ -96,6 +106,7 @@ model Categorie {
   libelleFr  String
   libelleEn  String
   picto      String?
+  dureeDefautMinutes Int @default(60)
 
   offres      Offre[]
   preferences Preference[]
@@ -123,6 +134,8 @@ model Offre {
   idExterne     String?
   statut        StatutOffre @default(EN_ATTENTE)
   vues          Int         @default(0)
+  motifRefus    String?
+  creeLe        DateTime    @default(now())
   majLe         DateTime    @default(now()) @updatedAt
 
   entreprise      Entreprise?       @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
@@ -130,11 +143,13 @@ model Offre {
   favoris         Favori[]
   recommandations Recommandation[]
   journal         JournalModeration[]
+  stats           StatOffreJour[]
 
   @@unique([source, idExterne])
   @@index([statut, fin])
   @@index([latitude, longitude])
   @@index([categorieId])
+  @@index([entrepriseId])
 }
 
 model Preference {
@@ -155,6 +170,7 @@ model Favori {
   offre         Offre       @relation(fields: [offreId], references: [id], onDelete: Cascade)
 
   @@id([utilisateurId, offreId])
+  @@index([offreId])
 }
 
 model Borne {
@@ -163,7 +179,7 @@ model Borne {
   emplacement String
   latitude    Float
   longitude   Float
-  cleApiHash  String
+  cleApiHash  String      @unique
   statut      StatutBorne @default(ACTIVE)
   dernierPing DateTime?
 
@@ -182,6 +198,7 @@ model SessionBorne {
   recherches Recherche[]
 
   @@index([statut, expireLe])
+  @@index([borneId])
 }
 
 model Recherche {
@@ -198,6 +215,9 @@ model Recherche {
   session           SessionBorne? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   utilisateur       Utilisateur?  @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
   recommandations   Recommandation[]
+
+  @@index([sessionId])
+  @@index([utilisateurId, creeLe])
 }
 
 model Recommandation {
@@ -211,7 +231,9 @@ model Recommandation {
   recherche    Recherche @relation(fields: [rechercheId], references: [id], onDelete: Cascade)
   offre        Offre     @relation(fields: [offreId], references: [id], onDelete: Cascade)
 
+  @@unique([rechercheId, offreId])
   @@index([rechercheId, rang])
+  @@index([offreId])
 }
 
 model JournalModeration {
@@ -228,6 +250,9 @@ model JournalModeration {
   entreprise    Entreprise?  @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
 
   @@index([creeLe])
+  @@index([offreId])
+  @@index([entrepriseId])
+  @@index([adminId])
 }
 
 model ImportRapport {
@@ -235,7 +260,26 @@ model ImportRapport {
   source      SourceOffre
   debutLe     DateTime
   finLe       DateTime?
+  statut      StatutImport @default(EN_COURS)
+  message     String?
   nbCrees     Int         @default(0)
   nbMisAJour  Int         @default(0)
   nbRejetes   Int         @default(0)
+
+  @@index([source, debutLe])
+}
+
+// Compteurs anonymes par offre et par jour (RG19). Ils survivent à la purge des
+// sessions (RG1) car ils ne contiennent aucune donnée sur l'usager.
+model StatOffreJour {
+  offreId         String
+  jour            DateTime @db.Date
+  recommandations Int      @default(0)
+  vues            Int      @default(0)
+  favoris         Int      @default(0)
+
+  offre           Offre    @relation(fields: [offreId], references: [id], onDelete: Cascade)
+
+  @@id([offreId, jour])
+  @@index([jour])
 }
