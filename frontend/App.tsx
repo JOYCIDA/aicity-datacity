@@ -4,6 +4,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
 import { DMSans_400Regular, DMSans_500Medium } from '@expo-google-fonts/dm-sans';
 import EcranDuree from './src/screens/EcranDuree';
+import EcranAccueil from './src/screens/EcranAccueil';
 import EcranInterets from './src/screens/EcranInterets';
 import EcranBudget from './src/screens/EcranBudget';
 import EcranResultats from './src/screens/EcranResultats';
@@ -12,7 +13,7 @@ import { couleurs } from './src/theme';
 import { Reponses } from './src/types/parcours';
 import { Activite } from './src/types/activite';
 
-type Etape = 'duree' | 'interets' | 'budget' | 'resultats' | 'fiche';
+type Etape = 'accueil' | 'duree' | 'interets' | 'budget' | 'resultats' | 'fiche';
 
 export default function App() {
   const [policesPretes] = useFonts({
@@ -20,7 +21,7 @@ export default function App() {
     DMSans_400Regular,
     DMSans_500Medium,
   });
-  const [etape, setEtape] = useState<Etape>('duree');
+  const [etape, setEtape] = useState<Etape>('accueil');
   const [reponses, setReponses] = useState<Reponses>({ interets: [] });
   const [activiteChoisie, setActiviteChoisie] = useState<Activite | null>(null);
 
@@ -37,7 +38,10 @@ export default function App() {
     <SafeAreaProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: couleurs.fond }}>
         <StatusBar style="light" />
-
+        
+        {etape === 'accueil' && (
+          <EcranAccueil onCommencer={() => setEtape('duree')} />
+        )}
         {etape === 'duree' && (
           <EcranDuree
             valeur={reponses.duree}
