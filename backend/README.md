@@ -46,3 +46,26 @@ par le test. Si la base est injoignable, ce fichier est ignoré et les autres te
 | GET | `/api/admin/offres?statut=EN_ATTENTE` | ADMIN |
 | PATCH | `/api/admin/offres/:id/decision` (`VALIDE`, `REFUSE` + motif) | ADMIN |
 | GET | `/api/citoyen/offres` | public |
+
+## Import des données publiques (lot L3)
+
+Chaque nuit à 3 h (`CRON_IMPORT`), les sources configurées sont importées l'une après l'autre ;
+une source en panne (rapport `ECHEC`) n'empêche pas les suivantes. Les offres importées sont
+directement `VALIDE` et repérées par `(source, idExterne)` : relancer un import met à jour
+sans créer de doublon. Les offres dont la fin est dépassée passent en `EXPIREE`.
+
+| Source (`:source`) | Clé | Données |
+|---|---|---|
+| `parisopendata` | non | « Que faire à Paris ? », export complet en une requête |
+| `openagenda` | `OPENAGENDA_API_KEY` + `OPENAGENDA_AGENDAS` | API v2, pagination `after` |
+| `datagouv` | non | ressource JSON d'un jeu data.gouv.fr (export OpenAgenda, GPSO par défaut) |
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| POST | `/api/admin/imports/:source/lancer` → 202 + rapport `EN_COURS` (409 si déjà en cours ou non configurée) | ADMIN |
+| GET | `/api/admin/imports?source=PARIS_OPEN_DATA` | ADMIN |
+
+Un événement est rejeté (et compté) s'il manque le titre, le lieu, les coordonnées ou la date ;
+il est ignoré sans être compté s'il est annulé, en ligne ou déjà terminé. Le détail figure dans
+le `message` du rapport. Les jeux d'essai de `data/` (réponses réelles pour Paris et data.gouv.fr,
+jeu construit d'après la documentation pour OpenAgenda) servent aux tests, sans réseau.

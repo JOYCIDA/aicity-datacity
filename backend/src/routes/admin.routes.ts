@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import * as imports from '../controllers/adminImport.controller.js';
 import * as moderation from '../controllers/adminModeration.controller.js';
 import { exigerRole, verifierJwt } from '../middlewares/auth.middleware.js';
 
@@ -13,3 +14,6 @@ adminRouter.patch('/entreprises/:id/decision', moderation.deciderEntreprise);
 
 adminRouter.get('/offres', moderation.listerOffres);
 adminRouter.patch('/offres/:id/decision', moderation.deciderOffre);
+
+adminRouter.get('/imports', imports.lister);
+adminRouter.post('/imports/:source/lancer', imports.lancer);
