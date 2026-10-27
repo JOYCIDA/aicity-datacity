@@ -1,0 +1,111 @@
+{
+  "_note": "Jeu d'essai CONSTRUIT à partir des exemples de la documentation officielle (developers.openagenda.com/evenements/lecture et /evenements/structure, lus le 2026-10-27), faute de clé d'API. À remplacer par une réponse réelle dès qu'une clé est disponible : GET /v2/agendas/{uid}/events?monolingual=fr&detailed=1&relative[]=current&relative[]=upcoming. Chaque élément de `pages` est une réponse de l'API ; `after` à null termine la pagination.",
+  "pages": [
+    {
+      "total": 5,
+      "after": ["0", "000001893456000", "1893456000000", "78903"],
+      "events": [
+        {
+          "uid": 78901,
+          "slug": "degustation-vins-afrique-du-sud",
+          "title": "Dégustation : les vins d'Afrique du Sud",
+          "description": "Une dégustation commentée de trois vins sud-africains.",
+          "longDescription": "**Explorez les multiples visages de l’Afrique du Sud** à travers une dégustation commentée.",
+          "conditions": "Tarif plein 25 €, réduit 20 €",
+          "keywords": ["dégustation", "vin", "afterwork"],
+          "image": {
+            "filename": "23fc5619015849848ffe4843c98a03e2.base.image.jpg",
+            "size": { "width": 700, "height": 394 },
+            "variants": [{ "filename": "23fc5619015849848ffe4843c98a03e2.full.image.jpg", "type": "full" }],
+            "base": "https://cdn.openagenda.com/main/"
+          },
+          "firstTiming": { "begin": "2030-02-23T17:00:00.000Z", "end": "2030-02-23T19:00:00.000Z" },
+          "lastTiming": { "begin": "2030-02-27T17:00:00.000Z", "end": "2030-02-27T19:00:00.000Z" },
+          "timings": [
+            { "begin": "2030-02-23T17:00:00.000Z", "end": "2030-02-23T19:00:00.000Z" },
+            { "begin": "2030-02-27T17:00:00.000Z", "end": "2030-02-27T19:00:00.000Z" }
+          ],
+          "location": {
+            "uid": 72236530,
+            "name": "Cave de la Bastille",
+            "address": "4 rue de la Roquette, 75011 Paris",
+            "city": "Paris",
+            "postalCode": "75011",
+            "latitude": 48.8541,
+            "longitude": 2.3712
+          },
+          "attendanceMode": 1,
+          "status": 1,
+          "canonicalUrl": "https://openagenda.com/events/degustation-vins-afrique-du-sud",
+          "updatedAt": "2030-01-10T13:52:05.000Z"
+        },
+        {
+          "uid": 78902,
+          "slug": "exposition-art-contemporain",
+          "title": "Exposition d'art contemporain",
+          "description": "Jeunes artistes franciliens.",
+          "conditions": "Entrée libre",
+          "keywords": ["exposition", "art contemporain"],
+          "image": null,
+          "firstTiming": { "begin": "2030-03-01T09:00:00.000Z", "end": "2030-03-01T17:00:00.000Z" },
+          "lastTiming": { "begin": "2030-03-31T09:00:00.000Z", "end": "2030-03-31T17:00:00.000Z" },
+          "location": {
+            "uid": 72236531,
+            "name": "Galerie du Marais",
+            "address": "12 rue Vieille-du-Temple, 75004 Paris",
+            "city": "Paris",
+            "postalCode": "75004",
+            "latitude": 48.8578,
+            "longitude": 2.3601
+          },
+          "attendanceMode": 1,
+          "status": 1,
+          "canonicalUrl": null
+        },
+        {
+          "uid": 78903,
+          "slug": "concert-annule",
+          "title": "Concert annulé",
+          "description": "Ce concert n'aura pas lieu.",
+          "keywords": ["concert"],
+          "firstTiming": { "begin": "2030-04-01T19:00:00.000Z", "end": "2030-04-01T21:00:00.000Z" },
+          "lastTiming": { "begin": "2030-04-01T19:00:00.000Z", "end": "2030-04-01T21:00:00.000Z" },
+          "location": { "name": "Salle Pleyel", "latitude": 48.8770, "longitude": 2.3009 },
+          "attendanceMode": 1,
+          "status": 6
+        }
+      ]
+    },
+    {
+      "total": 5,
+      "after": null,
+      "events": [
+        {
+          "uid": 78904,
+          "slug": "webinaire-jardinage",
+          "title": "Webinaire : jardiner en ville",
+          "description": "En ligne uniquement.",
+          "keywords": ["jardin"],
+          "firstTiming": { "begin": "2030-05-01T18:00:00.000Z", "end": "2030-05-01T19:00:00.000Z" },
+          "lastTiming": { "begin": "2030-05-01T18:00:00.000Z", "end": "2030-05-01T19:00:00.000Z" },
+          "location": null,
+          "onlineAccessLink": "https://exemple.org/webinaire",
+          "attendanceMode": 2,
+          "status": 1
+        },
+        {
+          "uid": 78905,
+          "slug": "balade-sans-coordonnees",
+          "title": "Balade urbaine",
+          "description": "Lieu non géolocalisé.",
+          "keywords": ["balade"],
+          "firstTiming": { "begin": "2030-06-01T10:00:00.000Z", "end": "2030-06-01T12:00:00.000Z" },
+          "lastTiming": { "begin": "2030-06-01T10:00:00.000Z", "end": "2030-06-01T12:00:00.000Z" },
+          "location": { "name": "Place de la République", "latitude": null, "longitude": null },
+          "attendanceMode": 1,
+          "status": 1
+        }
+      ]
+    }
+  ]
+}
