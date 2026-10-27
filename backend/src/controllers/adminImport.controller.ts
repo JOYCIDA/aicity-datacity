@@ -17,6 +17,11 @@ export const lancer: RequestHandler = async (req, res) => {
   res.status(202).json({ rapport });
 };
 
+/** UC16 : dernier rapport de chaque source, avec une alerte si l'import nocturne pose problème. */
+export const derniers: RequestHandler = async (_req, res) => {
+  res.json({ sources: await importService.derniersRapports(Object.values(adaptateurs)) });
+};
+
 export const lister: RequestHandler = async (req, res) => {
   const q = listeImportsSchema.parse(req.query);
   res.json(await importService.listerRapports(q));

@@ -2,6 +2,7 @@ import type { RequestHandler } from 'express';
 import {
   decisionEntrepriseSchema,
   decisionOffreSchema,
+  journalSchema,
   listeEntreprisesSchema,
   listeOffresModerationSchema,
 } from '../schemas/admin.schema.js';
@@ -35,6 +36,11 @@ export const deciderEntreprise: RequestHandler<{ id: string }> = async (req, res
 export const listerOffres: RequestHandler = async (req, res) => {
   const q = listeOffresModerationSchema.parse(req.query);
   res.json(await moderationService.listerOffres(q));
+};
+
+export const journal: RequestHandler = async (req, res) => {
+  const q = journalSchema.parse(req.query);
+  res.json(await moderationService.journal(q));
 };
 
 export const deciderOffre: RequestHandler<{ id: string }> = async (req, res) => {

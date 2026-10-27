@@ -47,6 +47,72 @@ par le test. Si la base est injoignable, ce fichier est ignoré et les autres te
 | PATCH | `/api/admin/offres/:id/decision` (`VALIDE`, `REFUSE` + motif) | ADMIN |
 | GET | `/api/citoyen/offres` | public |
 
+## Compte citoyen, statistiques, supervision (lot L7)
+
+| Méthode | Route | Accès |
+|---|---|---|
+| GET / PUT | `/api/citoyen/preferences` `{ categories, budgetMax, langue? }` (PUT remplace tout) | CITOYEN |
+| GET / POST | `/api/citoyen/favoris` `{ offreId }` (201, ou 200 si déjà en favori) | CITOYEN |
+| DELETE | `/api/citoyen/favoris/:offreId` (204, idempotent) | CITOYEN |
+| GET | `/api/citoyen/mes-donnees` (export RGPD, en pièce jointe) | CITOYEN |
+| DELETE | `/api/citoyen/compte` `{ motDePasse }` (204 ; 403 si mot de passe faux) | CITOYEN |
+| GET | `/api/entreprise/statistiques?jours=30` | ENTREPRISE |
+| GET | `/api/admin/bornes/supervision` (dernier signal, hors ligne en tête) | ADMIN |
+| GET | `/api/admin/imports/derniers` (dernier rapport et alerte par source) | ADMIN |
+| GET | `/api/admin/journal?decision=&offreId=&entrepriseId=&du=&au=` | ADMIN |
+| POST | `/api/citoyen/bornes/signal` (signal de vie, chaque minute) | en-tête `X-Borne-Key` |
+
+**RGPD.** Supprimer le compte efface en cascade préférences, favoris, recherches et
+recommandations ; seuls restent les compteurs anonymes `StatOffreJour`. Le jeton reste
+techniquement valide jusqu'à son expiration, mais toute route qui touche au compte répond alors
+401 « Compte supprimé ».
+
+**Statistiques (RG19).** Calculées sur les seules offres de l'entreprise connectée, à partir des
+compteurs quotidiens (vues, recommandations, favoris), désormais alimentés aux trois endroits.
+Regroupements par statut, catégorie, créneau de début (heure de Paris) et tranche de budget
+(mêmes paliers que la question posée au citoyen), tous présents même à zéro.
+
+**Supervision.** Le job de chaque minute passe `HORS_LIGNE` une borne active sans signal depuis
+5 min ; un signal ou une ouverture de session la remet `ACTIVE`.
+
+## Bornes et sessions (lot L5)
+
+| Méthode | Route | Accès |
+|---|---|---|
+| GET / POST | `/api/admin/bornes` (POST renvoie la clé **une seule fois**, RG17) | ADMIN |
+| PATCH | `/api/admin/bornes/:id` (`DESACTIVEE` ferme ses sessions) | ADMIN |
+| POST | `/api/admin/bornes/:id/cle` (nouvelle clé, l'ancienne cesse de fonctionner) | ADMIN |
+| POST | `/api/citoyen/sessions` `{ langue? }` → `{ session, jeton }` | en-tête `X-Borne-Key` |
+| GET / DELETE | `/api/citoyen/sessions/:id` | jeton de session |
+
+La base ne garde que l'empreinte SHA-256 des clés. Une session expire après 60 s sans appel, et
+au plus tard 10 min après son ouverture (RG1) : chaque appel portant le jeton repousse l'échéance
+(en-tête `X-Session-Expire-Le`), y compris sur les routes publiques. Une session échue est
+supprimée par l'appel qui la découvre (401) ou par la purge, chaque minute ; recherches et
+recommandations partent avec elle. En mode borne, la recommandation utilise la position de la
+borne (RG2).
+
+**Contrat pour le frontend** : la collection Bruno [`docs/api-aicity`](../docs/api-aicity/README.md)
+couvre toutes les routes et se joue de bout en bout (`npx @usebruno/cli run --env local -r`).
+
+## Recommandation (lot L4)
+
+| Méthode | Route | Accès |
+|---|---|---|
+| GET | `/api/citoyen/questions` | public |
+| POST | `/api/citoyen/recommandations` `{ latitude, longitude, tempsLibreMinutes, budgetMax?, categories?, rayonM?, langue? }` | CITOYEN (mode mobile) |
+| POST | `/api/citoyen/interpretations` `{ texte }` (texte jamais enregistré, RG3) | public |
+| GET | `/api/citoyen/offres?latitude=&longitude=&rayonM=&categorie=` (carte) | public |
+| GET | `/api/citoyen/offres/:id` (fiche, compte une vue) | public |
+
+Déroulé : préfiltre SQL (boîte englobante du rayon doublé, offres visibles) → filtres purs
+(`filtre.service.ts` : statut, catégories, budget, rayon, créneau) → si moins de 3 offres, rayon
+doublé une fois (RG12, `elargie: true`) → notation sur 9 et tri (`scoring.service.ts`, RG13) →
+5 meilleures, enregistrées avec la recherche (sans la position).
+
+Le barème est dans `src/config/scoring.ts`. **Il est provisoire** : la section 7.2 de l'analyse
+n'était pas disponible au lot L4 ; seul ce fichier est à modifier pour appliquer le barème officiel.
+
 ## Import des données publiques (lot L3)
 
 Chaque nuit à 3 h (`CRON_IMPORT`), les sources configurées sont importées l'une après l'autre ;

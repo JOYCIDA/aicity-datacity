@@ -175,6 +175,35 @@ export async function expirerOffres(maintenant = new Date()) {
   return count;
 }
 
+/** Sans import réussi depuis ce délai, une source configurée est signalée (import nocturne). */
+export const RETARD_MAX_MS = 26 * 60 * 60 * 1000;
+
+/**
+ * Supervision : pour chaque source, le dernier rapport, le dernier import réussi et, le cas
+ * échéant, une alerte (non configurée, dernier import en échec, aucun succès récent).
+ */
+export async function derniersRapports(adapters: SourceAdapter[], maintenant = new Date()) {
+  return Promise.all(
+    adapters.map(async (adapter) => {
+      const [dernier, dernierSucces] = await prisma.$transaction([
+        prisma.importRapport.findFirst({ where: { source: adapter.source }, orderBy: { debutLe: 'desc' } }),
+        prisma.importRapport.findFirst({
+          where: { source: adapter.source, statut: 'TERMINE' },
+          orderBy: { debutLe: 'desc' },
+        }),
+      ]);
+      const manque = adapter.configurationManquante();
+      let alerte: string | null = null;
+      if (manque) alerte = `Non configurée : ${manque}`;
+      else if (dernier?.statut === 'ECHEC') alerte = 'Dernier import en échec';
+      else if (!dernierSucces || maintenant.getTime() - dernierSucces.debutLe.getTime() > RETARD_MAX_MS) {
+        alerte = 'Aucun import réussi depuis plus de 26 h';
+      }
+      return { code: adapter.code, source: adapter.source, configuree: !manque, alerte, dernier, dernierSucces };
+    }),
+  );
+}
+
 export async function listerRapports(q: { source?: ImportRapport['source']; page: number; taille: number }) {
   const where = q.source ? { source: q.source } : {};
   const [rapports, total] = await prisma.$transaction([

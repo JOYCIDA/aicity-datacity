@@ -21,6 +21,6 @@ export async function preparerBase() {
     stdio: 'ignore',
   });
   await prismaTest.$executeRawUnsafe(
-    'TRUNCATE "ImportRapport", "JournalModeration", "Offre", "Entreprise", "Utilisateur", "Categorie" CASCADE',
+    'TRUNCATE "ImportRapport", "JournalModeration", "Offre", "Entreprise", "Utilisateur", "Categorie", "Borne" CASCADE',
   );
 }

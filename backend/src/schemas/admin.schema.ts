@@ -31,6 +31,18 @@ export const decisionOffreSchema = z
   })
   .refine(motifSiDefavorable, messageMotif);
 
+/** Journal des décisions, du plus récent au plus ancien, filtrable. */
+export const journalSchema = paginationSchema
+  .extend({
+    decision: z.enum(['VALIDE', 'REFUSE', 'SUSPENDU', 'REACTIVE']).optional(),
+    offreId: z.uuid().optional(),
+    entrepriseId: z.uuid().optional(),
+    du: z.coerce.date().optional(),
+    au: z.coerce.date().optional(),
+  })
+  .refine((q) => !q.du || !q.au || q.du <= q.au, { message: '`du` doit précéder `au`', path: ['au'] });
+
+export type JournalDto = z.infer<typeof journalSchema>;
 export type ListeEntreprisesDto = z.infer<typeof listeEntreprisesSchema>;
 export type DecisionEntrepriseDto = z.infer<typeof decisionEntrepriseSchema>;
 export type ListeOffresModerationDto = z.infer<typeof listeOffresModerationSchema>;
@@ -45,3 +57,20 @@ export const listeImportsSchema = paginationSchema.extend({
 });
 
 export type ListeImportsDto = z.infer<typeof listeImportsSchema>;
+
+const champsBorne = {
+  nom: z.string().trim().min(2).max(120),
+  emplacement: z.string().trim().min(2).max(250),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+};
+
+export const creerBorneSchema = z.object(champsBorne);
+
+export const modifierBorneSchema = z
+  .object({ ...champsBorne, statut: z.enum(['ACTIVE', 'HORS_LIGNE', 'DESACTIVEE']) })
+  .partial()
+  .refine((o) => Object.keys(o).length > 0, { message: 'Aucun champ à modifier' });
+
+export type CreerBorneDto = z.infer<typeof creerBorneSchema>;
+export type ModifierBorneDto = z.infer<typeof modifierBorneSchema>;

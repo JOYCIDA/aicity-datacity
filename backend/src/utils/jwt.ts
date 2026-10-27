@@ -26,3 +26,19 @@ export function verifierToken(token: string): JwtPayload | null {
     return null;
   }
 }
+
+/** Jeton court d'une session de borne : il ne porte que l'identifiant de la session. */
+export function signerJetonSession(sessionId: string, dureeSecondes: number): string {
+  return jwt.sign({ typ: 'session' }, env.JWT_SECRET, { subject: sessionId, expiresIn: dureeSecondes });
+}
+
+/** Identifiant de session, ou `null` si le jeton n'est pas un jeton de session valide. */
+export function verifierJetonSession(token: string): string | null {
+  try {
+    const decoded = jwt.verify(token, env.JWT_SECRET, { algorithms: ['HS256'] });
+    if (typeof decoded === 'string' || decoded['typ'] !== 'session') return null;
+    return typeof decoded.sub === 'string' ? decoded.sub : null;
+  } catch {
+    return null;
+  }
+}
