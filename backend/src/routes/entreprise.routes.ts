@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import * as offres from '../controllers/entrepriseOffre.controller.js';
 import * as profil from '../controllers/entrepriseProfil.controller.js';
+import * as stats from '../controllers/stats.controller.js';
 import * as upload from '../controllers/upload.controller.js';
 import { exigerRole, verifierJwt } from '../middlewares/auth.middleware.js';
 import { televerserJustificatif } from '../middlewares/upload.middleware.js';
@@ -19,3 +20,6 @@ entrepriseRouter.post('/offres', offres.creer);
 entrepriseRouter.get('/offres/:id', offres.detail);
 entrepriseRouter.patch('/offres/:id', offres.modifier);
 entrepriseRouter.patch('/offres/:id/statut', offres.changerStatut);
+
+// UC11 : comptages agrégés sur ses seules offres, sans donnée individuelle (RG19).
+entrepriseRouter.get('/statistiques', stats.statistiques);

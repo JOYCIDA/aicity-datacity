@@ -1,8 +1,9 @@
-import type { StatutCompte } from '../generated/prisma/client.js';
+import type { Prisma, StatutCompte } from '../generated/prisma/client.js';
 import { prisma } from '../prisma/client.js';
 import type {
   DecisionEntrepriseDto,
   DecisionOffreDto,
+  JournalDto,
   ListeEntreprisesDto,
   ListeOffresModerationDto,
 } from '../schemas/admin.schema.js';
@@ -90,6 +91,36 @@ export async function listerOffres(q: ListeOffresModerationDto) {
     prisma.offre.count({ where }),
   ]);
   return page(offres.map(offreDto), total, q);
+}
+
+/** Journal de modération : qui a décidé quoi, quand, sur quelle offre ou entreprise. */
+export async function journal(q: JournalDto) {
+  const where: Prisma.JournalModerationWhereInput = {
+    ...(q.decision && { decision: q.decision }),
+    ...(q.offreId && { offreId: q.offreId }),
+    ...(q.entrepriseId && { entrepriseId: q.entrepriseId }),
+    ...((q.du || q.au) && { creeLe: { ...(q.du && { gte: q.du }), ...(q.au && { lte: q.au }) } }),
+  };
+  const [lignes, total] = await prisma.$transaction([
+    prisma.journalModeration.findMany({
+      where,
+      select: {
+        id: true,
+        decision: true,
+        motif: true,
+        creeLe: true,
+        admin: { select: { id: true, email: true } },
+        // Supprimées depuis, offre et entreprise valent null ; la décision reste au journal.
+        offre: { select: { id: true, titre: true } },
+        entreprise: { select: { id: true, nom: true } },
+      },
+      orderBy: { creeLe: 'desc' },
+      skip: (q.page - 1) * q.taille,
+      take: q.taille,
+    }),
+    prisma.journalModeration.count({ where }),
+  ]);
+  return page(lignes, total, q);
 }
 
 /** UC17/UC18 : valide ou refuse une offre EN_ATTENTE (409 si elle a déjà été traitée). */

@@ -1,5 +1,6 @@
 import type { Prisma, StatutOffre } from '../generated/prisma/client.js';
 import { prisma } from '../prisma/client.js';
+import type { CarteDto } from '../schemas/citoyen.schema.js';
 import type {
   CreerOffreDto,
   ListeOffresEntrepriseDto,
@@ -9,7 +10,9 @@ import type {
 } from '../schemas/offre.schema.js';
 import { offreDto, offrePubliqueDto, page, selectionOffre } from '../utils/dto.js';
 import { conflict, forbidden, invalid, notFound } from '../utils/errors.js';
+import { boiteEnglobante } from '../utils/geo.js';
 import { entrepriseActive, entrepriseDe } from './entreprise.service.js';
+import { incrementer } from './stats.service.js';
 
 // RG6 : modifier l'un de ces champs sur une offre déjà validée impose une nouvelle modération.
 const CHAMPS_SENSIBLES = ['lieu', 'adresse', 'latitude', 'longitude', 'prix', 'gratuit', 'debut', 'fin'] as const;
@@ -171,12 +174,29 @@ export async function changerStatut(utilisateurId: string, offreId: string, dto:
 }
 
 /** Offres visibles du public : validées, non terminées, d'une entreprise toujours active. */
-export async function listerPubliques(q: PaginationDto) {
-  const maintenant = new Date();
-  const where: Prisma.OffreWhereInput = {
+export function whereVisible(maintenant = new Date()): Prisma.OffreWhereInput {
+  return {
     statut: 'VALIDE',
-    OR: [{ fin: null }, { fin: { gte: maintenant } }],
-    AND: [{ OR: [{ entrepriseId: null }, { entreprise: { statut: 'ACTIF' } }] }],
+    AND: [
+      { OR: [{ fin: null }, { fin: { gte: maintenant } }] },
+      { OR: [{ entrepriseId: null }, { entreprise: { statut: 'ACTIF' } }] },
+    ],
+  };
+}
+
+/** Carte : offres visibles, éventuellement dans une zone (rectangle autour du centre) et une catégorie. */
+export async function listerPubliques(q: PaginationDto & Partial<CarteDto>) {
+  const zone =
+    q.latitude !== undefined && q.longitude !== undefined
+      ? boiteEnglobante({ latitude: q.latitude, longitude: q.longitude }, q.rayonM ?? 2000)
+      : null;
+  const where: Prisma.OffreWhereInput = {
+    ...whereVisible(),
+    ...(zone && {
+      latitude: { gte: zone.latMin, lte: zone.latMax },
+      longitude: { gte: zone.lonMin, lte: zone.lonMax },
+    }),
+    ...(q.categorie && { categorie: { code: q.categorie } }),
   };
   const [offres, total] = await prisma.$transaction([
     prisma.offre.findMany({
@@ -189,4 +209,21 @@ export async function listerPubliques(q: PaginationDto) {
     prisma.offre.count({ where }),
   ]);
   return page(offres.map(offrePubliqueDto), total, q);
+}
+
+/** Fiche publique (UC8) : 404 si l'offre n'est pas visible ; chaque lecture compte une vue. */
+export async function detailPublique(offreId: string) {
+  const maintenant = new Date();
+  const visible = await prisma.offre.findFirst({
+    where: { id: offreId, ...whereVisible(maintenant) },
+    select: { id: true },
+  });
+  if (!visible) throw notFound('Offre introuvable');
+
+  // RG19 : compteur anonyme par jour, en plus du total porté par l'offre.
+  const [offre] = await prisma.$transaction([
+    prisma.offre.update({ where: { id: offreId }, data: { vues: { increment: 1 } }, select: selectionOffre }),
+    incrementer(offreId, 'vues', maintenant),
+  ]);
+  return offrePubliqueDto(offre);
 }

@@ -3,13 +3,15 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from '../src/prisma/client.js';
 
+// dureeDefautMinutes : durée retenue quand la source ne donne qu'une période (exposition sur
+// plusieurs semaines…). C'est le minimum d'une visite, pour qu'elle tienne dans un temps libre court.
 const categories = [
-  { code: 'culture', libelleFr: 'Culture', libelleEn: 'Culture', picto: 'museum', dureeDefautMinutes: 90 },
-  { code: 'gastronomie', libelleFr: 'Gastronomie', libelleEn: 'Food & drink', picto: 'restaurant', dureeDefautMinutes: 75 },
-  { code: 'nature', libelleFr: 'Nature', libelleEn: 'Nature', picto: 'park', dureeDefautMinutes: 60 },
-  { code: 'sport', libelleFr: 'Sport', libelleEn: 'Sport', picto: 'sport', dureeDefautMinutes: 60 },
-  { code: 'loisirs', libelleFr: 'Loisirs', libelleEn: 'Leisure', picto: 'leisure', dureeDefautMinutes: 90 },
-  { code: 'shopping', libelleFr: 'Shopping', libelleEn: 'Shopping', picto: 'shopping', dureeDefautMinutes: 45 },
+  { code: 'culture', libelleFr: 'Culture', libelleEn: 'Culture', picto: 'museum', dureeDefautMinutes: 45 },
+  { code: 'gastronomie', libelleFr: 'Gastronomie', libelleEn: 'Food & drink', picto: 'restaurant', dureeDefautMinutes: 45 },
+  { code: 'nature', libelleFr: 'Nature', libelleEn: 'Nature', picto: 'park', dureeDefautMinutes: 30 },
+  { code: 'sport', libelleFr: 'Sport', libelleEn: 'Sport', picto: 'sport', dureeDefautMinutes: 45 },
+  { code: 'loisirs', libelleFr: 'Loisirs', libelleEn: 'Leisure', picto: 'leisure', dureeDefautMinutes: 45 },
+  { code: 'shopping', libelleFr: 'Shopping', libelleEn: 'Shopping', picto: 'shopping', dureeDefautMinutes: 30 },
 ];
 
 async function main() {

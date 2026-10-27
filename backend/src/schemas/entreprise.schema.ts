@@ -9,4 +9,9 @@ export const modifierProfilSchema = z
   .partial()
   .refine((o) => Object.keys(o).length > 0, { message: 'Aucun champ à modifier' });
 
+/** Période des compteurs : les `jours` derniers jours, aujourd'hui compris. */
+export const statistiquesSchema = z.object({
+  jours: z.coerce.number().int().min(1).max(365).default(30),
+});
+
 export type ModifierProfilDto = z.infer<typeof modifierProfilSchema>;
