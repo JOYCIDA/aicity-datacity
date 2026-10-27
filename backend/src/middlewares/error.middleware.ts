@@ -9,7 +9,7 @@ export const notFoundHandler: RequestHandler = (req, _res, next) => {
 
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof ZodError) {
-    res.status(400).json({
+    res.status(422).json({
       erreur: { code: 'VALIDATION', message: 'Données invalides', details: err.issues },
     });
     return;

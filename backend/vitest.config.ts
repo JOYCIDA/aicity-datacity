@@ -7,6 +7,7 @@ export default defineConfig({
     env: {
       NODE_ENV: 'test',
       DATABASE_URL: 'postgresql://aicity:aicity@localhost:5432/aicity',
+      JWT_SECRET: 'secret-de-test-uniquement-0123456789abcdef0123456789',
     },
   },
 });

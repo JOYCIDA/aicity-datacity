@@ -14,6 +14,8 @@ export const badRequest = (message: string, details?: unknown) =>
   new AppError(400, 'REQUETE_INVALIDE', message, details);
 export const unauthorized = (message = 'Authentification requise') =>
   new AppError(401, 'NON_AUTHENTIFIE', message);
+export const invalid = (message: string, details?: unknown) =>
+  new AppError(422, 'VALIDATION', message, details);
 export const forbidden = (message = 'Accès refusé') => new AppError(403, 'INTERDIT', message);
 export const notFound = (message = 'Ressource introuvable') =>
   new AppError(404, 'INTROUVABLE', message);
