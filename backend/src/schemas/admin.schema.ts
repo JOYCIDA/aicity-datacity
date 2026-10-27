@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CODES_SOURCES } from '../adapters/source.adapter.js';
 import { paginationSchema } from './offre.schema.js';
 
 const motif = z.string().trim().min(5, 'Le motif doit contenir au moins 5 caractères').max(1000);
@@ -34,3 +35,13 @@ export type ListeEntreprisesDto = z.infer<typeof listeEntreprisesSchema>;
 export type DecisionEntrepriseDto = z.infer<typeof decisionEntrepriseSchema>;
 export type ListeOffresModerationDto = z.infer<typeof listeOffresModerationSchema>;
 export type DecisionOffreDto = z.infer<typeof decisionOffreSchema>;
+
+export const sourceImportSchema = z.object({
+  source: z.enum(CODES_SOURCES),
+});
+
+export const listeImportsSchema = paginationSchema.extend({
+  source: z.enum(['OPENAGENDA', 'DATA_GOUV', 'PARIS_OPEN_DATA']).optional(),
+});
+
+export type ListeImportsDto = z.infer<typeof listeImportsSchema>;

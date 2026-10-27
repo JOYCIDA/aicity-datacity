@@ -1,0 +1,63 @@
+import { Activite } from '../types/activite';
+
+const SOURCE = 'exemple (donnée factice)';
+const DATE = '2026-10-20';
+
+export const activitesExemple: Activite[] = [
+  {
+    id: 'a1',
+    titre: 'Nuit Blanche — Lumières',
+    categorie: 'expos',
+    lieu: 'Hôtel de Ville',
+    lat: 48.8566,
+    lng: 2.3522,
+    horaires: '20h – 23h30',
+    prix: 0,
+    distance_m: 220,
+    source: SOURCE,
+    date_maj: DATE,
+    raisons: ['Gratuit', 'À 220 m de toi', 'Correspond à ton intérêt : expositions'],
+  },
+  {
+    id: 'a2',
+    titre: 'Jazz sous les étoiles',
+    categorie: 'musique',
+    lieu: 'Parc des Buttes-Chaumont',
+    lat: 48.8809,
+    lng: 2.3828,
+    horaires: '19h – 21h',
+    prix: 5,
+    distance_m: 1200,
+    source: SOURCE,
+    date_maj: DATE,
+    raisons: ['5 €, dans ton budget', 'Dure 2 h', 'Correspond à ton intérêt : musique'],
+  },
+  {
+    id: 'a3',
+    titre: 'Street Food Festival',
+    categorie: 'food',
+    lieu: 'La Villette',
+    lat: 48.8938,
+    lng: 2.3906,
+    horaires: '12h – 22h',
+    prix: 0,
+    distance_m: 2800,
+    source: SOURCE,
+    date_maj: DATE,
+    raisons: ['Entrée libre', 'Ouvert toute la journée', 'Correspond à ton intérêt : food'],
+  },
+  {
+    id: 'a4',
+    titre: 'Vide-Grenier de Belleville',
+    categorie: 'autre',
+    lieu: 'Rue de Belleville',
+    lat: 48.8722,
+    lng: 2.3846,
+    horaires: '8h – 17h',
+    prix: 0,
+    distance_m: 900,
+    source: SOURCE,
+    date_maj: DATE,
+    raisons: ['Gratuit', 'À 900 m de toi'],
+  },
+];

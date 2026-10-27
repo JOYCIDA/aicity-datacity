@@ -1,33 +1,20 @@
 // Séquence 06 jouée de bout en bout sur une vraie base PostgreSQL (transactions, contraintes).
-// Base dédiée : TEST_DATABASE_URL (aicity_test par défaut), vidée avant le parcours.
+// Base dédiée (voir test/helpers/base-reelle.ts), vidée avant le parcours.
 // Le fichier est ignoré si la base n'est pas joignable.
-import { execSync } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import request from 'supertest';
 import bcrypt from 'bcryptjs';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '../../src/generated/prisma/client.js';
+import { baseDisponible, preparerBase, prismaTest as prisma } from '../helpers/base-reelle.js';
 
-const config = vi.hoisted(() => {
-  const url = process.env.TEST_DATABASE_URL ?? 'postgresql://aicity:aicity@localhost:5432/aicity_test';
-  process.env.DATABASE_URL = url;
-  return { url };
-});
 const dossierUploads = mkdtempSync(path.join(tmpdir(), 'aicity-uploads-'));
 process.env.UPLOAD_DIR = dossierUploads;
 
-const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: config.url }) });
 vi.mock('../../src/prisma/client.js', () => ({ prisma }));
 
 const { createApp } = await import('../../src/app.js');
-
-const baseDisponible = await prisma.$queryRaw`SELECT 1`.then(
-  () => true,
-  () => false,
-);
 
 const app = createApp();
 const PDF = Buffer.from('%PDF-1.4\n% justificatif de test\n');
@@ -70,10 +57,7 @@ describe.skipIf(!baseDisponible)('parcours entreprise → modération → offre 
     (await request(app).get('/api/citoyen/offres')).body.elements.map((o: { id: string }) => o.id);
 
   beforeAll(async () => {
-    execSync('npx prisma migrate deploy', { env: { ...process.env, DATABASE_URL: config.url }, stdio: 'ignore' });
-    await prisma.$executeRawUnsafe(
-      'TRUNCATE "JournalModeration", "Offre", "Entreprise", "Utilisateur", "Categorie" CASCADE',
-    );
+    await preparerBase();
     await prisma.categorie.create({
       data: { code: 'gastronomie', libelleFr: 'Gastronomie', libelleEn: 'Food & drink' },
     });
