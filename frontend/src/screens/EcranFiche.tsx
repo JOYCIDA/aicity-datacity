@@ -6,9 +6,10 @@ import { formaterPrix, formaterDistance, LIBELLES_CATEGORIE } from '../utils/for
 type Props = {
   activite: Activite;
   onRetour: () => void;
+  onSignaler: () => void;
 };
 
-export default function EcranFiche({ activite, onRetour }: Props) {
+export default function EcranFiche({ activite, onRetour, onSignaler }: Props) {
   return (
     <ScrollView contentContainerStyle={styles.page}>
       <Pressable
@@ -49,6 +50,15 @@ export default function EcranFiche({ activite, onRetour }: Props) {
           </Text>
         ))}
       </View>
+
+      <Pressable
+        onPress={onSignaler}
+        accessibilityRole="button"
+        accessibilityLabel="Signaler une information erronée"
+        style={styles.signaler}
+      >
+        <Text style={styles.signalerTexte}>Signaler une information erronée</Text>
+      </Pressable>
 
       <Text style={styles.source}>
         Source : {activite.source} · Mis à jour le {activite.date_maj}
@@ -95,6 +105,16 @@ const styles = StyleSheet.create({
   },
   pourquoiTitre: { fontFamily: polices.titre, color: couleurs.texte, fontSize: 22, marginBottom: 8 },
   raison: { fontFamily: polices.texte, color: couleurs.texte, fontSize: tailles.texte, marginTop: 4 },
+  signaler: {
+    minHeight: tailles.zoneMin + 8,
+    borderWidth: 2,
+    borderColor: couleurs.primaire,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  signalerTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: 18 },
   source: {
     fontFamily: polices.texte,
     color: couleurs.texteSecondaire,

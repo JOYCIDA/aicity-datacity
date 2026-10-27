@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 8,
   },
-  champ: {
+    champ: {
     minHeight: 96,
     backgroundColor: couleurs.carte,
     borderWidth: 2,
@@ -152,19 +152,28 @@ const styles = StyleSheet.create({
   aide: {
     fontFamily: polices.texte,
     color: couleurs.texteSecondaire,
-    fontSize: tailles.texte,
+    fontSize: tailles.petit,
     marginTop: 8,
   },
-  erreur: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
-  erreurIcone: { color: couleurs.erreur, fontSize: 20 },
-  erreurTexte: { fontFamily: polices.texteMoyen, color: couleurs.erreur, fontSize: tailles.texte },
-  bouton: {
-    minHeight: 60,
-    borderRadius: 30,
-    backgroundColor: couleurs.primaire,
-    justifyContent: 'center',
+  erreur: {
+    flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 12,
+  },
+  erreurIcone: { color: couleurs.erreur, fontSize: 20, marginRight: 8 },
+  erreurTexte: {
+    flex: 1,
+    fontFamily: polices.texteMoyen,
+    color: couleurs.erreur,
+    fontSize: tailles.texte,
+  },
+  bouton: {
+    minHeight: tailles.zoneMin + 8,
+    backgroundColor: couleurs.primaire,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 24,
   },
-  boutonTexte: { fontFamily: polices.titre, color: couleurs.fond, fontSize: 20 },
+  boutonTexte: { fontFamily: polices.titre, color: couleurs.fond, fontSize: 18 },
 });
