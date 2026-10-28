@@ -2,7 +2,7 @@ import type { Request, RequestHandler, Response } from 'express';
 import type { Role } from '../generated/prisma/client.js';
 import * as sessionService from '../services/session.service.js';
 import { forbidden, unauthorized } from '../utils/errors.js';
-import { verifierJetonSession, verifierToken } from '../utils/jwt.js';
+import { verifierJetonAnonyme, verifierJetonSession, verifierToken } from '../utils/jwt.js';
 
 const jetonBearer = (req: Request) => {
   const entete = req.headers.authorization;
@@ -62,11 +62,18 @@ export const exigerSession: RequestHandler = async (req, res, next) => {
   next();
 };
 
-/** Mode mobile (jeton CITOYEN) ou mode borne (jeton de session) ; tout autre rôle : 403. */
+/**
+ * Mode mobile avec compte (jeton CITOYEN), mobile sans compte (session anonyme) ou mode borne
+ * (jeton de session) ; tout autre rôle : 403.
+ */
 export const citoyenOuSession: RequestHandler = async (req, res, next) => {
   const jeton = jetonBearer(req);
   if (!jeton) throw unauthorized();
   if (await ouvrirSession(req, res, jeton)) return next();
+  if (verifierJetonAnonyme(jeton)) {
+    req.anonyme = true;
+    return next();
+  }
 
   const payload = verifierToken(jeton);
   if (!payload) throw unauthorized('Jeton invalide ou expiré');

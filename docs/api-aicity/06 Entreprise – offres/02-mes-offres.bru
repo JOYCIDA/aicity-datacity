@@ -1,0 +1,25 @@
+meta {
+  name: Mes offres
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/entreprise/offres
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonEntreprise}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  Filtre facultatif `statut`, pagination `page` / `taille`.
+}

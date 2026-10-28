@@ -1,0 +1,25 @@
+meta {
+  name: Questions (borne)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/citoyen/questions
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonSession}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  Route publique : envoyer le jeton de session fait compter l’appel comme une activité (RG1). Les questions ont `libelle.FR` / `libelle.EN` ; la question du budget propose aussi `saisieLibre` (montant libre, au centime).
+}

@@ -1,0 +1,25 @@
+meta {
+  name: Compte supprimé – 401
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/citoyen/preferences
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonCitoyen}}
+}
+
+tests {
+  test("statut 401", function () {
+    expect(res.status).to.equal(401);
+  });
+}
+
+docs {
+  L’ancien jeton n’ouvre plus rien : `401` « Compte supprimé ».
+}

@@ -1,0 +1,30 @@
+meta {
+  name: Mes données (RGPD)
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/citoyen/mes-donnees
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonCitoyen}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+
+  test("export complet, sans mot de passe", function () {
+    expect(res.body).to.include.all.keys("exporteLe", "compte", "preferences", "favoris", "recherches");
+    expect(JSON.stringify(res.body)).to.not.match(/motDePasse/);
+  });
+}
+
+docs {
+  Droit d’accès (UC19) : compte, préférences, favoris, recherches et leurs recommandations. Réponse en pièce jointe (`aicity-mes-donnees.json`) : la proposer au téléchargement. La position et les phrases saisies ne sont jamais enregistrées (`nonConserve`).
+}

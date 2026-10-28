@@ -1,0 +1,27 @@
+meta {
+  name: Modifier mon profil
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/entreprise/profil
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonEntreprise}}
+}
+
+body:json {
+  {
+    "typeActivite": "Fromagerie, dégustations"
+  }
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}

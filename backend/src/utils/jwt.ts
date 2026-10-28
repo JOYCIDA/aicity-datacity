@@ -42,3 +42,20 @@ export function verifierJetonSession(token: string): string | null {
     return null;
   }
 }
+
+/**
+ * Jeton d'une session anonyme de mobile : aucun compte, aucune ligne en base. Il ne sert qu'à
+ * prouver que l'appelant est passé par `POST /citoyen/sessions/anonyme` (et son limiteur).
+ */
+export function signerJetonAnonyme(dureeSecondes: number): string {
+  return jwt.sign({ typ: 'anonyme' }, env.JWT_SECRET, { expiresIn: dureeSecondes });
+}
+
+export function verifierJetonAnonyme(token: string): boolean {
+  try {
+    const decoded = jwt.verify(token, env.JWT_SECRET, { algorithms: ['HS256'] });
+    return typeof decoded !== 'string' && decoded['typ'] === 'anonyme';
+  } catch {
+    return false;
+  }
+}

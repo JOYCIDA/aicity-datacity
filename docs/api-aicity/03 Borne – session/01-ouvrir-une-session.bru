@@ -1,0 +1,40 @@
+meta {
+  name: Ouvrir une session
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/citoyen/sessions
+  body: json
+  auth: none
+}
+
+headers {
+  X-Borne-Key: {{cleBorne}}
+}
+
+body:json {
+  {
+    "langue": "FR"
+  }
+}
+
+script:post-response {
+  bru.setVar("jetonSession", res.body.jeton);
+  bru.setVar("sessionId", res.body.session.id);
+}
+
+tests {
+  test("statut 201", function () {
+    expect(res.status).to.equal(201);
+  });
+}
+
+docs {
+  Appelé par la borne quand un usager commence. En-tête **`X-Borne-Key`** obligatoire : `401` si absent ou faux, `403` si la borne est désactivée.
+
+  Réponse : `{ session: { id, langue, debutLe, expireLe }, jeton, borne: { nom, emplacement } }`. Le `jeton` s’utilise ensuite en `Authorization: Bearer`.
+
+  **RG1** : la session expire après **60 s sans appel**, et au plus tard **10 min** après son ouverture. Chaque appel avec le jeton repousse l’échéance, renvoyée dans l’en-tête `X-Session-Expire-Le`. Une session expirée répond `401` (« Session expirée ») : la borne revient à l’écran d’accueil.
+}

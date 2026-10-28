@@ -1,0 +1,31 @@
+meta {
+  name: Modifier mon offre
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/entreprise/offres/{{idOffre}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonEntreprise}}
+}
+
+body:json {
+  {
+    "titre": "Dégustation de fromages affinés (nouvelle sélection)"
+  }
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  RG6 : changer le lieu, l’adresse, les coordonnées, le prix, `gratuit` ou les dates d’une offre `VALIDE` (ou `EN_PAUSE`) la remet `EN_ATTENTE`. Le titre ou la description, non.
+}

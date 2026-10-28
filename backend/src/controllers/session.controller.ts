@@ -15,6 +15,13 @@ export const ouvrir: RequestHandler = async (req, res) => {
   });
 };
 
+/** Mobile sans compte : jeton à présenter ensuite sur les routes citoyen (recommandations, signalement). */
+export const ouvrirAnonyme: RequestHandler = (req, res) => {
+  const { langue } = ouvrirSessionSchema.parse(req.body ?? {});
+  const { jeton, expireLe } = sessionService.ouvrirAnonyme();
+  res.status(201).json({ jeton, expireLe, langue });
+};
+
 /** Signal de vie (chaque minute) : `exigerBorne` a déjà mis à jour `dernierPing`. */
 export const signal: RequestHandler = (_req, res) => {
   res.status(204).end();

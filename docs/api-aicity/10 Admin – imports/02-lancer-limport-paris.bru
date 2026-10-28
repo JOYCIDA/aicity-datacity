@@ -1,0 +1,25 @@
+meta {
+  name: Lancer l’import Paris
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/admin/imports/parisopendata/lancer
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+tests {
+  test("202 lancé, ou 409 déjà en cours", function () {
+    expect([202, 409]).to.include(res.status);
+  });
+}
+
+docs {
+  Sources : `parisopendata`, `openagenda`, `datagouv`. Répond `202` avec le rapport `EN_COURS` ; le suivre via « Rapports d’import ». `409` si un import de la même source tourne déjà, ou si la source n’est pas configurée.
+}

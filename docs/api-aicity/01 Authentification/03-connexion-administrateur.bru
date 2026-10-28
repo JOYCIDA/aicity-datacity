@@ -1,0 +1,32 @@
+meta {
+  name: Connexion administrateur
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/auth/connexion
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{adminEmail}}",
+    "motDePasse": "{{adminMotDePasse}}"
+  }
+}
+
+script:post-response {
+  bru.setVar("jetonAdmin", res.body.token);
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  Compte créé par `npm run seed` à partir de `ADMIN_EMAIL` / `ADMIN_MOT_DE_PASSE` (à reporter dans l’environnement Bruno). Même `401` générique pour un e-mail inconnu ou un mauvais mot de passe.
+}

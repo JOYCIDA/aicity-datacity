@@ -1,0 +1,25 @@
+meta {
+  name: Rapports d’import
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/imports
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  Filtre facultatif `source` : `PARIS_OPEN_DATA`, `OPENAGENDA`, `DATA_GOUV`.
+}

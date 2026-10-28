@@ -1,0 +1,35 @@
+meta {
+  name: Ajouter un favori
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/citoyen/favoris
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonCitoyen}}
+}
+
+body:json {
+  {
+    "offreId": "{{idOffre}}"
+  }
+}
+
+tests {
+  test("statut 201", function () {
+    expect(res.status).to.equal(201);
+  });
+
+  test("l’offre est renvoyée", function () {
+    expect(res.body.favori.offre.id).to.equal(bru.getVar("idOffre"));
+  });
+}
+
+docs {
+  `201` au premier ajout, `200` si l’offre était déjà en favori (le bouton peut être pressé deux fois sans erreur). `404` si l’offre n’est pas visible du public.
+}

@@ -1,0 +1,17 @@
+meta {
+  name: Questions
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/citoyen/questions
+  body: none
+  auth: none
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}

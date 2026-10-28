@@ -1,0 +1,35 @@
+meta {
+  name: Recommandations (borne)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/citoyen/recommandations
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonSession}}
+}
+
+body:json {
+  {
+    "tempsLibreMinutes": 90,
+    "budgetMax": null,
+    "categories": []
+  }
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  **RG2 : la position est celle de la borne** ; inutile (et ignoré) d’en envoyer une. Sans `langue`, celle de la session.
+
+  Réponse : `{ rechercheId, elargie, rayonM, resultats: [{ rang, score, scoreMax, explication, distanceM, trajetMinutes, offre }] }` — 5 résultats au plus, triés. `elargie: true` signifie que le rayon a été doublé faute de 3 résultats (RG12).
+}

@@ -3,6 +3,7 @@ import * as compte from '../controllers/compteCitoyen.controller.js';
 import * as offresPubliques from '../controllers/offrePublique.controller.js';
 import * as recommandation from '../controllers/recommandation.controller.js';
 import * as session from '../controllers/session.controller.js';
+import * as signalement from '../controllers/signalement.controller.js';
 import {
   citoyenOuSession,
   exigerRole,
@@ -11,6 +12,7 @@ import {
   verifierJwt,
 } from '../middlewares/auth.middleware.js';
 import { exigerBorne } from '../middlewares/borne.middleware.js';
+import { limiter } from '../middlewares/rateLimit.middleware.js';
 
 export const citoyenRouter = Router();
 
@@ -23,6 +25,12 @@ citoyenRouter.post('/interpretations', sessionSiPresente, recommandation.interpr
 
 // Mode mobile (jeton CITOYEN) ou mode borne (jeton de session, position de la borne).
 citoyenRouter.post('/recommandations', citoyenOuSession, recommandation.recommander);
+
+// Mobile sans compte : session anonyme, sans rien stocker (limitée par adresse IP).
+citoyenRouter.post('/sessions/anonyme', limiter(30, 15), session.ouvrirAnonyme);
+
+// Signalement d'un problème sur une offre : compte, borne ou session anonyme ; sans identité.
+citoyenRouter.post('/signalement', limiter(20, 60), citoyenOuSession, signalement.signaler);
 
 // Sessions de borne (UC1) : ouverture avec la clé de la borne, puis jeton de session.
 citoyenRouter.post('/sessions', exigerBorne, session.ouvrir);

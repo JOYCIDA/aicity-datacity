@@ -1,0 +1,27 @@
+meta {
+  name: Réactiver
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/entreprise/offres/{{idOffre}}/statut
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonEntreprise}}
+}
+
+body:json {
+  {
+    "statut": "VALIDE"
+  }
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}

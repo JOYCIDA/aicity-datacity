@@ -1,0 +1,43 @@
+meta {
+  name: Créer une borne
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/admin/bornes
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+body:json {
+  {
+    "nom": "Borne Hôtel de Ville",
+    "emplacement": "Parvis de l’Hôtel de Ville",
+    "latitude": 48.8566,
+    "longitude": 2.3522
+  }
+}
+
+script:post-response {
+  bru.setVar("cleBorne", res.body.cle);
+  bru.setVar("idBorne", res.body.borne.id);
+}
+
+tests {
+  test("statut 201", function () {
+    expect(res.status).to.equal(201);
+  });
+
+  test("la clé n’est rendue qu’ici", function () {
+    expect(res.body.cle).to.match(/^borne_/);
+  });
+}
+
+docs {
+  **RG17 : la clé `cle` n’est renvoyée qu’une seule fois.** Elle va dans la configuration de la borne ; la base n’en garde que l’empreinte SHA-256. Clé perdue : utiliser « Renouveler la clé ».
+}

@@ -1,0 +1,30 @@
+meta {
+  name: État des bornes
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/bornes/supervision
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+
+  test("résumé et dernier signal", function () {
+    expect(res.body.resume).to.have.all.keys("ACTIVE", "HORS_LIGNE", "DESACTIVEE", "sessionsEnCours");
+    expect(res.body.bornes[0]).to.include.keys("dernierPing", "silenceSecondes");
+  });
+}
+
+docs {
+  Bornes `HORS_LIGNE` en tête, puis `ACTIVE`, puis `DESACTIVEE`. `silenceSecondes` : temps écoulé depuis le dernier signal (`null` si jamais vue). Une borne active muette depuis `seuilSilenceSecondes` (300) passe `HORS_LIGNE` ; vérifié chaque minute.
+}

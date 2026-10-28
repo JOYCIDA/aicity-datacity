@@ -1,0 +1,25 @@
+meta {
+  name: Mon profil entreprise
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/entreprise/profil
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonEntreprise}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  `statut` : `EN_ATTENTE`, `ACTIF`, `REFUSE` ou `SUSPENDU` ; `justificatifFourni` indique si la pièce a été envoyée.
+}

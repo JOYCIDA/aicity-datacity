@@ -1,0 +1,30 @@
+meta {
+  name: Mes favoris
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/citoyen/favoris
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonCitoyen}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+
+  test("un favori, disponible", function () {
+    expect(res.body.favoris).to.have.lengthOf(1);
+    expect(res.body.favoris[0].disponible).to.equal(true);
+  });
+}
+
+docs {
+  `{ favoris: [{ ajouteLe, disponible, offre }] }`, du plus récent au plus ancien. Une offre mise en pause, expirée ou retirée **reste** dans la liste avec `disponible: false` : l’afficher grisée, sans lien vers la fiche (qui répondrait `404`).
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Détail d’une entreprise
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/admin/entreprises/{{idEntreprise}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}

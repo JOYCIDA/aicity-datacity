@@ -1,0 +1,25 @@
+meta {
+  name: Signal de vie
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/citoyen/bornes/signal
+  body: none
+  auth: none
+}
+
+headers {
+  X-Borne-Key: {{cleBorne}}
+}
+
+tests {
+  test("statut 204", function () {
+    expect(res.status).to.equal(204);
+  });
+}
+
+docs {
+  À appeler **chaque minute**, même sans usager. Sans signal depuis 5 min, la borne passe `HORS_LIGNE` dans la supervision ; le signal suivant (ou une ouverture de session) la remet `ACTIVE`. `401` si la clé est fausse, `403` si la borne est désactivée.
+}

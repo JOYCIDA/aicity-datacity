@@ -1,0 +1,25 @@
+meta {
+  name: Détail de mon offre
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/entreprise/offres/{{idOffre}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonEntreprise}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  `403` si l’offre appartient à une autre entreprise (RG16).
+}

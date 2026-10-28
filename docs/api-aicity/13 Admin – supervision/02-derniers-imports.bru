@@ -1,0 +1,29 @@
+meta {
+  name: Derniers imports
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/admin/imports/derniers
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+
+  test("une entrée par source", function () {
+    expect(res.body.sources.map((s) => s.code)).to.eql(["parisopendata", "openagenda", "datagouv"]);
+  });
+}
+
+docs {
+  `{ sources: [{ code, source, configuree, alerte, dernier, dernierSucces }] }`. `alerte` vaut `null` si tout va bien, sinon : source non configurée, dernier import en échec, ou aucun import réussi depuis plus de 26 h. L’historique complet reste sur `GET /admin/imports`.
+}

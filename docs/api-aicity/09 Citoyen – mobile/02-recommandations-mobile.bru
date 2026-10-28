@@ -1,0 +1,42 @@
+meta {
+  name: Recommandations (mobile)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/citoyen/recommandations
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonCitoyen}}
+}
+
+body:json {
+  {
+    "latitude": 48.8575,
+    "longitude": 2.3556,
+    "tempsLibreMinutes": 90,
+    "budgetMax": 20,
+    "categories": [
+      "gastronomie"
+    ],
+    "langue": "FR"
+  }
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+
+  test("au plus 5 résultats triés", function () {
+    expect(res.body.resultats.length).to.be.at.most(5);
+  });
+}
+
+docs {
+  Mode mobile : jeton **CITOYEN** et position de l’usager dans la requête (jamais enregistrée). Champs : `tempsLibreMinutes` (15–720), `budgetMax` (`null` = sans limite, `0` = gratuit, sinon montant libre au centime), `categories` (vide = toutes), `rayonM` (défaut 1000), `langue`. `403` pour un compte entreprise ou admin.
+}

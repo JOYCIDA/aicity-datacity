@@ -1,0 +1,31 @@
+meta {
+  name: Modifier une borne
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/admin/bornes/{{idBorne}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+body:json {
+  {
+    "emplacement": "Parvis, côté rue de Rivoli"
+  }
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  Champs modifiables : `nom`, `emplacement`, `latitude`, `longitude`, `statut`. Passer à `DESACTIVEE` ferme aussitôt les sessions de la borne et lui interdit d’en ouvrir (403).
+}

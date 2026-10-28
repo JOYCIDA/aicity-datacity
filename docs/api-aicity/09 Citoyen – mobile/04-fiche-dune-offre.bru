@@ -1,0 +1,21 @@
+meta {
+  name: Fiche d’une offre
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/citoyen/offres/{{idOffre}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  Compte une vue. `404` si l’offre n’est pas visible (en attente, en pause, expirée…).
+}
