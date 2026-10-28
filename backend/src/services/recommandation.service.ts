@@ -11,7 +11,7 @@ import { whereVisible } from './offre.service.js';
 import { classer } from './scoring.service.js';
 import { incrementer } from './stats.service.js';
 
-type Auteur = { utilisateurId?: string; sessionId?: string };
+type Auteur = { utilisateurId?: string; sessionId?: string; anonyme?: true };
 
 /**
  * Envies servant à la notation : préférences enregistrées, à défaut les catégories demandées.
@@ -72,6 +72,27 @@ export async function recommander(dto: RecommandationDto, auteur: Auteur, mainte
     },
     NB_RESULTATS,
   );
+
+  // Mobile sans compte : rien n'est enregistré, hormis les compteurs anonymes du jour (RG19).
+  if (auteur.anonyme) {
+    if (classes.length) {
+      await prisma.$transaction(classes.map((c) => incrementer(c.offre.id, 'recommandations', maintenant)));
+    }
+    return {
+      rechercheId: null,
+      elargie,
+      rayonM,
+      resultats: classes.map((c) => ({
+        rang: c.rang,
+        score: c.score,
+        scoreMax: SCORE_MAX,
+        explication: c.explication[dto.langue],
+        distanceM: c.distanceM,
+        trajetMinutes: c.trajetMinutes,
+        offre: offrePubliqueDto(parId.get(c.offre.id)!),
+      })),
+    };
+  }
 
   // La position n'est pas enregistrée : la recherche ne garde que les critères (RGPD).
   // RG19 : chaque offre recommandée compte aussi dans les statistiques anonymes du jour.

@@ -1,0 +1,31 @@
+meta {
+  name: Supprimer mon compte
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseUrl}}/citoyen/compte
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonCitoyen}}
+}
+
+body:json {
+  {
+    "motDePasse": "motdepasse123"
+  }
+}
+
+tests {
+  test("statut 204", function () {
+    expect(res.status).to.equal(204);
+  });
+}
+
+docs {
+  Droit à l’effacement (UC19) : le compte, ses préférences, favoris, recherches et recommandations sont supprimés, **sans retour possible**. Seuls restent les compteurs anonymes des offres. Après `204`, oublier le jeton et revenir à l’accueil.
+}

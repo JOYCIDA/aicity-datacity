@@ -1,0 +1,55 @@
+meta {
+  name: Publier une offre
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/entreprise/offres
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonEntreprise}}
+}
+
+body:json {
+  {
+    "categorieCode": "gastronomie",
+    "titre": "Dégustation de fromages affinés",
+    "description": "Trois fromages commentés par le fromager.",
+    "lieu": "Fromagerie du Marais",
+    "adresse": "5 rue des Archives, 75004 Paris",
+    "latitude": 48.858,
+    "longitude": 2.356,
+    "debut": "{{debutOffre}}",
+    "fin": "{{finOffre}}",
+    "horaires": "Du mardi au samedi, 10 h – 19 h",
+    "dureeMinutes": 45,
+    "prix": 8.5
+  }
+}
+
+script:pre-request {
+  bru.setVar("debutOffre", new Date(Date.now() - 3600e3).toISOString());
+  bru.setVar("finOffre", new Date(Date.now() + 30 * 86400e3).toISOString());
+}
+
+script:post-response {
+  bru.setVar("idOffre", res.body.offre.id);
+}
+
+tests {
+  test("statut 201", function () {
+    expect(res.status).to.equal(201);
+  });
+
+  test("RG5 : l’offre naît EN_ATTENTE", function () {
+    expect(res.body.offre.statut).to.equal("EN_ATTENTE");
+  });
+}
+
+docs {
+  Catégories (`categorieCode`) : `culture`, `gastronomie`, `nature`, `sport`, `loisirs`, `shopping`. Indiquer `prix` ou `gratuit: true`. L’offre est `EN_ATTENTE` jusqu’à la modération (RG5).
+}

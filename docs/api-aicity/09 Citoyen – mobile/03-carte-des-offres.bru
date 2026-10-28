@@ -1,0 +1,28 @@
+meta {
+  name: Carte des offres
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/citoyen/offres?latitude=48.8566&longitude=2.3522&rayonM=2000&taille=100
+  body: none
+  auth: none
+}
+
+params:query {
+  latitude: 48.8566
+  longitude: 2.3522
+  rayonM: 2000
+  taille: 100
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  Offres visibles. Filtres facultatifs : zone (`latitude` + `longitude` + `rayonM`), `categorie` ; pagination `page` / `taille` (≤ 500).
+}

@@ -1,0 +1,34 @@
+meta {
+  name: Journal de modération
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/admin/journal?taille=20
+  body: none
+  auth: bearer
+}
+
+params:query {
+  taille: 20
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+
+  test("les décisions du parcours y figurent", function () {
+    expect(res.body.total).to.be.at.least(2);
+    expect(res.body.elements[0]).to.include.keys("decision", "motif", "creeLe", "admin", "offre", "entreprise");
+  });
+}
+
+docs {
+  Du plus récent au plus ancien, paginé (`page`, `taille`). Filtres facultatifs : `decision` (`VALIDE`, `REFUSE`, `SUSPENDU`, `REACTIVE`), `offreId`, `entrepriseId`, `du` et `au` (dates ISO). `offre` ou `entreprise` vaut `null` selon la cible de la décision.
+}

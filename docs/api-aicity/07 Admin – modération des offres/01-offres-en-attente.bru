@@ -1,0 +1,25 @@
+meta {
+  name: Offres en attente
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/offres?statut=EN_ATTENTE
+  body: none
+  auth: bearer
+}
+
+params:query {
+  statut: EN_ATTENTE
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}

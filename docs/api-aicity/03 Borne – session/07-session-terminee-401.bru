@@ -1,0 +1,25 @@
+meta {
+  name: Session terminée → 401
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/citoyen/sessions/{{sessionId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonSession}}
+}
+
+tests {
+  test("statut 401", function () {
+    expect(res.status).to.equal(401);
+  });
+}
+
+docs {
+  Exemple du contrat : après la fin (ou l’expiration), le jeton ne sert plus. `{ erreur: { code: "NON_AUTHENTIFIE", message: "Session expirée" } }`.
+}

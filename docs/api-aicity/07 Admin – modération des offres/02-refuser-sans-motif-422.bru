@@ -1,0 +1,31 @@
+meta {
+  name: Refuser sans motif → 422
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/admin/offres/{{idOffre}}/decision
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+body:json {
+  {
+    "decision": "REFUSE"
+  }
+}
+
+tests {
+  test("statut 422", function () {
+    expect(res.status).to.equal(422);
+  });
+}
+
+docs {
+  RG7 : un refus doit être motivé (`motif`, 5 caractères au moins).
+}

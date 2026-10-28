@@ -1,0 +1,42 @@
+meta {
+  name: Inscription entreprise
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/inscription
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "role": "ENTREPRISE",
+    "email": "{{emailEntreprise}}",
+    "motDePasse": "motdepasse123",
+    "entreprise": {
+      "nom": "Fromagerie du Marais",
+      "typeActivite": "Commerce de bouche",
+      "adresse": "5 rue des Archives, 75004 Paris"
+    }
+  }
+}
+
+script:pre-request {
+  bru.setVar("emailEntreprise", `pro+${Date.now()}@aicity.test`);
+}
+
+script:post-response {
+  bru.setVar("jetonEntreprise", res.body.token);
+}
+
+tests {
+  test("statut 201", function () {
+    expect(res.status).to.equal(201);
+  });
+}
+
+docs {
+  Le compte entreprise naît `EN_ATTENTE` : il ne peut pas publier avant validation par l’administration (RG8).
+}

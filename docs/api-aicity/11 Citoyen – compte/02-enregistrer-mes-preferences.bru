@@ -1,0 +1,38 @@
+meta {
+  name: Enregistrer mes préférences
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/citoyen/preferences
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonCitoyen}}
+}
+
+body:json {
+  {
+    "categories": ["gastronomie", "culture"],
+    "budgetMax": 15,
+    "langue": "FR"
+  }
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+
+  test("catégories enregistrées, triées", function () {
+    expect(res.body.preferences.categories).to.eql(["culture", "gastronomie"]);
+    expect(res.body.preferences.budgetMax).to.equal(15);
+  });
+}
+
+docs {
+  **Remplace** l’ensemble : `categories` et `budgetMax` sont obligatoires (`[]` et `null` pour tout effacer). `budgetMax` : montant libre en euros, centimes autorisés, ou `null` (sans limite). `langue` (`FR` | `EN`) est facultative et change la langue du compte. `422` pour une catégorie inconnue.
+}

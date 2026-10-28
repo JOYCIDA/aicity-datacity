@@ -1,0 +1,38 @@
+meta {
+  name: Publier avant validation → 403
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/entreprise/offres
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonEntreprise}}
+}
+
+body:json {
+  {
+    "categorieCode": "gastronomie",
+    "titre": "Essai",
+    "lieu": "Marais",
+    "latitude": 48.858,
+    "longitude": 2.356,
+    "debut": "2030-01-01T10:00:00Z",
+    "dureeMinutes": 45,
+    "gratuit": true
+  }
+}
+
+tests {
+  test("statut 403", function () {
+    expect(res.status).to.equal(403);
+  });
+}
+
+docs {
+  RG8 : seule une entreprise `ACTIF` peut publier.
+}

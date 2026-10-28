@@ -4,10 +4,12 @@
 // recommandations (suppression en cascade).
 import type { Langue } from '../generated/prisma/client.js';
 import { prisma } from '../prisma/client.js';
-import { signerJetonSession } from '../utils/jwt.js';
+import { signerJetonAnonyme, signerJetonSession } from '../utils/jwt.js';
 
 export const INACTIVITE_MS = 60_000;
 export const DUREE_MAX_MS = 10 * 60_000;
+/** Une session anonyme de mobile ne stocke rien : sa durée n'est qu'une limite d'usage du jeton. */
+export const DUREE_ANONYME_S = 30 * 60;
 
 const echeance = (debutLe: Date, maintenant: Date) =>
   new Date(Math.min(maintenant.getTime() + INACTIVITE_MS, debutLe.getTime() + DUREE_MAX_MS));
@@ -21,6 +23,14 @@ export async function ouvrir(borneId: string, langue: Langue, maintenant = new D
   // Le jeton survit une minute à la durée maximale : c'est la base qui tranche l'échéance, et
   // une session échue est ainsi toujours supprimée par l'appel qui la découvre.
   return { session, jeton: signerJetonSession(session.id, (DUREE_MAX_MS + 60_000) / 1000) };
+}
+
+/** Session anonyme de mobile : sans compte ni ligne en base ; la position vient de chaque requête (RG2). */
+export function ouvrirAnonyme(maintenant = new Date()) {
+  return {
+    jeton: signerJetonAnonyme(DUREE_ANONYME_S),
+    expireLe: new Date(maintenant.getTime() + DUREE_ANONYME_S * 1000),
+  };
 }
 
 /**

@@ -1,0 +1,31 @@
+meta {
+  name: Valider l’entreprise
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/admin/entreprises/{{idEntreprise}}/decision
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+body:json {
+  {
+    "decision": "VALIDE"
+  }
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  Décisions : `VALIDE`, `REFUSE` (depuis `EN_ATTENTE`), `SUSPENDU` (depuis `ACTIF`), `REACTIVE` (depuis `SUSPENDU`). `motif` obligatoire pour `REFUSE` et `SUSPENDU` (RG7, sinon `422`). `409` si la décision ne s’applique pas au statut actuel ou sans justificatif. La décision et la ligne de journal sont écrites ensemble.
+}

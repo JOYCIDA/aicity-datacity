@@ -60,6 +60,14 @@ enum StatutImport {
   ECHEC
 }
 
+enum MotifSignalement {
+  INFORMATION_ERRONEE
+  OFFRE_EXPIREE
+  LIEU_INCORRECT
+  CONTENU_INAPPROPRIE
+  AUTRE
+}
+
 enum DecisionModeration {
   VALIDE
   REFUSE
@@ -144,6 +152,7 @@ model Offre {
   recommandations Recommandation[]
   journal         JournalModeration[]
   stats           StatOffreJour[]
+  signalements    Signalement[]
 
   @@unique([source, idExterne])
   @@index([statut, fin])
@@ -282,4 +291,20 @@ model StatOffreJour {
 
   @@id([offreId, jour])
   @@index([jour])
+}
+
+// Signalement d'un problème sur une offre (donnée erronée, offre périmée...). Il ne porte
+// aucune identité : ni compte, ni session, ni adresse IP (RGPD, RG1).
+model Signalement {
+  id          String           @id @default(uuid())
+  offreId     String
+  motif       MotifSignalement
+  commentaire String?
+  traite      Boolean          @default(false)
+  creeLe      DateTime         @default(now())
+
+  offre       Offre            @relation(fields: [offreId], references: [id], onDelete: Cascade)
+
+  @@index([traite, creeLe])
+  @@index([offreId])
 }

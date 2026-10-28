@@ -1,0 +1,21 @@
+meta {
+  name: Santé de l’API
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/sante
+  body: none
+  auth: none
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  Vérifie que l’API et la base répondent. `503` si la base est indisponible.
+}

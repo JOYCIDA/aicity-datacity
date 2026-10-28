@@ -1,0 +1,25 @@
+meta {
+  name: État de la session
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/citoyen/sessions/{{sessionId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonSession}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  À appeler quand l’usager touche l’écran sans autre appel à l’API : l’appel repousse l’échéance (RG1). `403` pour l’identifiant d’une autre session.
+}

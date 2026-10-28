@@ -1,0 +1,25 @@
+meta {
+  name: Retirer un favori
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/citoyen/favoris/{{idOffre}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonCitoyen}}
+}
+
+tests {
+  test("statut 204", function () {
+    expect(res.status).to.equal(204);
+  });
+}
+
+docs {
+  `204`, y compris si l’offre n’était pas en favori.
+}

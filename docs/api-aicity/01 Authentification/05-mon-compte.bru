@@ -1,0 +1,25 @@
+meta {
+  name: Mon compte
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/auth/moi
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonCitoyen}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  Profil du compte connecté ; pour une entreprise, inclut `entreprise.statut` et `motifRefus`.
+}

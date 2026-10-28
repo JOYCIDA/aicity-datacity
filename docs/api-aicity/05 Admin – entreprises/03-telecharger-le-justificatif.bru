@@ -1,0 +1,25 @@
+meta {
+  name: Télécharger le justificatif
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/admin/entreprises/{{idEntreprise}}/justificatif
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  Renvoie le fichier en téléchargement (`Cache-Control: no-store`).
+}

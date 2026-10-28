@@ -1,0 +1,29 @@
+meta {
+  name: Renouveler la clé
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/admin/bornes/{{idBorne}}/cle
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+script:post-response {
+  bru.setVar("cleBorne", res.body.cle);
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  Nouvelle clé, renvoyée une seule fois ; l’ancienne cesse immédiatement de fonctionner.
+}

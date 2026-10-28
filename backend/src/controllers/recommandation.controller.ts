@@ -14,7 +14,8 @@ export const questions: RequestHandler = (_req, res) => {
 
 /**
  * Monté après `citoyenOuSession`. Mode borne : position de la borne (RG2) et langue de la
- * session par défaut. Mode mobile : jeton CITOYEN, position fournie dans la requête.
+ * session par défaut. Mode mobile : jeton CITOYEN ou session anonyme, position fournie dans la
+ * requête.
  */
 export const recommander: RequestHandler = async (req, res) => {
   const session = req.sessionBorne;
@@ -26,6 +27,11 @@ export const recommander: RequestHandler = async (req, res) => {
   }
   const criteres = recommandationMobileSchema.parse(req.body);
   const dto = { ...criteres, langue: criteres.langue ?? 'FR' };
+  if (req.anonyme) {
+    // Mobile sans compte : on répond sans rien enregistrer (ni recherche, ni position).
+    res.json(await recommandationService.recommander(dto, { anonyme: true }));
+    return;
+  }
   res.json(await recommandationService.recommander(dto, { utilisateurId: req.utilisateur!.id }));
 };
 

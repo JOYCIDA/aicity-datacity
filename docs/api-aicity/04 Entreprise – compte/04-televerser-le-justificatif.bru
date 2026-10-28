@@ -1,0 +1,29 @@
+meta {
+  name: Téléverser le justificatif
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/entreprise/justificatif
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonEntreprise}}
+}
+
+body:multipart-form {
+  justificatif: @file(fixtures/kbis.pdf)
+}
+
+tests {
+  test("statut 201", function () {
+    expect(res.status).to.equal(201);
+  });
+}
+
+docs {
+  `multipart/form-data`, champ **`justificatif`** : PDF, JPEG, PNG ou WebP, **5 Mo maximum**. `413` si trop lourd, `415` si le type ou le contenu ne convient pas. Après un refus, un nouvel envoi repasse le compte `EN_ATTENTE`.
+}

@@ -1,0 +1,34 @@
+meta {
+  name: Entreprises en attente
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/entreprises?statut=EN_ATTENTE
+  body: none
+  auth: bearer
+}
+
+params:query {
+  statut: EN_ATTENTE
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+script:post-response {
+  const e = res.body.elements.find((x) => x.email === bru.getVar("emailEntreprise"));
+  if (e) bru.setVar("idEntreprise", e.id);
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  Filtre `statut` (défaut `EN_ATTENTE`), pagination `page` / `taille`. Les plus anciennes demandes d’abord.
+}

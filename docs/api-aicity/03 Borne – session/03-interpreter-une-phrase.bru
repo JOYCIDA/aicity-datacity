@@ -1,0 +1,31 @@
+meta {
+  name: Interpréter une phrase
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/citoyen/interpretations
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonSession}}
+}
+
+body:json {
+  {
+    "texte": "J’ai 1h30, gratuit si possible, un musée ou un parc"
+  }
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  Transforme une phrase libre en réponses aux questions : `{ interpretation: { tempsLibreMinutes?, budgetMax?, categories } }`. Champ absent = non mentionné. **RG3 : le texte n’est jamais enregistré.**
+}

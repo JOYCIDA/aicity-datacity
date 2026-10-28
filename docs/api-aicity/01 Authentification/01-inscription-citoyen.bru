@@ -1,0 +1,38 @@
+meta {
+  name: Inscription citoyen
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/inscription
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "role": "CITOYEN",
+    "email": "{{emailCitoyen}}",
+    "motDePasse": "motdepasse123",
+    "langue": "FR"
+  }
+}
+
+script:pre-request {
+  bru.setVar("emailCitoyen", `citoyen+${Date.now()}@aicity.test`);
+}
+
+script:post-response {
+  bru.setVar("jetonCitoyen", res.body.token);
+}
+
+tests {
+  test("statut 201", function () {
+    expect(res.status).to.equal(201);
+  });
+}
+
+docs {
+  Crée un compte citoyen et renvoie `{ token, utilisateur }`. `409` si l’e-mail existe, `422` si les données sont invalides (mot de passe ≥ 8 caractères). Le rôle `ADMIN` ne peut pas s’inscrire.
+}

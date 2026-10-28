@@ -1,0 +1,40 @@
+meta {
+  name: Mes statistiques
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/entreprise/statistiques?jours=30
+  body: none
+  auth: bearer
+}
+
+params:query {
+  jours: 30
+}
+
+auth:bearer {
+  token: {{jetonEntreprise}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+
+  test("tous les regroupements, même vides", function () {
+    expect(res.body.parStatut).to.have.lengthOf(5);
+    expect(res.body.parCreneau).to.have.lengthOf(3);
+    expect(res.body.parBudget).to.have.lengthOf(5);
+    expect(res.body.totaux.offres).to.be.at.least(1);
+  });
+}
+
+docs {
+  Seulement les offres de l’entreprise connectée, sans aucune donnée individuelle (RG19). `jours` : 1 à 365 (30 par défaut, aujourd’hui compris).
+
+  - `totaux` et chaque groupe : `{ offres, vues, recommandations, favoris }`. `offres` compte toutes les offres ; les trois compteurs portent sur la période.
+  - `parStatut` (`EN_ATTENTE`, `VALIDE`, `REFUSE`, `EN_PAUSE`, `EXPIREE`), `parCategorie`, `parCreneau` (début de l’offre, heure de Paris : `MATIN` avant 12 h, `APRES_MIDI` avant 18 h, `SOIREE` ensuite), `parBudget` (`GRATUIT`, `JUSQU_A_10`, `JUSQU_A_20`, `JUSQU_A_50`, `PLUS_DE_50`). Tous les groupes sont présents, même à zéro.
+  - `parJour` : `[{ jour: "AAAA-MM-JJ", vues, recommandations, favoris }]`, seulement les jours avec activité.
+}

@@ -1,0 +1,31 @@
+meta {
+  name: Mettre en pause
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{baseUrl}}/entreprise/offres/{{idOffre}}/statut
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonEntreprise}}
+}
+
+body:json {
+  {
+    "statut": "EN_PAUSE"
+  }
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  `EN_PAUSE` depuis `VALIDE`, `VALIDE` depuis `EN_PAUSE` ; `409` sinon. Une offre en pause n’est plus proposée.
+}

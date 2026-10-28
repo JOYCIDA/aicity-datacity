@@ -1,0 +1,31 @@
+meta {
+  name: Valider l’offre
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/admin/offres/{{idOffre}}/decision
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonAdmin}}
+}
+
+body:json {
+  {
+    "decision": "VALIDE"
+  }
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+}
+
+docs {
+  `VALIDE` ou `REFUSE` + `motif`. `409` si l’offre a déjà été traitée.
+}

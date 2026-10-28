@@ -1,0 +1,25 @@
+meta {
+  name: Terminer la session
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/citoyen/sessions/{{sessionId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonSession}}
+}
+
+tests {
+  test("statut 204", function () {
+    expect(res.status).to.equal(204);
+  });
+}
+
+docs {
+  Bouton « Terminer » : supprime la session, ses recherches et ses recommandations (cascade).
+}

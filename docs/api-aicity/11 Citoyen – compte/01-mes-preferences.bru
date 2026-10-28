@@ -1,0 +1,29 @@
+meta {
+  name: Mes préférences
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/citoyen/preferences
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jetonCitoyen}}
+}
+
+tests {
+  test("statut 200", function () {
+    expect(res.status).to.equal(200);
+  });
+
+  test("forme des préférences", function () {
+    expect(res.body.preferences).to.have.all.keys("categories", "budgetMax", "langue");
+  });
+}
+
+docs {
+  `{ preferences: { categories: string[], budgetMax: number | null, langue } }`. Sans préférences enregistrées : `categories: []`, `budgetMax: null`. Les catégories préférées servent à la notation des recommandations en mode mobile.
+}
