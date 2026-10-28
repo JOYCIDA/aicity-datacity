@@ -2,14 +2,7 @@ import { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import BoutonChoix from '../components/BoutonChoix';
 import { couleurs, polices, tailles } from '../theme';
-
-const CHOIX = [
-  { valeur: 'musique', libelle: 'Musique & concerts' },
-  { valeur: 'expos', libelle: 'Expositions & musées' },
-  { valeur: 'sport', libelle: 'Sport & plein air' },
-  { valeur: 'food', libelle: 'Gastronomie & food' },
-  { valeur: 'nature', libelle: 'Nature & parcs' },
-];
+import { CATEGORIES } from '../data/questions';
 
 type Props = {
   valeurs: string[];
@@ -55,7 +48,7 @@ export default function EcranInterets({ valeurs, onBasculer, onSuivant, onRetour
       <Text style={styles.aide}>Choisis une ou plusieurs réponses.</Text>
 
       <View style={{ marginTop: 24 }}>
-        {CHOIX.map((c) => (
+        {CATEGORIES.map((c) => (
           <BoutonChoix
             key={c.valeur}
             multiple
