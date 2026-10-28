@@ -1,8 +1,9 @@
-export type Duree = '30min' | '1h' | '2h' | 'soiree' | 'inconnu';
-export type Budget = 'gratuit' | '10' | '25' | 'illimite';
+export type Duree = number; // minutes (tempsLibreMinutes)
+// Budget en euros ; 0 = gratuit ; null = sans limite ; undefined = pas encore choisi.
+export type Budget = number | null;
 
 export type Reponses = {
   duree?: Duree;
-  interets: string[];
+  interets: string[]; // codes de catégories du backend
   budget?: Budget;
 };

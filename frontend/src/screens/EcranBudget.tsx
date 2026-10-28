@@ -1,15 +1,9 @@
 import { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import BoutonChoix from '../components/BoutonChoix';
+import { BUDGETS } from '../data/questions';
 import { couleurs, polices, tailles } from '../theme';
 import { Budget } from '../types/parcours';
-
-const CHOIX: { valeur: Budget; libelle: string }[] = [
-  { valeur: 'gratuit', libelle: 'Gratuit uniquement' },
-  { valeur: '10', libelle: "Jusqu'à 10 €" },
-  { valeur: '25', libelle: 'Entre 10 € et 25 €' },
-  { valeur: 'illimite', libelle: 'Pas de limite' },
-];
 
 type Props = {
   valeur?: Budget;
@@ -20,10 +14,10 @@ type Props = {
 
 export default function EcranBudget({ valeur, onChoisir, onSuivant, onRetour }: Props) {
   const [aEssaye, setAEssaye] = useState(false);
-  const afficherErreur = aEssaye && !valeur;
+  const afficherErreur = aEssaye && valeur === undefined;
 
   const suivant = () => {
-    if (!valeur) {
+    if (valeur === undefined) {
       setAEssaye(true);
       return;
     }
@@ -55,9 +49,9 @@ export default function EcranBudget({ valeur, onChoisir, onSuivant, onRetour }: 
       <Text style={styles.aide}>Une seule réponse.</Text>
 
       <View accessibilityRole="radiogroup" style={{ marginTop: 24 }}>
-        {CHOIX.map((c) => (
+        {BUDGETS.map((c) => (
           <BoutonChoix
-            key={c.valeur}
+            key={String(c.valeur)}
             libelle={c.libelle}
             selectionne={valeur === c.valeur}
             onPress={() => onChoisir(c.valeur)}
