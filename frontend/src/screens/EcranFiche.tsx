@@ -2,6 +2,7 @@ import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { Activite } from '../types/activite';
 import { couleurs, polices, tailles } from '../theme';
 import { formaterPrix, formaterDistance, LIBELLES_CATEGORIE } from '../utils/format';
+import { SIGNALEMENT_ACTIF } from '../config';
 
 type Props = {
   activite: Activite;
@@ -51,14 +52,16 @@ export default function EcranFiche({ activite, onRetour, onSignaler }: Props) {
         ))}
       </View>
 
-      <Pressable
-        onPress={onSignaler}
-        accessibilityRole="button"
-        accessibilityLabel="Signaler une information erronée"
-        style={styles.signaler}
-      >
-        <Text style={styles.signalerTexte}>Signaler une information erronée</Text>
-      </Pressable>
+      {SIGNALEMENT_ACTIF && (
+        <Pressable
+          onPress={onSignaler}
+          accessibilityRole="button"
+          accessibilityLabel="Signaler une information erronée"
+          style={styles.signaler}
+        >
+          <Text style={styles.signalerTexte}>Signaler une information erronée</Text>
+        </Pressable>
+      )}
 
       <Text style={styles.source}>
         Source : {activite.source} · Mis à jour le {activite.date_maj}

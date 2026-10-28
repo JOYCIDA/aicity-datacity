@@ -1,0 +1,1 @@
+export const SIGNALEMENT_ACTIF = false;
