@@ -1,54 +1,54 @@
-import { View, Text, Pressable, FlatList, StyleSheet } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { View, Text, Pressable, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import CarteActivite from '../components/CarteActivite';
-import { activitesExemple } from '../data/activitesExemple';
+import { recommander, ErreurApi } from '../api/client';
+import { versActivite } from '../api/adaptateur';
+import { DUREES, BUDGETS } from '../data/questions';
+import { POSITION_PAR_DEFAUT } from '../config';
 import { Activite } from '../types/activite';
 import { Reponses } from '../types/parcours';
 import { couleurs, polices, tailles } from '../theme';
 
-const LIBELLES_DUREE: Record<string, string> = {
-  '30min': '30 minutes',
-  '1h': '1 heure',
-  '2h': '2 heures',
-  soiree: 'Toute la soirée',
-  inconnu: 'Durée libre',
-};
-
-const LIBELLES_BUDGET: Record<string, string> = {
-  gratuit: 'Gratuit',
-  '10': "Jusqu'à 10 €",
-  '25': "Jusqu'à 25 €",
-  illimite: 'Sans limite de budget',
-};
-
-function filtrer(activites: Activite[], reponses: Reponses): Activite[] {
-  return activites.filter((a) => {
-    const budgetMax =
-      reponses.budget === 'gratuit' ? 0 :
-      reponses.budget === '10' ? 10 :
-      reponses.budget === '25' ? 25 :
-      Infinity;
-    const dansLeBudget = a.prix <= budgetMax;
-    const dansLesInterets =
-      reponses.interets.length === 0 || reponses.interets.includes(a.categorie);
-    return dansLeBudget && dansLesInterets;
-  });
-}
+export type Recherche = { activites: Activite[]; elargie: boolean };
 
 type Props = {
   reponses: Reponses;
+  recherche: Recherche | null; // null : pas encore chargée
+  onRecherche: (r: Recherche) => void;
   onRetour: () => void;
   onOuvrir: (activite: Activite) => void;
 };
 
-export default function EcranResultats({ reponses, onRetour, onOuvrir }: Props) {
-  const resultats = filtrer(activitesExemple, reponses);
-  const n = resultats.length;
+export default function EcranResultats({ reponses, recherche, onRecherche, onRetour, onOuvrir }: Props) {
+  const [erreur, setErreur] = useState<string | null>(null);
+
+  const charger = useCallback(async () => {
+    setErreur(null);
+    try {
+      const r = await recommander({
+        ...POSITION_PAR_DEFAUT,
+        tempsLibreMinutes: reponses.duree ?? DUREES[0].valeur,
+        budgetMax: reponses.budget === undefined ? null : reponses.budget,
+        categories: reponses.interets,
+      });
+      onRecherche({ activites: r.resultats.map(versActivite), elargie: r.elargie });
+    } catch (e) {
+      setErreur(e instanceof ErreurApi ? e.message : 'Une erreur est survenue. Réessaie dans un instant.');
+    }
+  }, [reponses, onRecherche]);
+
+  useEffect(() => {
+    if (!recherche) charger();
+  }, [recherche, charger]);
+
   const resume = [
-    reponses.duree ? LIBELLES_DUREE[reponses.duree] : null,
-    reponses.budget ? LIBELLES_BUDGET[reponses.budget] : null,
+    DUREES.find((d) => d.valeur === reponses.duree)?.libelle,
+    BUDGETS.find((b) => b.valeur === reponses.budget)?.libelle,
   ]
     .filter(Boolean)
     .join(' · ');
+
+  const n = recherche?.activites.length ?? 0;
 
   return (
     <View style={styles.page}>
@@ -61,24 +61,51 @@ export default function EcranResultats({ reponses, onRetour, onOuvrir }: Props) 
         <Text style={styles.retourTexte}>‹ Modifier mes choix</Text>
       </Pressable>
 
-      <Text accessibilityRole="header" style={styles.titre}>
-        {n === 0
-          ? 'Aucune activité trouvée'
-          : `${n} activité${n > 1 ? 's' : ''} trouvée${n > 1 ? 's' : ''} près de toi`}
-      </Text>
-      <Text style={styles.resume}>{resume}</Text>
-
-      {n === 0 ? (
-        <Text style={styles.vide}>
-          Aucune activité ne correspond à tes choix. Modifie ton budget ou tes centres d'intérêt.
-        </Text>
+      {erreur ? (
+        <View>
+          <View style={styles.erreur} accessibilityRole="alert">
+            <Text style={styles.erreurIcone}>⚠</Text>
+            <Text style={styles.erreurTexte}>{erreur}</Text>
+          </View>
+          <Pressable
+            onPress={charger}
+            accessibilityRole="button"
+            accessibilityLabel="Réessayer"
+            style={styles.bouton}
+          >
+            <Text style={styles.boutonTexte}>Réessayer</Text>
+          </Pressable>
+        </View>
+      ) : !recherche ? (
+        <View style={styles.chargement} accessible accessibilityLabel="Recherche des activités en cours">
+          <ActivityIndicator size="large" color={couleurs.primaire} />
+          <Text style={styles.resume}>Je cherche des activités près de toi…</Text>
+        </View>
       ) : (
-        <FlatList
-          data={resultats}
-          keyExtractor={(a) => a.id}
-          renderItem={({ item }) => ( <CarteActivite activite={item} onPress={() => onOuvrir(item)} />)}
-          contentContainerStyle={{ paddingTop: 16, paddingBottom: 24 }}
-        />
+        <>
+          <Text accessibilityRole="header" style={styles.titre}>
+            {n === 0
+              ? 'Aucune activité trouvée'
+              : `${n} activité${n > 1 ? 's' : ''} trouvée${n > 1 ? 's' : ''} près de toi`}
+          </Text>
+          <Text style={styles.resume}>{resume}</Text>
+          {recherche.elargie && n > 0 && (
+            <Text style={styles.resume}>Peu d'activités tout près : nous avons élargi la zone de recherche.</Text>
+          )}
+
+          {n === 0 ? (
+            <Text style={styles.vide}>
+              Aucune activité ne correspond à tes choix. Modifie ton budget ou tes centres d'intérêt.
+            </Text>
+          ) : (
+            <FlatList
+              data={recherche.activites}
+              keyExtractor={(a) => a.id}
+              renderItem={({ item }) => <CarteActivite activite={item} onPress={() => onOuvrir(item)} />}
+              contentContainerStyle={{ paddingTop: 16, paddingBottom: 24 }}
+            />
+          )}
+        </>
       )}
     </View>
   );
@@ -106,4 +133,18 @@ const styles = StyleSheet.create({
     fontSize: tailles.texte,
     marginTop: 24,
   },
+  chargement: { alignItems: 'center', gap: 12, marginTop: 48 },
+  erreur: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 24 },
+  erreurIcone: { color: couleurs.erreur, fontSize: 20 },
+  erreurTexte: { flex: 1, fontFamily: polices.texteMoyen, color: couleurs.erreur, fontSize: tailles.texte },
+  bouton: {
+    alignSelf: 'flex-start',
+    minHeight: tailles.zoneMin + 12,
+    justifyContent: 'center',
+    backgroundColor: couleurs.primaire,
+    paddingHorizontal: 32,
+    borderRadius: 30,
+    marginTop: 16,
+  },
+  boutonTexte: { fontFamily: polices.titre, color: couleurs.fond, fontSize: 20 },
 });
