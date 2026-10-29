@@ -98,6 +98,9 @@ export default function App() {
             choix={questions.categories}
             valeurs={reponses.interets}
             onBasculer={basculerInteret}
+            onAjouter={(codes) =>
+              setReponses({ ...reponses, interets: [...new Set([...reponses.interets, ...codes])] })
+            }
             onRetour={() => setEtape('duree')}
             onSuivant={() => setEtape('budget')}
           />
