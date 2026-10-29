@@ -2,6 +2,7 @@ import { ChevronLeft } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, fonts, radius, textSize } from '../theme/tokens';
+import { useTextes } from '../i18n';
 import AiCityLogo from './AiCityLogo';
 import LanguageSelector, { type Lang } from './LanguageSelector';
 
@@ -14,6 +15,7 @@ type Props = {
 };
 
 export default function KioskTopBar({ showBack = false, dark = true, lang, onLangChange, onBack }: Props) {
+  const t = useTextes();
   const backColor = dark ? colors.nightForeground : colors.night;
 
   return (
@@ -22,11 +24,12 @@ export default function KioskTopBar({ showBack = false, dark = true, lang, onLan
         {showBack && (
           <Pressable
             accessibilityRole="button"
+            accessibilityLabel={t.retour}
             onPress={onBack}
             style={[styles.back, { backgroundColor: dark ? colors.cardDark : colors.muted }]}
           >
             <ChevronLeft size={22} color={backColor} />
-            <Text style={[styles.backLabel, { color: backColor }]}>Retour</Text>
+            <Text style={[styles.backLabel, { color: backColor }]}>{t.retour}</Text>
           </Pressable>
         )}
       </View>
@@ -45,8 +48,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   dark: {
     backgroundColor: colors.night,
@@ -57,7 +60,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   side: {
-    minWidth: 120,
+    flex: 1,
   },
   sideEnd: {
     alignItems: 'flex-end',
@@ -66,13 +69,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    gap: 8,
+    gap: 6,
+    minHeight: 44,
     borderRadius: radius.xl,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: 14,
   },
   backLabel: {
     fontFamily: fonts.bodyBold,
-    fontSize: textSize.base,
+    fontSize: textSize.sm,
   },
 });

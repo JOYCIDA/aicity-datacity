@@ -5,6 +5,7 @@ import { couleurs, polices, tailles } from '../theme';
 import { Duree } from '../types/parcours';
 import { Choix } from '../types/questions';
 import { useTextes } from '../i18n';
+import { iconeDuree } from '../components/Icones';
 
 type Props = {
   choix: Choix<Duree>[];
@@ -46,6 +47,7 @@ export default function EcranDuree({ choix, valeur, onChoisir, onSuivant }: Prop
           <BoutonChoix
             key={c.valeur}
             libelle={c.libelle}
+            icone={iconeDuree(c.valeur)}
             selectionne={valeur === c.valeur}
             onPress={() => onChoisir(c.valeur)}
           />

@@ -1,96 +1,114 @@
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { CirclePlay } from 'lucide-react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import AiCityLogo from '../components/AiCityLogo';
+import CitySkyline from '../components/CitySkyline';
+import { ICONES_CATEGORIE } from '../components/Icones';
 import { couleurs, polices, tailles } from '../theme';
-import { Langue, LANGUES, TEXTES, useLangue, useTextes } from '../i18n';
+import { useTextes } from '../i18n';
+import { Choix } from '../types/questions';
 
 type Props = {
-  onChangerLangue: (langue: Langue) => void;
+  categories: Choix<string>[] | null; // null tant que les questions ne sont pas chargées
+  onRaccourci: (categorie: string) => void;
   onCommencer: () => void;
 };
 
-export default function EcranAccueil({ onChangerLangue, onCommencer }: Props) {
+export default function EcranAccueil({ categories, onRaccourci, onCommencer }: Props) {
   const t = useTextes();
-  const langue = useLangue();
+  // Sur téléphone, un logo plus petit laisse le bouton Commencer visible sans défiler.
+  const petitEcran = useWindowDimensions().width < 600;
 
   return (
-    <View style={styles.page}>
-      <View style={styles.langues} accessibilityRole="radiogroup" accessibilityLabel={t.accueil.choixLangue}>
-        {LANGUES.map((l) => (
-          <Pressable
-            key={l}
-            onPress={() => onChangerLangue(l)}
-            accessibilityRole="radio"
-            accessibilityState={{ selected: l === langue }}
-            accessibilityLabel={TEXTES[l].nomLangue}
-            style={[styles.langue, l === langue && styles.langueActive]}
-          >
-            <Text style={[styles.langueTexte, l === langue && styles.langueTexteActive]}>{l}</Text>
-          </Pressable>
-        ))}
-      </View>
+    <View style={styles.ecran}>
+      <ScrollView contentContainerStyle={styles.page}>
+        <View style={styles.centre}>
+          <AiCityLogo size={petitEcran ? 'md' : 'lg'} dark />
+          <Text style={styles.accroche}>{t.accueil.accroche}</Text>
+        </View>
 
-      <View style={styles.centre}>
-        <Text accessibilityRole="header" style={styles.logo}>
-          <Text style={{ color: couleurs.texte }}>Ai</Text>
-          <Text style={{ color: couleurs.primaire }}>City</Text>
-        </Text>
-        <Text style={styles.slogan}>FROM A TO B</Text>
+        {categories && (
+          <View style={styles.raccourcis}>
+            <Text accessibilityRole="header" style={styles.question}>
+              {t.accueil.queCherchesTu}
+            </Text>
+            <View style={styles.tuiles}>
+              {categories.map((c) => {
+                const Icone = ICONES_CATEGORIE[c.valeur];
+                return (
+                  <Pressable
+                    key={c.valeur}
+                    onPress={() => onRaccourci(c.valeur)}
+                    accessibilityRole="button"
+                    accessibilityLabel={t.accueil.raccourciA11y(c.libelle)}
+                    style={({ pressed }) => [styles.tuile, pressed && styles.tuileAppuyee]}
+                  >
+                    {Icone && <Icone size={28} color={couleurs.texte} />}
+                    <Text style={styles.tuileTexte}>{c.libelle}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        )}
 
-        <Text style={styles.accroche}>{t.accueil.accroche}</Text>
-      </View>
+        <Pressable
+          onPress={onCommencer}
+          accessibilityRole="button"
+          accessibilityLabel={t.accueil.commencer}
+          style={styles.bouton}
+        >
+          <CirclePlay size={30} color={couleurs.fond} />
+          <Text style={styles.boutonTexte}>{t.accueil.commencer}</Text>
+        </Pressable>
 
-      <Pressable
-        onPress={onCommencer}
-        accessibilityRole="button"
-        accessibilityLabel={t.accueil.commencer}
-        style={styles.bouton}
-      >
-        <Text style={styles.boutonTexte}>{t.accueil.commencer}</Text>
-      </Pressable>
+        <Text style={styles.mention}>{t.accueil.mention}</Text>
+      </ScrollView>
 
-      <Text style={styles.mention}>{t.accueil.mention}</Text>
+      <CitySkyline />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, padding: 24 },
-  langues: {
-    flexDirection: 'row',
-    alignSelf: 'flex-end',
-    gap: 4,
-    padding: 4,
-    borderRadius: 28,
-    borderWidth: 2,
-    borderColor: couleurs.primaire,
-  },
-  langue: {
-    minWidth: tailles.zoneMin + 8,
-    minHeight: tailles.zoneMin,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  langueActive: { backgroundColor: couleurs.primaire },
-  langueTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: tailles.texte },
-  langueTexteActive: { color: couleurs.fond },
-  centre: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  logo: { fontFamily: polices.titre, fontSize: 56 },
-  slogan: {
-    fontFamily: polices.texteMoyen,
-    color: couleurs.primaire,
-    fontSize: tailles.texte,
-    letterSpacing: 3,
-    marginTop: 4,
-  },
+  ecran: { flex: 1 },
+  page: { flexGrow: 1, padding: 16, gap: 20, justifyContent: 'center' },
+  centre: { alignItems: 'center', gap: 12 },
   accroche: {
     fontFamily: polices.texte,
     color: couleurs.texteSecondaire,
     fontSize: 20,
     textAlign: 'center',
-    marginTop: 32,
     maxWidth: 420,
   },
+  raccourcis: { alignItems: 'center', gap: 12 },
+  question: {
+    fontFamily: polices.texteMoyen,
+    color: couleurs.texteSecondaire,
+    fontSize: tailles.texte,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+  },
+  tuiles: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, maxWidth: 720 },
+  tuile: {
+    width: 112,
+    minHeight: 88,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: couleurs.primaire,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+  },
+  tuileAppuyee: { backgroundColor: couleurs.carte },
+  tuileTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: tailles.texte, textAlign: 'center' },
   bouton: {
+    flexDirection: 'row',
+    gap: 12,
+    alignSelf: 'center',
+    width: '100%',
+    maxWidth: 420,
     minHeight: 64,
     borderRadius: 32,
     backgroundColor: couleurs.primaire,
@@ -103,6 +121,5 @@ const styles = StyleSheet.create({
     color: couleurs.texteSecondaire,
     fontSize: tailles.texte,
     textAlign: 'center',
-    marginTop: 16,
   },
 });
