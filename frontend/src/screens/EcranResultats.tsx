@@ -4,12 +4,12 @@ import CarteActivite from '../components/CarteActivite';
 import { recommander, ErreurApi } from '../api/client';
 import { versActivite } from '../api/adaptateur';
 import { DUREES, BUDGETS } from '../data/questions';
-import { POSITION_PAR_DEFAUT } from '../config';
+import { obtenirPosition } from '../utils/position';
 import { Activite } from '../types/activite';
 import { Reponses } from '../types/parcours';
 import { couleurs, polices, tailles } from '../theme';
 
-export type Recherche = { activites: Activite[]; elargie: boolean };
+export type Recherche = { activites: Activite[]; elargie: boolean; remarquePosition: string | null };
 
 type Props = {
   reponses: Reponses;
@@ -25,13 +25,14 @@ export default function EcranResultats({ reponses, recherche, onRecherche, onRet
   const charger = useCallback(async () => {
     setErreur(null);
     try {
+      const { position, remarque } = await obtenirPosition();
       const r = await recommander({
-        ...POSITION_PAR_DEFAUT,
+        ...position,
         tempsLibreMinutes: reponses.duree ?? DUREES[0].valeur,
         budgetMax: reponses.budget === undefined ? null : reponses.budget,
         categories: reponses.interets,
       });
-      onRecherche({ activites: r.resultats.map(versActivite), elargie: r.elargie });
+      onRecherche({ activites: r.resultats.map(versActivite), elargie: r.elargie, remarquePosition: remarque });
     } catch (e) {
       setErreur(e instanceof ErreurApi ? e.message : 'Une erreur est survenue. Réessaie dans un instant.');
     }
@@ -89,6 +90,11 @@ export default function EcranResultats({ reponses, recherche, onRecherche, onRet
               : `${n} activité${n > 1 ? 's' : ''} trouvée${n > 1 ? 's' : ''} près de toi`}
           </Text>
           <Text style={styles.resume}>{resume}</Text>
+          {recherche.remarquePosition && (
+            <Text style={styles.resume} accessibilityRole="text">
+              ℹ {recherche.remarquePosition}
+            </Text>
+          )}
           {recherche.elargie && n > 0 && (
             <Text style={styles.resume}>Peu d'activités tout près : nous avons élargi la zone de recherche.</Text>
           )}
