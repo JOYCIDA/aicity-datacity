@@ -6,6 +6,8 @@ export type Activite = {
   categorieLibelle: string;
   description: string | null;
   photo_url: string | null;
+  photo_credit: string | null; // à afficher sous la photo (droit d'auteur)
+  photo_alt: string | null; // description lue par les lecteurs d'écran
   lieu: string;
   adresse: string | null;
   lat: number;

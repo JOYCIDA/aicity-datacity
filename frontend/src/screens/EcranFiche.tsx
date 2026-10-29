@@ -68,12 +68,19 @@ export default function EcranFiche({ activite, onSignaler }: Props) {
   return (
     <ScrollView style={styles.ecran} contentContainerStyle={[styles.page, large && styles.pageLarge]}>
       {activite.photo_url ? (
-        <Image
-          source={{ uri: activite.photo_url }}
-          resizeMode="cover"
-          accessibilityLabel={t.fiche.photo(activite.titre)}
-          style={large ? styles.photoLarge : styles.photo}
-        />
+        <View style={large ? styles.photoLarge : styles.photo}>
+          <Image
+            source={{ uri: activite.photo_url }}
+            resizeMode="cover"
+            accessibilityLabel={activite.photo_alt ?? t.fiche.photo(activite.titre)}
+            style={styles.image}
+          />
+          {activite.photo_credit && (
+            <Text style={styles.credit} accessibilityLabel={t.fiche.credit(activite.photo_credit)}>
+              © {activite.photo_credit}
+            </Text>
+          )}
+        </View>
       ) : (
         <View style={[large ? styles.photoLarge : styles.photo, styles.sansPhoto]}>
           {IconeCategorie && <IconeCategorie size={64} color={colors.teal} />}
@@ -173,8 +180,22 @@ const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: colors.background },
   page: { padding: 16, paddingBottom: 32, gap: 20 },
   pageLarge: { flexDirection: 'row', alignItems: 'flex-start', padding: 24, gap: 32 },
-  photo: { width: '100%', height: 220, borderRadius: 24 },
-  photoLarge: { width: '38%', aspectRatio: 3 / 4, borderRadius: 24 },
+  photo: { width: '100%', height: 220, borderRadius: 24, overflow: 'hidden' },
+  photoLarge: { width: '38%', aspectRatio: 3 / 4, borderRadius: 24, overflow: 'hidden' },
+  image: { width: '100%', height: '100%' },
+  // Bandeau sombre en bas de la photo : lisible quelle que soit l'image.
+  credit: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    left: 0,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(8, 43, 56, 0.8)',
+    color: colors.nightForeground,
+    fontFamily: polices.texte,
+    fontSize: tailles.petit,
+  },
   sansPhoto: { backgroundColor: colors.muted, alignItems: 'center', justifyContent: 'center' },
   contenu: { flex: 1, gap: 16 },
   pastille: {
