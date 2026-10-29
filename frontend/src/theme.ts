@@ -3,7 +3,7 @@ export const couleurs = {
   primaire: '#42A8B7',
   texte: '#FFFDF8',
   texteSecondaire: 'rgba(255,253,248,0.75)', // lisible sur le fond (8,8:1)
-  carte: '#0F3D4F', // approximatif, à ajuster avec Alceo
+  carte: '#0D3C4F', // cardDark de la maquette (theme/tokens.ts)
   barreInactive: '#5A8FA0',
   erreur: '#FFB4A8',
 };

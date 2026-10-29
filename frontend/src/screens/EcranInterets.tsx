@@ -5,6 +5,7 @@ import { interpreter, ErreurApi } from '../api/client';
 import { couleurs, polices, tailles } from '../theme';
 import { Choix } from '../types/questions';
 import { useTextes } from '../i18n';
+import { ICONES_CATEGORIE } from '../components/Icones';
 
 type Props = {
   choix: Choix<string>[];
@@ -12,13 +13,12 @@ type Props = {
   onBasculer: (valeur: string) => void;
   onAjouter: (valeurs: string[]) => void;
   onSuivant: () => void;
-  onRetour: () => void;
 };
 
 // Retour affiché sous le champ « Autre… » : ✓ si compris, ⚠ sinon.
 type Retour = { ok: boolean; message: string };
 
-export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, onSuivant, onRetour }: Props) {
+export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, onSuivant }: Props) {
   const t = useTextes();
   const [aEssaye, setAEssaye] = useState(false);
   const [texte, setTexte] = useState('');
@@ -57,15 +57,6 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
 
   return (
     <ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
-      <Pressable
-        onPress={onRetour}
-        accessibilityRole="button"
-        accessibilityLabel={t.retourA11y}
-        style={styles.retour}
-      >
-        <Text style={styles.retourTexte}>{t.retour}</Text>
-      </Pressable>
-
       <View style={styles.progression} accessible accessibilityLabel={t.etape(2)}>
         {[1, 2, 3].map((n) => (
           <View key={n} style={[styles.barre, n <= 2 && styles.barreActive]} />
@@ -79,11 +70,13 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
       </Text>
       <Text style={styles.aide}>{t.interets.aide}</Text>
 
-      <View style={{ marginTop: 24 }}>
+      <View style={styles.grille}>
         {choix.map((c) => (
           <BoutonChoix
             key={c.valeur}
             multiple
+            style={styles.case}
+            icone={ICONES_CATEGORIE[c.valeur]}
             libelle={c.libelle}
             selectionne={valeurs.includes(c.valeur)}
             onPress={() => onBasculer(c.valeur)}
@@ -153,13 +146,8 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
 
 const styles = StyleSheet.create({
   page: { flexGrow: 1, padding: 16 },
-  retour: {
-    alignSelf: 'flex-start',
-    minHeight: tailles.zoneMin,
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  retourTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: 18 },
+  grille: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 24, marginBottom: 12 },
+  case: { flexGrow: 1, flexBasis: 220, marginBottom: 0 },
   progression: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 20 },
   barre: { flex: 1, height: 10, borderRadius: 5, backgroundColor: couleurs.barreInactive },
   barreActive: { backgroundColor: couleurs.primaire },
