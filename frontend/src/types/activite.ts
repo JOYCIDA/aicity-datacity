@@ -5,6 +5,7 @@ export type Activite = {
   categorie: string; // code du backend : culture, gastronomie...
   categorieLibelle: string;
   description: string | null;
+  photo_url: string | null;
   lieu: string;
   adresse: string | null;
   lat: number;
