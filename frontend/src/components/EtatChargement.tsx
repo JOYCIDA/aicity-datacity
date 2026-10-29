@@ -1,5 +1,6 @@
 import { View, Text, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
 import { couleurs, polices, tailles } from '../theme';
+import { useTextes } from '../i18n';
 
 type Props = {
   message: string; // affiché pendant le chargement
@@ -8,6 +9,7 @@ type Props = {
 };
 
 export default function EtatChargement({ message, erreur, onReessayer }: Props) {
+  const t = useTextes();
   if (erreur) {
     return (
       <View>
@@ -18,10 +20,10 @@ export default function EtatChargement({ message, erreur, onReessayer }: Props) 
         <Pressable
           onPress={onReessayer}
           accessibilityRole="button"
-          accessibilityLabel="Réessayer"
+          accessibilityLabel={t.reessayer}
           style={styles.bouton}
         >
-          <Text style={styles.boutonTexte}>Réessayer</Text>
+          <Text style={styles.boutonTexte}>{t.reessayer}</Text>
         </Pressable>
       </View>
     );

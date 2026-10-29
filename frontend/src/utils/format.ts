@@ -1,7 +1,9 @@
-export function formaterPrix(prix: number | null): string {
-  if (prix === null) return 'Prix non communiqué';
-  if (prix === 0) return 'Gratuit';
-  return `${String(prix).replace('.', ',')} €`;
+import { Textes } from '../i18n';
+
+export function formaterPrix(prix: number | null, t: Textes): string {
+  if (prix === null) return t.prixInconnu;
+  if (prix === 0) return t.gratuit;
+  return t.locale === 'fr-FR' ? `${String(prix).replace('.', ',')} €` : `€${prix}`;
 }
 
 export function formaterDistance(metres: number): string {
@@ -9,29 +11,22 @@ export function formaterDistance(metres: number): string {
   return `${(metres / 1000).toFixed(1).replace('.', ',')} km`;
 }
 
-export function formaterDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('fr-FR');
+export function formaterDate(iso: string, t: Textes): string {
+  return new Date(iso).toLocaleDateString(t.locale);
 }
 
-function jourEtHeure(iso: string): string {
+function jourEtHeure(iso: string, t: Textes): string {
   const d = new Date(iso);
-  const jour = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-  const heure = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-  return `${jour} à ${heure}`;
+  const jour = d.toLocaleDateString(t.locale, { weekday: 'long', day: 'numeric', month: 'long' });
+  const heure = d.toLocaleTimeString(t.locale, { hour: '2-digit', minute: '2-digit' });
+  return t.horaires.jourHeure(jour, heure);
 }
 
 // Quand le backend ne donne pas d'horaires, on les déduit des dates de début et de fin.
-export function formaterHoraires(horaires: string | null, debut: string, fin: string | null): string {
+export function formaterHoraires(horaires: string | null, debut: string, fin: string | null, t: Textes): string {
   if (horaires) return horaires;
   const maintenant = new Date();
-  if (!fin) return `À partir du ${jourEtHeure(debut)}`;
-  if (new Date(debut) <= maintenant) return `En cours, jusqu'au ${jourEtHeure(fin)}`;
-  return `Du ${jourEtHeure(debut)} au ${jourEtHeure(fin)}`;
+  if (!fin) return t.horaires.aPartirDu(jourEtHeure(debut, t));
+  if (new Date(debut) <= maintenant) return t.horaires.enCours(jourEtHeure(fin, t));
+  return t.horaires.duAu(jourEtHeure(debut, t), jourEtHeure(fin, t));
 }
-
-export const LIBELLES_SOURCE: Record<string, string> = {
-  ENTREPRISE: 'Partenaire AiCity',
-  OPENAGENDA: 'OpenAgenda',
-  DATA_GOUV: 'data.gouv.fr',
-  PARIS_OPEN_DATA: 'Paris Open Data',
-};
