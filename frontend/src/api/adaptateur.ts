@@ -34,6 +34,8 @@ export function versActivite(
     categorieLibelle: langue === 'FR' ? offre.categorie.libelleFr : offre.categorie.libelleEn,
     description: offre.description,
     photo_url: offre.photoUrl,
+    photo_credit: offre.photoCredit ?? null,
+    photo_alt: offre.photoAlt ?? null,
     lieu: offre.lieu,
     adresse: offre.adresse,
     lat: offre.latitude,

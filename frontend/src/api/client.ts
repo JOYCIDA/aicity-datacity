@@ -19,6 +19,9 @@ export type OffreApi = {
   prix: number | null;
   gratuit: boolean;
   photoUrl: string | null;
+  // Pas encore renvoyés par le backend (demandés à Elfried) : facultatifs en attendant.
+  photoCredit?: string | null;
+  photoAlt?: string | null;
   source: SourceOffre;
   sourceUrl: string | null;
   creeLe: string;
