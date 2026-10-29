@@ -17,7 +17,14 @@ export function formaterDate(iso: string, t: Textes): string {
 
 function jourEtHeure(iso: string, t: Textes): string {
   const d = new Date(iso);
-  const jour = d.toLocaleDateString(t.locale, { weekday: 'long', day: 'numeric', month: 'long' });
+  // L'année n'est utile que si ce n'est pas l'année en cours (« jusqu'au 5 juillet 2027 »).
+  const autreAnnee = d.getFullYear() !== new Date().getFullYear();
+  const jour = d.toLocaleDateString(t.locale, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    ...(autreAnnee && { year: 'numeric' }),
+  });
   const heure = d.toLocaleTimeString(t.locale, { hour: '2-digit', minute: '2-digit' });
   return t.horaires.jourHeure(jour, heure);
 }
