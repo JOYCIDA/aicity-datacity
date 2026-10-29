@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
@@ -10,9 +11,13 @@ import EcranBudget from './src/screens/EcranBudget';
 import EcranResultats, { Recherche } from './src/screens/EcranResultats';
 import EcranFiche from './src/screens/EcranFiche';
 import EcranSignalement from './src/screens/EcranSignalement';
+import EtatChargement from './src/components/EtatChargement';
+import { chargerQuestions, ErreurApi } from './src/api/client';
+import { versQuestions } from './src/api/adaptateur';
 import { couleurs } from './src/theme';
 import { Reponses } from './src/types/parcours';
 import { Activite } from './src/types/activite';
+import { Questions } from './src/types/questions';
 
 type Etape =
   | 'accueil'
@@ -33,6 +38,23 @@ export default function App() {
   const [reponses, setReponses] = useState<Reponses>({ interets: [] });
   const [activiteChoisie, setActiviteChoisie] = useState<Activite | null>(null);
   const [recherche, setRecherche] = useState<Recherche | null>(null);
+  const [questions, setQuestions] = useState<Questions | null>(null);
+  const [erreurQuestions, setErreurQuestions] = useState<string | null>(null);
+
+  const chargerLesQuestions = useCallback(async () => {
+    setErreurQuestions(null);
+    try {
+      setQuestions(versQuestions(await chargerQuestions()));
+    } catch (e) {
+      setErreurQuestions(
+        e instanceof ErreurApi ? e.message : 'Les questions n’ont pas pu être chargées. Réessaie dans un instant.',
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    chargerLesQuestions();
+  }, [chargerLesQuestions]);
 
   if (!policesPretes) return null;
 
@@ -52,16 +74,28 @@ export default function App() {
           <EcranAccueil onCommencer={() => setEtape('duree')} />
         )}
 
-        {etape === 'duree' && (
+        {etape !== 'accueil' && !questions && (
+          <View style={{ padding: 16 }}>
+            <EtatChargement
+              message="Chargement des questions…"
+              erreur={erreurQuestions}
+              onReessayer={chargerLesQuestions}
+            />
+          </View>
+        )}
+
+        {etape === 'duree' && questions && (
           <EcranDuree
+            choix={questions.durees}
             valeur={reponses.duree}
             onChoisir={(duree) => setReponses({ ...reponses, duree })}
             onSuivant={() => setEtape('interets')}
           />
         )}
 
-        {etape === 'interets' && (
+        {etape === 'interets' && questions && (
           <EcranInterets
+            choix={questions.categories}
             valeurs={reponses.interets}
             onBasculer={basculerInteret}
             onRetour={() => setEtape('duree')}
@@ -69,8 +103,10 @@ export default function App() {
           />
         )}
 
-        {etape === 'budget' && (
+        {etape === 'budget' && questions && (
           <EcranBudget
+            choix={questions.budgets}
+            saisieLibre={questions.budgetLibre}
             valeur={reponses.budget}
             onChoisir={(budget) => setReponses({ ...reponses, budget })}
             onRetour={() => setEtape('interets')}
@@ -81,8 +117,9 @@ export default function App() {
           />
         )}
 
-        {etape === 'resultats' && (
+        {etape === 'resultats' && questions && (
           <EcranResultats
+            questions={questions}
             reponses={reponses}
             recherche={recherche}
             onRecherche={setRecherche}

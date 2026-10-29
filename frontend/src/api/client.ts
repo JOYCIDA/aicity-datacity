@@ -43,6 +43,17 @@ export type ReponseRecommandations = {
   resultats: ResultatApi[];
 };
 
+// backend/src/config/questions.ts
+export type Libelle = { FR: string; EN: string };
+
+export type QuestionApi = {
+  id: 'tempsLibreMinutes' | 'budgetMax' | 'categories';
+  libelle: Libelle;
+  choixMultiple: boolean;
+  choix: { valeur: number | string | null; libelle: Libelle }[];
+  saisieLibre?: { min: number; max: number; pas: number; unite: string; libelle: Libelle };
+};
+
 export type Criteres = {
   latitude: number;
   longitude: number;
@@ -109,6 +120,11 @@ async function avecSession<T>(appel: () => Promise<T>): Promise<T> {
     }
     throw e;
   }
+}
+
+export async function chargerQuestions(): Promise<QuestionApi[]> {
+  const { questions } = await requete<{ questions: QuestionApi[] }>('/citoyen/questions');
+  return questions;
 }
 
 export function recommander(criteres: Criteres): Promise<ReponseRecommandations> {
