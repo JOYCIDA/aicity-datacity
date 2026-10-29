@@ -1,24 +1,7 @@
 import { Pressable, View, Text, StyleSheet } from 'react-native';
 import { Activite } from '../types/activite';
 import { couleurs, polices, tailles } from '../theme';
-
-const LIBELLES_CATEGORIE: Record<Activite['categorie'], string> = {
-  musique: 'Musique',
-  expos: 'Expo & Art',
-  sport: 'Sport',
-  food: 'Food',
-  nature: 'Nature',
-  autre: 'Autre',
-};
-
-function formaterPrix(prix: number): string {
-  return prix === 0 ? 'Gratuit' : `${prix} €`;
-}
-
-function formaterDistance(metres: number): string {
-  if (metres < 1000) return `${metres} m`;
-  return `${(metres / 1000).toFixed(1).replace('.', ',')} km`;
-}
+import { formaterPrix, formaterDistance } from '../utils/format';
 
 type Props = {
   activite: Activite;
@@ -27,16 +10,16 @@ type Props = {
 
 export default function CarteActivite({ activite, onPress }: Props) {
   const prix = formaterPrix(activite.prix);
-  const distance = formaterDistance(activite.distance_m);
+  const distance = `${formaterDistance(activite.distance_m)} · ${activite.trajet_min} min à pied`;
 
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${activite.titre}, ${LIBELLES_CATEGORIE[activite.categorie]}, ${activite.lieu}, ${activite.horaires}, ${prix}, à ${distance}`}
+      accessibilityLabel={`${activite.titre}, ${activite.categorieLibelle}, ${activite.lieu}, ${activite.horaires}, ${prix}, à ${distance}`}
       style={styles.carte}
     >
-      <Text style={styles.categorie}>{LIBELLES_CATEGORIE[activite.categorie]}</Text>
+      <Text style={styles.categorie}>{activite.categorieLibelle}</Text>
       <Text accessibilityRole="header" style={styles.titre}>
         {activite.titre}
       </Text>

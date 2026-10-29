@@ -1,7 +1,7 @@
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView, Linking, StyleSheet } from 'react-native';
 import { Activite } from '../types/activite';
 import { couleurs, polices, tailles } from '../theme';
-import { formaterPrix, formaterDistance, LIBELLES_CATEGORIE } from '../utils/format';
+import { formaterPrix, formaterDistance } from '../utils/format';
 import { SIGNALEMENT_ACTIF } from '../config';
 
 type Props = {
@@ -22,14 +22,22 @@ export default function EcranFiche({ activite, onRetour, onSignaler }: Props) {
         <Text style={styles.retourTexte}>‹ Retour aux résultats</Text>
       </Pressable>
 
-      <Text style={styles.categorie}>{LIBELLES_CATEGORIE[activite.categorie]}</Text>
+      <Text style={styles.categorie}>{activite.categorieLibelle}</Text>
       <Text accessibilityRole="header" style={styles.titre}>
         {activite.titre}
       </Text>
 
+      <View style={styles.pourquoi}>
+        <Text accessibilityRole="header" style={styles.pourquoiTitre}>
+          Pourquoi cette proposition ?
+        </Text>
+        <Text style={styles.raison}>{activite.explication}</Text>
+      </View>
+
       <View style={styles.infos}>
         <Text style={styles.libelle}>Lieu</Text>
         <Text style={styles.valeur}>{activite.lieu}</Text>
+        {activite.adresse && <Text style={styles.raison}>{activite.adresse}</Text>}
 
         <Text style={styles.libelle}>Horaire</Text>
         <Text style={styles.valeur}>{activite.horaires}</Text>
@@ -38,19 +46,30 @@ export default function EcranFiche({ activite, onRetour, onSignaler }: Props) {
         <Text style={styles.valeur}>{formaterPrix(activite.prix)}</Text>
 
         <Text style={styles.libelle}>Distance</Text>
-        <Text style={styles.valeur}>{formaterDistance(activite.distance_m)}</Text>
+        <Text style={styles.valeur}>
+          {formaterDistance(activite.distance_m)} · {activite.trajet_min} min à pied
+        </Text>
       </View>
 
-      <View style={styles.pourquoi}>
-        <Text accessibilityRole="header" style={styles.pourquoiTitre}>
-          Pourquoi cette proposition ?
-        </Text>
-        {activite.raisons.map((r) => (
-          <Text key={r} style={styles.raison}>
-            • {r}
+      {activite.description && (
+        <View style={styles.infos}>
+          <Text accessibilityRole="header" style={styles.pourquoiTitre}>
+            Description
           </Text>
-        ))}
-      </View>
+          <Text style={styles.raison}>{activite.description}</Text>
+        </View>
+      )}
+
+      {activite.source_url && (
+        <Pressable
+          onPress={() => Linking.openURL(activite.source_url!)}
+          accessibilityRole="link"
+          accessibilityLabel={`Voir l'offre sur ${activite.source}`}
+          style={styles.signaler}
+        >
+          <Text style={styles.signalerTexte}>Voir l'offre sur {activite.source} ↗</Text>
+        </Pressable>
+      )}
 
       {SIGNALEMENT_ACTIF && (
         <Pressable
