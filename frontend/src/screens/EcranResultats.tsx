@@ -4,14 +4,15 @@ import CarteActivite from '../components/CarteActivite';
 import EtatChargement from '../components/EtatChargement';
 import { recommander, ErreurApi } from '../api/client';
 import { versActivite } from '../api/adaptateur';
-import { obtenirPosition } from '../utils/position';
+import { obtenirPosition, RemarquePosition } from '../utils/position';
 import { formaterPrix } from '../utils/format';
+import { useLangue, useTextes } from '../i18n';
 import { Activite } from '../types/activite';
 import { Reponses } from '../types/parcours';
 import { Questions } from '../types/questions';
 import { couleurs, polices, tailles } from '../theme';
 
-export type Recherche = { activites: Activite[]; elargie: boolean; remarquePosition: string | null };
+export type Recherche = { activites: Activite[]; elargie: boolean; remarquePosition: RemarquePosition | null };
 
 type Props = {
   questions: Questions;
@@ -32,6 +33,8 @@ export default function EcranResultats({
   onRetour,
   onOuvrir,
 }: Props) {
+  const t = useTextes();
+  const langue = useLangue();
   const [erreur, setErreur] = useState<string | null>(null);
 
   const charger = useCallback(async () => {
@@ -44,11 +47,15 @@ export default function EcranResultats({
         budgetMax: reponses.budget === undefined ? null : reponses.budget,
         categories: reponses.interets,
       });
-      onRecherche({ activites: r.resultats.map(versActivite), elargie: r.elargie, remarquePosition: remarque });
+      onRecherche({
+        activites: r.resultats.map((x) => versActivite(x, langue)),
+        elargie: r.elargie,
+        remarquePosition: remarque,
+      });
     } catch (e) {
-      setErreur(e instanceof ErreurApi ? e.message : 'Une erreur est survenue. Réessaie dans un instant.');
+      setErreur(e instanceof ErreurApi ? e.message : t.erreurs.generique);
     }
-  }, [reponses, onRecherche]);
+  }, [reponses, onRecherche, langue, t]);
 
   useEffect(() => {
     if (!recherche) charger();
@@ -58,7 +65,7 @@ export default function EcranResultats({
     reponses.budget === undefined
       ? undefined
       : questions.budgets.find((b) => b.valeur === reponses.budget)?.libelle ??
-        `Jusqu'à ${formaterPrix(reponses.budget)}`;
+        t.resultats.jusqua(formaterPrix(reponses.budget, t));
   const resume = [questions.durees.find((d) => d.valeur === reponses.duree)?.libelle, libelleBudget]
     .filter(Boolean)
     .join(' · ');
@@ -72,46 +79,38 @@ export default function EcranResultats({
       <Pressable
         onPress={onRetour}
         accessibilityRole="button"
-        accessibilityLabel="Modifier mes choix"
+        accessibilityLabel={t.resultats.modifierA11y}
         style={styles.retour}
       >
-        <Text style={styles.retourTexte}>‹ Modifier mes choix</Text>
+        <Text style={styles.retourTexte}>{t.resultats.modifier}</Text>
       </Pressable>
 
       {erreur || !recherche ? (
-        <EtatChargement message="Je cherche des activités près de toi…" erreur={erreur} onReessayer={charger} />
+        <EtatChargement message={t.resultats.chargement} erreur={erreur} onReessayer={charger} />
       ) : (
         <>
           <Text accessibilityRole="header" style={styles.titre}>
-            {n === 0
-              ? 'Aucune activité trouvée'
-              : `${n} activité${n > 1 ? 's' : ''} trouvée${n > 1 ? 's' : ''} près de toi`}
+            {n === 0 ? t.resultats.aucune : t.resultats.trouvees(n)}
           </Text>
           <Text style={styles.resume}>{resume}</Text>
           {recherche.remarquePosition && (
             <Text style={styles.resume} accessibilityRole="text">
-              ℹ {recherche.remarquePosition}
+              ℹ {t.position[recherche.remarquePosition]}
             </Text>
           )}
-          {recherche.elargie && n > 0 && (
-            <Text style={styles.resume}>Peu d'activités tout près : nous avons élargi la zone de recherche.</Text>
-          )}
+          {recherche.elargie && n > 0 && <Text style={styles.resume}>{t.resultats.elargie}</Text>}
 
           {n === 0 ? (
             <View>
-              <Text style={styles.vide}>
-                {dureeSuivante
-                  ? "Aucune activité ne tient dans ce temps-là. Avec un peu plus de temps, tu auras plus de choix."
-                  : "Aucune activité ne correspond à tes choix. Modifie ton budget ou tes centres d'intérêt."}
-              </Text>
+              <Text style={styles.vide}>{dureeSuivante ? t.resultats.aucunTemps : t.resultats.aucunChoix}</Text>
               {dureeSuivante && (
                 <Pressable
                   onPress={() => onChangerDuree(dureeSuivante.valeur)}
                   accessibilityRole="button"
-                  accessibilityLabel={`Chercher avec plus de temps : ${dureeSuivante.libelle}`}
+                  accessibilityLabel={t.resultats.plusDeTemps(dureeSuivante.libelle)}
                   style={styles.bouton}
                 >
-                  <Text style={styles.boutonTexte}>Chercher avec plus de temps ({dureeSuivante.libelle})</Text>
+                  <Text style={styles.boutonTexte}>{t.resultats.plusDeTemps(dureeSuivante.libelle)}</Text>
                 </Pressable>
               )}
             </View>

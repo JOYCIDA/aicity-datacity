@@ -1,13 +1,33 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { couleurs, polices, tailles } from '../theme';
+import { Langue, LANGUES, TEXTES, useLangue, useTextes } from '../i18n';
 
 type Props = {
+  onChangerLangue: (langue: Langue) => void;
   onCommencer: () => void;
 };
 
-export default function EcranAccueil({ onCommencer }: Props) {
+export default function EcranAccueil({ onChangerLangue, onCommencer }: Props) {
+  const t = useTextes();
+  const langue = useLangue();
+
   return (
     <View style={styles.page}>
+      <View style={styles.langues} accessibilityRole="radiogroup" accessibilityLabel={t.accueil.choixLangue}>
+        {LANGUES.map((l) => (
+          <Pressable
+            key={l}
+            onPress={() => onChangerLangue(l)}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: l === langue }}
+            accessibilityLabel={TEXTES[l].nomLangue}
+            style={[styles.langue, l === langue && styles.langueActive]}
+          >
+            <Text style={[styles.langueTexte, l === langue && styles.langueTexteActive]}>{l}</Text>
+          </Pressable>
+        ))}
+      </View>
+
       <View style={styles.centre}>
         <Text accessibilityRole="header" style={styles.logo}>
           <Text style={{ color: couleurs.texte }}>Ai</Text>
@@ -15,29 +35,44 @@ export default function EcranAccueil({ onCommencer }: Props) {
         </Text>
         <Text style={styles.slogan}>FROM A TO B</Text>
 
-        <Text style={styles.accroche}>
-          Trouve une activité près de toi en moins de 2 minutes.
-        </Text>
+        <Text style={styles.accroche}>{t.accueil.accroche}</Text>
       </View>
 
       <Pressable
         onPress={onCommencer}
         accessibilityRole="button"
-        accessibilityLabel="Commencer"
+        accessibilityLabel={t.accueil.commencer}
         style={styles.bouton}
       >
-        <Text style={styles.boutonTexte}>Commencer</Text>
+        <Text style={styles.boutonTexte}>{t.accueil.commencer}</Text>
       </Pressable>
 
-      <Text style={styles.mention}>
-        Aucun compte. Aucune inscription. Session effacée à la fin.
-      </Text>
+      <Text style={styles.mention}>{t.accueil.mention}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   page: { flex: 1, padding: 24 },
+  langues: {
+    flexDirection: 'row',
+    alignSelf: 'flex-end',
+    gap: 4,
+    padding: 4,
+    borderRadius: 28,
+    borderWidth: 2,
+    borderColor: couleurs.primaire,
+  },
+  langue: {
+    minWidth: tailles.zoneMin + 8,
+    minHeight: tailles.zoneMin,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  langueActive: { backgroundColor: couleurs.primaire },
+  langueTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: tailles.texte },
+  langueTexteActive: { color: couleurs.fond },
   centre: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   logo: { fontFamily: polices.titre, fontSize: 56 },
   slogan: {

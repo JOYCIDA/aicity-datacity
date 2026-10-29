@@ -3,8 +3,9 @@ import { POSITION_PAR_DEFAUT } from '../config';
 
 export type Position = { latitude: number; longitude: number };
 
-// Message à afficher quand on cherche autour du centre de Paris plutôt qu'autour du citoyen.
-export type ResultatPosition = { position: Position; remarque: string | null };
+// Pourquoi on cherche autour du centre de Paris plutôt qu'autour du citoyen (texte dans i18n.ts).
+export type RemarquePosition = 'refusee' | 'horsParis' | 'introuvable';
+export type ResultatPosition = { position: Position; remarque: RemarquePosition | null };
 
 // Les données couvrent Paris : au-delà, on cherche autour du centre.
 const DISTANCE_MAX_PARIS_M = 15_000;
@@ -23,25 +24,14 @@ function distanceM(a: Position, b: Position): number {
 export async function obtenirPosition(): Promise<ResultatPosition> {
   try {
     const { granted } = await Location.requestForegroundPermissionsAsync();
-    if (!granted) {
-      return {
-        position: POSITION_PAR_DEFAUT,
-        remarque: "Tu n'as pas autorisé l'accès à ta position : nous cherchons autour du centre de Paris.",
-      };
-    }
+    if (!granted) return { position: POSITION_PAR_DEFAUT, remarque: 'refusee' };
     const { coords } = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
     const position = { latitude: coords.latitude, longitude: coords.longitude };
     if (distanceM(position, POSITION_PAR_DEFAUT) > DISTANCE_MAX_PARIS_M) {
-      return {
-        position: POSITION_PAR_DEFAUT,
-        remarque: 'Tu sembles être hors de Paris : nous cherchons autour du centre de Paris.',
-      };
+      return { position: POSITION_PAR_DEFAUT, remarque: 'horsParis' };
     }
     return { position, remarque: null };
   } catch {
-    return {
-      position: POSITION_PAR_DEFAUT,
-      remarque: "Ta position n'a pas pu être trouvée : nous cherchons autour du centre de Paris.",
-    };
+    return { position: POSITION_PAR_DEFAUT, remarque: 'introuvable' };
   }
 }
