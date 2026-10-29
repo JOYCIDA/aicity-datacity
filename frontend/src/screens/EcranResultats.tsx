@@ -1,17 +1,20 @@
 import { useCallback, useEffect, useState } from 'react';
-import { View, Text, Pressable, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, Pressable, FlatList, StyleSheet } from 'react-native';
 import CarteActivite from '../components/CarteActivite';
+import EtatChargement from '../components/EtatChargement';
 import { recommander, ErreurApi } from '../api/client';
 import { versActivite } from '../api/adaptateur';
-import { DUREES, BUDGETS } from '../data/questions';
 import { obtenirPosition } from '../utils/position';
+import { formaterPrix } from '../utils/format';
 import { Activite } from '../types/activite';
 import { Reponses } from '../types/parcours';
+import { Questions } from '../types/questions';
 import { couleurs, polices, tailles } from '../theme';
 
 export type Recherche = { activites: Activite[]; elargie: boolean; remarquePosition: string | null };
 
 type Props = {
+  questions: Questions;
   reponses: Reponses;
   recherche: Recherche | null; // null : pas encore chargée
   onRecherche: (r: Recherche) => void;
@@ -19,7 +22,7 @@ type Props = {
   onOuvrir: (activite: Activite) => void;
 };
 
-export default function EcranResultats({ reponses, recherche, onRecherche, onRetour, onOuvrir }: Props) {
+export default function EcranResultats({ questions, reponses, recherche, onRecherche, onRetour, onOuvrir }: Props) {
   const [erreur, setErreur] = useState<string | null>(null);
 
   const charger = useCallback(async () => {
@@ -28,7 +31,7 @@ export default function EcranResultats({ reponses, recherche, onRecherche, onRet
       const { position, remarque } = await obtenirPosition();
       const r = await recommander({
         ...position,
-        tempsLibreMinutes: reponses.duree ?? DUREES[0].valeur,
+        tempsLibreMinutes: reponses.duree!,
         budgetMax: reponses.budget === undefined ? null : reponses.budget,
         categories: reponses.interets,
       });
@@ -42,10 +45,12 @@ export default function EcranResultats({ reponses, recherche, onRecherche, onRet
     if (!recherche) charger();
   }, [recherche, charger]);
 
-  const resume = [
-    DUREES.find((d) => d.valeur === reponses.duree)?.libelle,
-    BUDGETS.find((b) => b.valeur === reponses.budget)?.libelle,
-  ]
+  const libelleBudget =
+    reponses.budget === undefined
+      ? undefined
+      : questions.budgets.find((b) => b.valeur === reponses.budget)?.libelle ??
+        `Jusqu'à ${formaterPrix(reponses.budget)}`;
+  const resume = [questions.durees.find((d) => d.valeur === reponses.duree)?.libelle, libelleBudget]
     .filter(Boolean)
     .join(' · ');
 
@@ -62,26 +67,8 @@ export default function EcranResultats({ reponses, recherche, onRecherche, onRet
         <Text style={styles.retourTexte}>‹ Modifier mes choix</Text>
       </Pressable>
 
-      {erreur ? (
-        <View>
-          <View style={styles.erreur} accessibilityRole="alert">
-            <Text style={styles.erreurIcone}>⚠</Text>
-            <Text style={styles.erreurTexte}>{erreur}</Text>
-          </View>
-          <Pressable
-            onPress={charger}
-            accessibilityRole="button"
-            accessibilityLabel="Réessayer"
-            style={styles.bouton}
-          >
-            <Text style={styles.boutonTexte}>Réessayer</Text>
-          </Pressable>
-        </View>
-      ) : !recherche ? (
-        <View style={styles.chargement} accessible accessibilityLabel="Recherche des activités en cours">
-          <ActivityIndicator size="large" color={couleurs.primaire} />
-          <Text style={styles.resume}>Je cherche des activités près de toi…</Text>
-        </View>
+      {erreur || !recherche ? (
+        <EtatChargement message="Je cherche des activités près de toi…" erreur={erreur} onReessayer={charger} />
       ) : (
         <>
           <Text accessibilityRole="header" style={styles.titre}>
@@ -139,18 +126,4 @@ const styles = StyleSheet.create({
     fontSize: tailles.texte,
     marginTop: 24,
   },
-  chargement: { alignItems: 'center', gap: 12, marginTop: 48 },
-  erreur: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 24 },
-  erreurIcone: { color: couleurs.erreur, fontSize: 20 },
-  erreurTexte: { flex: 1, fontFamily: polices.texteMoyen, color: couleurs.erreur, fontSize: tailles.texte },
-  bouton: {
-    alignSelf: 'flex-start',
-    minHeight: tailles.zoneMin + 12,
-    justifyContent: 'center',
-    backgroundColor: couleurs.primaire,
-    paddingHorizontal: 32,
-    borderRadius: 30,
-    marginTop: 16,
-  },
-  boutonTexte: { fontFamily: polices.titre, color: couleurs.fond, fontSize: 20 },
 });
