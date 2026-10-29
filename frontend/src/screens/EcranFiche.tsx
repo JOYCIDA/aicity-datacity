@@ -7,23 +7,13 @@ import { SIGNALEMENT_ACTIF } from '../config';
 
 type Props = {
   activite: Activite;
-  onRetour: () => void;
   onSignaler: () => void;
 };
 
-export default function EcranFiche({ activite, onRetour, onSignaler }: Props) {
+export default function EcranFiche({ activite, onSignaler }: Props) {
   const t = useTextes();
   return (
     <ScrollView contentContainerStyle={styles.page}>
-      <Pressable
-        onPress={onRetour}
-        accessibilityRole="button"
-        accessibilityLabel={t.fiche.retourA11y}
-        style={styles.retour}
-      >
-        <Text style={styles.retourTexte}>{t.fiche.retour}</Text>
-      </Pressable>
-
       <Text style={styles.categorie}>{activite.categorieLibelle}</Text>
       <Text accessibilityRole="header" style={styles.titre}>
         {activite.titre}
@@ -91,13 +81,6 @@ export default function EcranFiche({ activite, onRetour, onSignaler }: Props) {
 
 const styles = StyleSheet.create({
   page: { padding: 16, paddingBottom: 32 },
-  retour: {
-    alignSelf: 'flex-start',
-    minHeight: tailles.zoneMin,
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  retourTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: 18 },
   categorie: {
     fontFamily: polices.texteMoyen,
     color: couleurs.primaire,

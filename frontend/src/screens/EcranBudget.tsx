@@ -5,6 +5,7 @@ import { couleurs, polices, tailles } from '../theme';
 import { Budget } from '../types/parcours';
 import { Choix, SaisieLibre } from '../types/questions';
 import { useTextes } from '../i18n';
+import { iconeBudget } from '../components/Icones';
 
 type Props = {
   choix: Choix<Budget>[];
@@ -12,13 +13,12 @@ type Props = {
   valeur?: Budget;
   onChoisir: (b: Budget | undefined) => void;
   onSuivant: () => void;
-  onRetour: () => void;
 };
 
 // Montant en euros avec au plus 2 décimales, virgule ou point.
 const FORMAT_MONTANT = /^\d+([.,]\d{1,2})?$/;
 
-export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onSuivant, onRetour }: Props) {
+export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onSuivant }: Props) {
   const t = useTextes();
   const [aEssaye, setAEssaye] = useState(false);
   const montantLibre = valeur !== undefined && !choix.some((c) => c.valeur === valeur);
@@ -54,15 +54,6 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
 
   return (
     <ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
-      <Pressable
-        onPress={onRetour}
-        accessibilityRole="button"
-        accessibilityLabel={t.retourA11y}
-        style={styles.retour}
-      >
-        <Text style={styles.retourTexte}>{t.retour}</Text>
-      </Pressable>
-
       <View style={styles.progression} accessible accessibilityLabel={t.etape(3)}>
         {[1, 2, 3].map((n) => (
           <View key={n} style={[styles.barre, styles.barreActive]} />
@@ -81,6 +72,7 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
           <BoutonChoix
             key={String(c.valeur)}
             libelle={c.libelle}
+            icone={iconeBudget(c.valeur)}
             selectionne={texte === '' && valeur === c.valeur}
             onPress={() => choisir(c.valeur)}
           />
@@ -140,13 +132,6 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
 
 const styles = StyleSheet.create({
   page: { flexGrow: 1, padding: 16 },
-  retour: {
-    alignSelf: 'flex-start',
-    minHeight: tailles.zoneMin,
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  retourTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: 18 },
   progression: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 20 },
   barre: { flex: 1, height: 10, borderRadius: 5, backgroundColor: couleurs.barreInactive },
   barreActive: { backgroundColor: couleurs.primaire },

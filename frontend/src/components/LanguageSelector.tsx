@@ -1,10 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, fonts, radius, textSize } from '../theme/tokens';
+import { Langue, LANGUES, TEXTES, useTextes } from '../i18n';
 
-export type Lang = 'FR' | 'EN';
-
-const languages: Lang[] = ['FR', 'EN'];
+export type Lang = Langue;
 
 type Props = {
   active: Lang;
@@ -12,15 +11,17 @@ type Props = {
 };
 
 export default function LanguageSelector({ active, onChange }: Props) {
+  const t = useTextes();
   return (
-    <View style={styles.container}>
-      {languages.map((lang) => {
+    <View style={styles.container} accessibilityRole="radiogroup" accessibilityLabel={t.accueil.choixLangue}>
+      {LANGUES.map((lang) => {
         const isActive = lang === active;
         return (
           <Pressable
             key={lang}
-            accessibilityRole="button"
+            accessibilityRole="radio"
             accessibilityState={{ selected: isActive }}
+            accessibilityLabel={TEXTES[lang].nomLangue}
             onPress={() => onChange?.(lang)}
             style={[styles.option, isActive && styles.optionActive]}
           >
@@ -41,8 +42,11 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   option: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    minWidth: 44,
+    minHeight: 44,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: radius.xl,
   },
   optionActive: {

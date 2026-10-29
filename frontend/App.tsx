@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
-import { DMSans_400Regular, DMSans_500Medium } from '@expo-google-fonts/dm-sans';
+import { DMSans_400Regular, DMSans_500Medium, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
 import EcranAccueil from './src/screens/EcranAccueil';
 import EcranDuree from './src/screens/EcranDuree';
 import EcranInterets from './src/screens/EcranInterets';
@@ -12,6 +12,7 @@ import EcranResultats, { Recherche } from './src/screens/EcranResultats';
 import EcranFiche from './src/screens/EcranFiche';
 import EcranSignalement from './src/screens/EcranSignalement';
 import EtatChargement from './src/components/EtatChargement';
+import KioskTopBar from './src/components/KioskTopBar';
 import { chargerQuestions, definirLangue, ErreurApi, QuestionApi } from './src/api/client';
 import { versQuestions } from './src/api/adaptateur';
 import { couleurs } from './src/theme';
@@ -33,6 +34,7 @@ export default function App() {
     SpaceGrotesk_700Bold,
     DMSans_400Regular,
     DMSans_500Medium,
+    DMSans_700Bold,
   });
   const [etape, setEtape] = useState<Etape>('accueil');
   const [reponses, setReponses] = useState<Reponses>({ interets: [] });
@@ -69,8 +71,21 @@ export default function App() {
   const changerLangue = (l: Langue) => {
     definirLangue(l);
     setLangue(l);
+    // Les résultats affichés sont dans l'ancienne langue : on les recharge.
     setRecherche(null);
+    if (etape === 'fiche') setEtape('resultats');
   };
+
+  // Écran précédent pour le bouton Retour de la barre du haut (aucun sur l'accueil).
+  const PRECEDENT: Partial<Record<Etape, Etape>> = {
+    duree: 'accueil',
+    interets: 'duree',
+    budget: 'interets',
+    resultats: 'budget',
+    fiche: 'resultats',
+    signalement: 'fiche',
+  };
+  const precedent = PRECEDENT[etape];
 
   const basculerInteret = (valeur: string) => {
     const interets = reponses.interets.includes(valeur)
@@ -84,9 +99,22 @@ export default function App() {
       <SafeAreaProvider>
         <SafeAreaView style={{ flex: 1, backgroundColor: couleurs.fond }}>
           <StatusBar style="light" />
+          <KioskTopBar
+            showBack={precedent !== undefined}
+            onBack={() => precedent && setEtape(precedent)}
+            lang={langue}
+            onLangChange={changerLangue}
+          />
 
           {etape === 'accueil' && (
-            <EcranAccueil onChangerLangue={changerLangue} onCommencer={() => setEtape('duree')} />
+            <EcranAccueil
+              categories={questions?.categories ?? null}
+              onRaccourci={(categorie) => {
+                setReponses({ ...reponses, interets: [categorie] });
+                setEtape('duree');
+              }}
+              onCommencer={() => setEtape('duree')}
+            />
           )}
 
           {etape !== 'accueil' && !questions && (
@@ -122,7 +150,6 @@ export default function App() {
               onAjouter={(codes) =>
                 setReponses({ ...reponses, interets: [...new Set([...reponses.interets, ...codes])] })
               }
-              onRetour={() => setEtape('duree')}
               onSuivant={() => setEtape('budget')}
             />
           )}
@@ -133,7 +160,6 @@ export default function App() {
               saisieLibre={questions.budgetLibre}
               valeur={reponses.budget}
               onChoisir={(budget) => setReponses({ ...reponses, budget })}
-              onRetour={() => setEtape('interets')}
               onSuivant={() => {
                 setRecherche(null);
                 setEtape('resultats');
@@ -151,7 +177,6 @@ export default function App() {
                 setReponses({ ...reponses, duree });
                 setRecherche(null);
               }}
-              onRetour={() => setEtape('budget')}
               onOuvrir={(activite) => {
                 setActiviteChoisie(activite);
                 setEtape('fiche');
@@ -162,7 +187,6 @@ export default function App() {
           {etape === 'fiche' && activiteChoisie && (
             <EcranFiche
               activite={activiteChoisie}
-              onRetour={() => setEtape('resultats')}
               onSignaler={() => setEtape('signalement')}
             />
           )}

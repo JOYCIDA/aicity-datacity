@@ -20,7 +20,6 @@ type Props = {
   recherche: Recherche | null; // null : pas encore chargée
   onRecherche: (r: Recherche) => void;
   onChangerDuree: (minutes: number) => void;
-  onRetour: () => void;
   onOuvrir: (activite: Activite) => void;
 };
 
@@ -30,7 +29,6 @@ export default function EcranResultats({
   recherche,
   onRecherche,
   onChangerDuree,
-  onRetour,
   onOuvrir,
 }: Props) {
   const t = useTextes();
@@ -76,15 +74,6 @@ export default function EcranResultats({
 
   return (
     <View style={styles.page}>
-      <Pressable
-        onPress={onRetour}
-        accessibilityRole="button"
-        accessibilityLabel={t.resultats.modifierA11y}
-        style={styles.retour}
-      >
-        <Text style={styles.retourTexte}>{t.resultats.modifier}</Text>
-      </Pressable>
-
       {erreur || !recherche ? (
         <EtatChargement message={t.resultats.chargement} erreur={erreur} onReessayer={charger} />
       ) : (
@@ -130,13 +119,6 @@ export default function EcranResultats({
 
 const styles = StyleSheet.create({
   page: { flex: 1, padding: 16 },
-  retour: {
-    alignSelf: 'flex-start',
-    minHeight: tailles.zoneMin,
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  retourTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: 18 },
   titre: { fontFamily: polices.titre, color: couleurs.texte, fontSize: 28 },
   resume: {
     fontFamily: polices.texte,
