@@ -22,7 +22,13 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "AiCity utilise ta position pour te proposer des activités près de toi. Elle n'est jamais enregistrée."
+        }
+      ]
     ]
   }
 }
