@@ -2,16 +2,17 @@ import { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import BoutonChoix from '../components/BoutonChoix';
 import { couleurs, polices, tailles } from '../theme';
-import { CATEGORIES } from '../data/questions';
+import { Choix } from '../types/questions';
 
 type Props = {
+  choix: Choix<string>[];
   valeurs: string[];
   onBasculer: (valeur: string) => void;
   onSuivant: () => void;
   onRetour: () => void;
 };
 
-export default function EcranInterets({ valeurs, onBasculer, onSuivant, onRetour }: Props) {
+export default function EcranInterets({ choix, valeurs, onBasculer, onSuivant, onRetour }: Props) {
   const [aEssaye, setAEssaye] = useState(false);
   const afficherErreur = aEssaye && valeurs.length === 0;
 
@@ -48,7 +49,7 @@ export default function EcranInterets({ valeurs, onBasculer, onSuivant, onRetour
       <Text style={styles.aide}>Choisis une ou plusieurs réponses.</Text>
 
       <View style={{ marginTop: 24 }}>
-        {CATEGORIES.map((c) => (
+        {choix.map((c) => (
           <BoutonChoix
             key={c.valeur}
             multiple

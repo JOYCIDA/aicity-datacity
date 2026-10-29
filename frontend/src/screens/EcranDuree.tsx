@@ -3,15 +3,16 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import BoutonChoix from '../components/BoutonChoix';
 import { couleurs, polices, tailles } from '../theme';
 import { Duree } from '../types/parcours';
-import { DUREES } from '../data/questions';
+import { Choix } from '../types/questions';
 
 type Props = {
+  choix: Choix<Duree>[];
   valeur?: Duree;
   onChoisir: (d: Duree) => void;
   onSuivant: () => void;
 };
 
-export default function EcranDuree({ valeur, onChoisir, onSuivant }: Props) {
+export default function EcranDuree({ choix, valeur, onChoisir, onSuivant }: Props) {
   const [aEssaye, setAEssaye] = useState(false);
   const afficherErreur = aEssaye && valeur === undefined;
 
@@ -39,7 +40,7 @@ export default function EcranDuree({ valeur, onChoisir, onSuivant }: Props) {
       <Text style={styles.aide}>Une seule réponse.</Text>
 
       <View accessibilityRole="radiogroup" style={{ marginTop: 24 }}>
-        {DUREES.map((c) => (
+        {choix.map((c) => (
           <BoutonChoix
             key={c.valeur}
             libelle={c.libelle}
