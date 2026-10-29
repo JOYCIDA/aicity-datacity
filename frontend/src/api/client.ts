@@ -127,6 +127,17 @@ export async function chargerQuestions(): Promise<QuestionApi[]> {
   return questions;
 }
 
+// Le texte n'est jamais enregistré par le backend : seule l'interprétation revient.
+export type Interpretation = { tempsLibreMinutes?: number; budgetMax?: number; categories: string[] };
+
+export async function interpreter(texte: string): Promise<Interpretation> {
+  const { interpretation } = await requete<{ interpretation: Interpretation }>('/citoyen/interpretations', {
+    method: 'POST',
+    body: JSON.stringify({ texte }),
+  });
+  return interpretation;
+}
+
 export function recommander(criteres: Criteres): Promise<ReponseRecommandations> {
   return avecSession(() =>
     requete<ReponseRecommandations>('/citoyen/recommandations', {
