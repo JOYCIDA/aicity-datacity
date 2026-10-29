@@ -4,6 +4,7 @@ import BoutonChoix from '../components/BoutonChoix';
 import { couleurs, polices, tailles } from '../theme';
 import { Duree } from '../types/parcours';
 import { Choix } from '../types/questions';
+import { useTextes } from '../i18n';
 
 type Props = {
   choix: Choix<Duree>[];
@@ -13,6 +14,7 @@ type Props = {
 };
 
 export default function EcranDuree({ choix, valeur, onChoisir, onSuivant }: Props) {
+  const t = useTextes();
   const [aEssaye, setAEssaye] = useState(false);
   const afficherErreur = aEssaye && valeur === undefined;
 
@@ -26,18 +28,18 @@ export default function EcranDuree({ choix, valeur, onChoisir, onSuivant }: Prop
 
   return (
     <View style={styles.page}>
-      <View style={styles.progression} accessible accessibilityLabel="Étape 1 sur 3">
+      <View style={styles.progression} accessible accessibilityLabel={t.etape(1)}>
         {[1, 2, 3].map((n) => (
           <View key={n} style={[styles.barre, n === 1 && styles.barreActive]} />
         ))}
         <Text style={styles.compteur}>1 / 3</Text>
       </View>
 
-      <Text style={styles.etiquette}>QUESTION 1 SUR 3</Text>
+      <Text style={styles.etiquette}>{t.question(1)}</Text>
       <Text accessibilityRole="header" style={styles.titre}>
-        Combien de temps as-tu devant toi ?
+        {t.duree.titre}
       </Text>
-      <Text style={styles.aide}>Une seule réponse.</Text>
+      <Text style={styles.aide}>{t.uneReponse}</Text>
 
       <View accessibilityRole="radiogroup" style={{ marginTop: 24 }}>
         {choix.map((c) => (
@@ -53,17 +55,17 @@ export default function EcranDuree({ choix, valeur, onChoisir, onSuivant }: Prop
       {afficherErreur && (
         <View style={styles.erreur} accessibilityRole="alert">
           <Text style={styles.erreurIcone}>⚠</Text>
-          <Text style={styles.erreurTexte}>Choisis une réponse pour continuer.</Text>
+          <Text style={styles.erreurTexte}>{t.erreurChoix}</Text>
         </View>
       )}
 
       <Pressable
         onPress={suivant}
         accessibilityRole="button"
-        accessibilityLabel="Suivant"
+        accessibilityLabel={t.suivantA11y}
         style={styles.suivant}
       >
-        <Text style={styles.suivantTexte}>Suivant ›</Text>
+        <Text style={styles.suivantTexte}>{t.suivant}</Text>
       </Pressable>
     </View>
   );

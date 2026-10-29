@@ -2,6 +2,7 @@ import { View, Text, Pressable, ScrollView, Linking, StyleSheet } from 'react-na
 import { Activite } from '../types/activite';
 import { couleurs, polices, tailles } from '../theme';
 import { formaterPrix, formaterDistance } from '../utils/format';
+import { useTextes } from '../i18n';
 import { SIGNALEMENT_ACTIF } from '../config';
 
 type Props = {
@@ -11,15 +12,16 @@ type Props = {
 };
 
 export default function EcranFiche({ activite, onRetour, onSignaler }: Props) {
+  const t = useTextes();
   return (
     <ScrollView contentContainerStyle={styles.page}>
       <Pressable
         onPress={onRetour}
         accessibilityRole="button"
-        accessibilityLabel="Retour aux résultats"
+        accessibilityLabel={t.fiche.retourA11y}
         style={styles.retour}
       >
-        <Text style={styles.retourTexte}>‹ Retour aux résultats</Text>
+        <Text style={styles.retourTexte}>{t.fiche.retour}</Text>
       </Pressable>
 
       <Text style={styles.categorie}>{activite.categorieLibelle}</Text>
@@ -29,32 +31,32 @@ export default function EcranFiche({ activite, onRetour, onSignaler }: Props) {
 
       <View style={styles.pourquoi}>
         <Text accessibilityRole="header" style={styles.pourquoiTitre}>
-          Pourquoi cette proposition ?
+          {t.fiche.pourquoi}
         </Text>
         <Text style={styles.raison}>{activite.explication}</Text>
       </View>
 
       <View style={styles.infos}>
-        <Text style={styles.libelle}>Lieu</Text>
+        <Text style={styles.libelle}>{t.fiche.lieu}</Text>
         <Text style={styles.valeur}>{activite.lieu}</Text>
         {activite.adresse && <Text style={styles.raison}>{activite.adresse}</Text>}
 
-        <Text style={styles.libelle}>Horaire</Text>
+        <Text style={styles.libelle}>{t.fiche.horaire}</Text>
         <Text style={styles.valeur}>{activite.horaires}</Text>
 
-        <Text style={styles.libelle}>Prix</Text>
-        <Text style={styles.valeur}>{formaterPrix(activite.prix)}</Text>
+        <Text style={styles.libelle}>{t.fiche.prix}</Text>
+        <Text style={styles.valeur}>{formaterPrix(activite.prix, t)}</Text>
 
-        <Text style={styles.libelle}>Distance</Text>
+        <Text style={styles.libelle}>{t.fiche.distance}</Text>
         <Text style={styles.valeur}>
-          {formaterDistance(activite.distance_m)} · {activite.trajet_min} min à pied
+          {formaterDistance(activite.distance_m)} · {t.aPied(activite.trajet_min)}
         </Text>
       </View>
 
       {activite.description && (
         <View style={styles.infos}>
           <Text accessibilityRole="header" style={styles.pourquoiTitre}>
-            Description
+            {t.fiche.description}
           </Text>
           <Text style={styles.raison}>{activite.description}</Text>
         </View>
@@ -64,10 +66,10 @@ export default function EcranFiche({ activite, onRetour, onSignaler }: Props) {
         <Pressable
           onPress={() => Linking.openURL(activite.source_url!)}
           accessibilityRole="link"
-          accessibilityLabel={`Voir l'offre sur ${activite.source}`}
+          accessibilityLabel={t.fiche.voirSur(activite.source)}
           style={styles.signaler}
         >
-          <Text style={styles.signalerTexte}>Voir l'offre sur {activite.source} ↗</Text>
+          <Text style={styles.signalerTexte}>{t.fiche.voirSur(activite.source)} ↗</Text>
         </Pressable>
       )}
 
@@ -75,16 +77,14 @@ export default function EcranFiche({ activite, onRetour, onSignaler }: Props) {
         <Pressable
           onPress={onSignaler}
           accessibilityRole="button"
-          accessibilityLabel="Signaler une information erronée"
+          accessibilityLabel={t.fiche.signaler}
           style={styles.signaler}
         >
-          <Text style={styles.signalerTexte}>Signaler une information erronée</Text>
+          <Text style={styles.signalerTexte}>{t.fiche.signaler}</Text>
         </Pressable>
       )}
 
-      <Text style={styles.source}>
-        Source : {activite.source} · Mis à jour le {activite.date_maj}
-      </Text>
+      <Text style={styles.source}>{t.sourceMaj(activite.source, activite.date_maj)}</Text>
     </ScrollView>
   );
 }

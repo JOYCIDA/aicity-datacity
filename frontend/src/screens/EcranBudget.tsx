@@ -4,6 +4,7 @@ import BoutonChoix from '../components/BoutonChoix';
 import { couleurs, polices, tailles } from '../theme';
 import { Budget } from '../types/parcours';
 import { Choix, SaisieLibre } from '../types/questions';
+import { useTextes } from '../i18n';
 
 type Props = {
   choix: Choix<Budget>[];
@@ -18,6 +19,7 @@ type Props = {
 const FORMAT_MONTANT = /^\d+([.,]\d{1,2})?$/;
 
 export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onSuivant, onRetour }: Props) {
+  const t = useTextes();
   const [aEssaye, setAEssaye] = useState(false);
   const montantLibre = valeur !== undefined && !choix.some((c) => c.valeur === valeur);
   const [texte, setTexte] = useState(montantLibre ? String(valeur).replace('.', ',') : '');
@@ -55,24 +57,24 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
       <Pressable
         onPress={onRetour}
         accessibilityRole="button"
-        accessibilityLabel="Retour"
+        accessibilityLabel={t.retourA11y}
         style={styles.retour}
       >
-        <Text style={styles.retourTexte}>‹ Retour</Text>
+        <Text style={styles.retourTexte}>{t.retour}</Text>
       </Pressable>
 
-      <View style={styles.progression} accessible accessibilityLabel="Étape 3 sur 3">
+      <View style={styles.progression} accessible accessibilityLabel={t.etape(3)}>
         {[1, 2, 3].map((n) => (
           <View key={n} style={[styles.barre, styles.barreActive]} />
         ))}
         <Text style={styles.compteur}>3 / 3</Text>
       </View>
 
-      <Text style={styles.etiquette}>QUESTION 3 SUR 3 — DERNIÈRE !</Text>
+      <Text style={styles.etiquette}>{t.budget.etiquette}</Text>
       <Text accessibilityRole="header" style={styles.titre}>
-        Quel est ton budget pour cette sortie ?
+        {t.budget.titre}
       </Text>
-      <Text style={styles.aide}>Une seule réponse.</Text>
+      <Text style={styles.aide}>{t.uneReponse}</Text>
 
       <View accessibilityRole="radiogroup" style={{ marginTop: 24 }}>
         {choix.map((c) => (
@@ -94,9 +96,9 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
             value={texte}
             onChangeText={saisir}
             keyboardType="decimal-pad"
-            placeholder="Ex. : 15"
+            placeholder={t.budget.montantPlaceholder}
             placeholderTextColor={couleurs.texteSecondaire}
-            accessibilityLabel={`${saisieLibre.libelle} en ${saisieLibre.unite}`}
+            accessibilityLabel={t.budget.montantA11y(saisieLibre.libelle, saisieLibre.unite)}
             accessibilityLabelledBy="libelle-montant"
             style={[styles.champSaisie, texte !== '' && !texteInvalide && styles.champActif]}
           />
@@ -104,8 +106,11 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
             <View style={styles.erreur} accessibilityRole="alert">
               <Text style={styles.erreurIcone}>⚠</Text>
               <Text style={styles.erreurTexte}>
-                Entre un montant entre {saisieLibre.min} et {saisieLibre.max.toLocaleString('fr-FR')}{' '}
-                {saisieLibre.unite}, avec au plus 2 chiffres après la virgule.
+                {t.budget.montantInvalide(
+                  saisieLibre.min.toLocaleString(t.locale),
+                  saisieLibre.max.toLocaleString(t.locale),
+                  saisieLibre.unite,
+                )}
               </Text>
             </View>
           )}
@@ -115,19 +120,19 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
       {afficherErreur && (
         <View style={styles.erreur} accessibilityRole="alert">
           <Text style={styles.erreurIcone}>⚠</Text>
-          <Text style={styles.erreurTexte}>Choisis une réponse pour continuer.</Text>
+          <Text style={styles.erreurTexte}>{t.erreurChoix}</Text>
         </View>
       )}
 
-      <Text style={styles.confidentialite}>Tes données ne sont pas enregistrées.</Text>
+      <Text style={styles.confidentialite}>{t.budget.confidentialite}</Text>
 
       <Pressable
         onPress={suivant}
         accessibilityRole="button"
-        accessibilityLabel="Voir les résultats"
+        accessibilityLabel={t.budget.voirResultatsA11y}
         style={styles.suivant}
       >
-        <Text style={styles.suivantTexte}>Voir les résultats ›</Text>
+        <Text style={styles.suivantTexte}>{t.budget.voirResultats}</Text>
       </Pressable>
     </ScrollView>
   );

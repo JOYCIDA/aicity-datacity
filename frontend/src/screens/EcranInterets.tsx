@@ -4,6 +4,7 @@ import BoutonChoix from '../components/BoutonChoix';
 import { interpreter, ErreurApi } from '../api/client';
 import { couleurs, polices, tailles } from '../theme';
 import { Choix } from '../types/questions';
+import { useTextes } from '../i18n';
 
 type Props = {
   choix: Choix<string>[];
@@ -18,6 +19,7 @@ type Props = {
 type Retour = { ok: boolean; message: string };
 
 export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, onSuivant, onRetour }: Props) {
+  const t = useTextes();
   const [aEssaye, setAEssaye] = useState(false);
   const [texte, setTexte] = useState('');
   const [enCours, setEnCours] = useState(false);
@@ -31,21 +33,15 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
     try {
       const { categories } = await interpreter(texte.trim());
       if (categories.length === 0) {
-        setRetour({
-          ok: false,
-          message: "Je n'ai pas reconnu d'activité dans ta phrase. Essaie d'autres mots ou choisis ci-dessus.",
-        });
+        setRetour({ ok: false, message: t.interets.nonCompris });
       } else {
         onAjouter(categories);
         const libelles = categories.map((c) => choix.find((x) => x.valeur === c)?.libelle ?? c);
-        setRetour({ ok: true, message: `J'ai compris : ${libelles.join(', ')}. C'est coché ci-dessus.` });
+        setRetour({ ok: true, message: t.interets.compris(libelles.join(', ')) });
         setTexte('');
       }
     } catch (e) {
-      setRetour({
-        ok: false,
-        message: e instanceof ErreurApi ? e.message : 'Une erreur est survenue. Réessaie dans un instant.',
-      });
+      setRetour({ ok: false, message: e instanceof ErreurApi ? e.message : t.erreurs.generique });
     } finally {
       setEnCours(false);
     }
@@ -64,24 +60,24 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
       <Pressable
         onPress={onRetour}
         accessibilityRole="button"
-        accessibilityLabel="Retour"
+        accessibilityLabel={t.retourA11y}
         style={styles.retour}
       >
-        <Text style={styles.retourTexte}>‹ Retour</Text>
+        <Text style={styles.retourTexte}>{t.retour}</Text>
       </Pressable>
 
-      <View style={styles.progression} accessible accessibilityLabel="Étape 2 sur 3">
+      <View style={styles.progression} accessible accessibilityLabel={t.etape(2)}>
         {[1, 2, 3].map((n) => (
           <View key={n} style={[styles.barre, n <= 2 && styles.barreActive]} />
         ))}
         <Text style={styles.compteur}>2 / 3</Text>
       </View>
 
-      <Text style={styles.etiquette}>QUESTION 2 SUR 3</Text>
+      <Text style={styles.etiquette}>{t.question(2)}</Text>
       <Text accessibilityRole="header" style={styles.titre}>
-        Qu'est-ce qui t'attire le plus en ce moment ?
+        {t.interets.titre}
       </Text>
-      <Text style={styles.aide}>Choisis une ou plusieurs réponses.</Text>
+      <Text style={styles.aide}>{t.interets.aide}</Text>
 
       <View style={{ marginTop: 24 }}>
         {choix.map((c) => (
@@ -97,7 +93,7 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
 
       <View style={styles.champ}>
         <Text nativeID="libelle-autre" style={styles.champLibelle}>
-          Autre… dis-moi avec tes mots
+          {t.interets.autreLibelle}
         </Text>
         <View style={styles.ligne}>
           <TextInput
@@ -106,9 +102,9 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
             onSubmitEditing={comprendre}
             maxLength={500}
             returnKeyType="done"
-            placeholder="Ex. : voir une expo, courir au parc"
+            placeholder={t.interets.autrePlaceholder}
             placeholderTextColor={couleurs.texteSecondaire}
-            accessibilityLabel="Autre : décris ce que tu as envie de faire"
+            accessibilityLabel={t.interets.autreA11y}
             accessibilityLabelledBy="libelle-autre"
             style={styles.champSaisie}
           />
@@ -116,18 +112,18 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
             onPress={comprendre}
             disabled={enCours}
             accessibilityRole="button"
-            accessibilityLabel="Valider ma phrase"
+            accessibilityLabel={t.interets.validerA11y}
             accessibilityState={{ disabled: enCours, busy: enCours }}
             style={styles.valider}
           >
             {enCours ? (
               <ActivityIndicator color={couleurs.fond} />
             ) : (
-              <Text style={styles.validerTexte}>OK</Text>
+              <Text style={styles.validerTexte}>{t.interets.valider}</Text>
             )}
           </Pressable>
         </View>
-        <Text style={styles.confidentialite}>Ta phrase n'est jamais enregistrée.</Text>
+        <Text style={styles.confidentialite}>{t.interets.phraseNonEnregistree}</Text>
         {retour && (
           <View style={styles.erreur} accessibilityRole="alert">
             <Text style={retour.ok ? styles.succesIcone : styles.erreurIcone}>{retour.ok ? '✓' : '⚠'}</Text>
@@ -139,17 +135,17 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
       {afficherErreur && (
         <View style={styles.erreur} accessibilityRole="alert">
           <Text style={styles.erreurIcone}>⚠</Text>
-          <Text style={styles.erreurTexte}>Choisis au moins une réponse pour continuer.</Text>
+          <Text style={styles.erreurTexte}>{t.interets.erreur}</Text>
         </View>
       )}
 
       <Pressable
         onPress={suivant}
         accessibilityRole="button"
-        accessibilityLabel="Suivant"
+        accessibilityLabel={t.suivantA11y}
         style={styles.suivant}
       >
-        <Text style={styles.suivantTexte}>Suivant ›</Text>
+        <Text style={styles.suivantTexte}>{t.suivant}</Text>
       </Pressable>
     </ScrollView>
   );

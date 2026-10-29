@@ -1,4 +1,5 @@
 import { API_URL } from '../config';
+import { Langue, TEXTES } from '../i18n';
 
 // Formes renvoyées par le backend (backend/src/services/recommandation.service.ts, utils/dto.ts).
 export type SourceOffre = 'ENTREPRISE' | 'OPENAGENDA' | 'DATA_GOUV' | 'PARIS_OPEN_DATA';
@@ -71,6 +72,12 @@ export class ErreurApi extends Error {
 
 // Le jeton reste en mémoire seulement : il disparaît quand l'appli se ferme.
 let jeton: string | null = null;
+let langue: Langue = 'FR';
+
+// Langue des réponses du backend (explications) et des messages d'erreur.
+export function definirLangue(l: Langue) {
+  langue = l;
+}
 
 async function requete<T>(chemin: string, init: RequestInit = {}): Promise<T> {
   let reponse: Response;
@@ -84,17 +91,15 @@ async function requete<T>(chemin: string, init: RequestInit = {}): Promise<T> {
       },
     });
   } catch {
-    throw new ErreurApi(0, 'RESEAU', 'Impossible de joindre le serveur. Vérifie ta connexion.');
+    throw new ErreurApi(0, 'RESEAU', TEXTES[langue].erreurs.reseau);
   }
 
   const corps = await reponse.json().catch(() => null);
   if (!reponse.ok) {
     const erreur = corps?.erreur;
-    throw new ErreurApi(
-      reponse.status,
-      erreur?.code ?? 'INCONNUE',
-      erreur?.message ?? 'Une erreur est survenue. Réessaie dans un instant.',
-    );
+    // Les messages du backend sont en français : en anglais, on affiche un message générique.
+    const message = langue === 'FR' && erreur?.message ? erreur.message : TEXTES[langue].erreurs.generique;
+    throw new ErreurApi(reponse.status, erreur?.code ?? 'INCONNUE', message);
   }
   return corps as T;
 }
@@ -103,7 +108,7 @@ export async function ouvrirSessionAnonyme(): Promise<void> {
   jeton = null;
   const session = await requete<{ jeton: string; expireLe: string }>('/citoyen/sessions/anonyme', {
     method: 'POST',
-    body: JSON.stringify({ langue: 'FR' }),
+    body: JSON.stringify({ langue }),
   });
   jeton = session.jeton;
 }
@@ -142,7 +147,7 @@ export function recommander(criteres: Criteres): Promise<ReponseRecommandations>
   return avecSession(() =>
     requete<ReponseRecommandations>('/citoyen/recommandations', {
       method: 'POST',
-      body: JSON.stringify({ ...criteres, langue: 'FR' }),
+      body: JSON.stringify({ ...criteres, langue }),
     }),
   );
 }

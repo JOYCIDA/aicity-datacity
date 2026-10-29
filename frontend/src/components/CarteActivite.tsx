@@ -2,6 +2,7 @@ import { Pressable, View, Text, StyleSheet } from 'react-native';
 import { Activite } from '../types/activite';
 import { couleurs, polices, tailles } from '../theme';
 import { formaterPrix, formaterDistance } from '../utils/format';
+import { useTextes } from '../i18n';
 
 type Props = {
   activite: Activite;
@@ -9,14 +10,15 @@ type Props = {
 };
 
 export default function CarteActivite({ activite, onPress }: Props) {
-  const prix = formaterPrix(activite.prix);
-  const distance = `${formaterDistance(activite.distance_m)} · ${activite.trajet_min} min à pied`;
+  const t = useTextes();
+  const prix = formaterPrix(activite.prix, t);
+  const distance = `${formaterDistance(activite.distance_m)} · ${t.aPied(activite.trajet_min)}`;
 
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${activite.titre}, ${activite.categorieLibelle}, ${activite.lieu}, ${activite.horaires}, ${prix}, à ${distance}`}
+      accessibilityLabel={`${activite.titre}, ${activite.categorieLibelle}, ${activite.lieu}, ${activite.horaires}, ${prix}, ${distance}`}
       style={styles.carte}
     >
       <Text style={styles.categorie}>{activite.categorieLibelle}</Text>
@@ -32,9 +34,7 @@ export default function CarteActivite({ activite, onPress }: Props) {
         <Text style={styles.distance}>{distance}</Text>
       </View>
 
-      <Text style={styles.source}>
-        Source : {activite.source} · Mis à jour le {activite.date_maj}
-      </Text>
+      <Text style={styles.source}>{t.sourceMaj(activite.source, activite.date_maj)}</Text>
     </Pressable>
   );
 }

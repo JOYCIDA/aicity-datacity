@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -12,12 +12,12 @@ import EcranResultats, { Recherche } from './src/screens/EcranResultats';
 import EcranFiche from './src/screens/EcranFiche';
 import EcranSignalement from './src/screens/EcranSignalement';
 import EtatChargement from './src/components/EtatChargement';
-import { chargerQuestions, ErreurApi } from './src/api/client';
+import { chargerQuestions, definirLangue, ErreurApi, QuestionApi } from './src/api/client';
 import { versQuestions } from './src/api/adaptateur';
 import { couleurs } from './src/theme';
 import { Reponses } from './src/types/parcours';
 import { Activite } from './src/types/activite';
-import { Questions } from './src/types/questions';
+import { Langue, LangueContext, TEXTES } from './src/i18n';
 
 type Etape =
   | 'accueil'
@@ -38,17 +38,23 @@ export default function App() {
   const [reponses, setReponses] = useState<Reponses>({ interets: [] });
   const [activiteChoisie, setActiviteChoisie] = useState<Activite | null>(null);
   const [recherche, setRecherche] = useState<Recherche | null>(null);
-  const [questions, setQuestions] = useState<Questions | null>(null);
-  const [erreurQuestions, setErreurQuestions] = useState<string | null>(null);
+  const [langue, setLangue] = useState<Langue>('FR');
+  // Questions brutes du backend (FR et EN) ; on n'affiche que la langue choisie.
+  const [questionsApi, setQuestionsApi] = useState<QuestionApi[] | null>(null);
+  const [erreurQuestions, setErreurQuestions] = useState<unknown>(null);
+  const questions = useMemo(
+    () => (questionsApi ? versQuestions(questionsApi, langue) : null),
+    [questionsApi, langue],
+  );
 
   const chargerLesQuestions = useCallback(async () => {
     setErreurQuestions(null);
     try {
-      setQuestions(versQuestions(await chargerQuestions()));
+      const api = await chargerQuestions();
+      versQuestions(api, 'FR'); // vérifie que les 3 questions sont bien là
+      setQuestionsApi(api);
     } catch (e) {
-      setErreurQuestions(
-        e instanceof ErreurApi ? e.message : 'Les questions n’ont pas pu être chargées. Réessaie dans un instant.',
-      );
+      setErreurQuestions(e);
     }
   }, []);
 
@@ -58,6 +64,14 @@ export default function App() {
 
   if (!policesPretes) return null;
 
+  const t = TEXTES[langue];
+
+  const changerLangue = (l: Langue) => {
+    definirLangue(l);
+    setLangue(l);
+    setRecherche(null);
+  };
+
   const basculerInteret = (valeur: string) => {
     const interets = reponses.interets.includes(valeur)
       ? reponses.interets.filter((i) => i !== valeur)
@@ -66,96 +80,104 @@ export default function App() {
   };
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={{ flex: 1, backgroundColor: couleurs.fond }}>
-        <StatusBar style="light" />
+    <LangueContext.Provider value={langue}>
+      <SafeAreaProvider>
+        <SafeAreaView style={{ flex: 1, backgroundColor: couleurs.fond }}>
+          <StatusBar style="light" />
 
-        {etape === 'accueil' && (
-          <EcranAccueil onCommencer={() => setEtape('duree')} />
-        )}
+          {etape === 'accueil' && (
+            <EcranAccueil onChangerLangue={changerLangue} onCommencer={() => setEtape('duree')} />
+          )}
 
-        {etape !== 'accueil' && !questions && (
-          <View style={{ padding: 16 }}>
-            <EtatChargement
-              message="Chargement des questions…"
-              erreur={erreurQuestions}
-              onReessayer={chargerLesQuestions}
+          {etape !== 'accueil' && !questions && (
+            <View style={{ padding: 16 }}>
+              <EtatChargement
+                message={t.chargementQuestions}
+                erreur={
+                  erreurQuestions === null
+                    ? null
+                    : erreurQuestions instanceof ErreurApi
+                      ? erreurQuestions.message
+                      : t.erreurs.generique
+                }
+                onReessayer={chargerLesQuestions}
+              />
+            </View>
+          )}
+
+          {etape === 'duree' && questions && (
+            <EcranDuree
+              choix={questions.durees}
+              valeur={reponses.duree}
+              onChoisir={(duree) => setReponses({ ...reponses, duree })}
+              onSuivant={() => setEtape('interets')}
             />
-          </View>
-        )}
+          )}
 
-        {etape === 'duree' && questions && (
-          <EcranDuree
-            choix={questions.durees}
-            valeur={reponses.duree}
-            onChoisir={(duree) => setReponses({ ...reponses, duree })}
-            onSuivant={() => setEtape('interets')}
-          />
-        )}
+          {etape === 'interets' && questions && (
+            <EcranInterets
+              choix={questions.categories}
+              valeurs={reponses.interets}
+              onBasculer={basculerInteret}
+              onAjouter={(codes) =>
+                setReponses({ ...reponses, interets: [...new Set([...reponses.interets, ...codes])] })
+              }
+              onRetour={() => setEtape('duree')}
+              onSuivant={() => setEtape('budget')}
+            />
+          )}
 
-        {etape === 'interets' && questions && (
-          <EcranInterets
-            choix={questions.categories}
-            valeurs={reponses.interets}
-            onBasculer={basculerInteret}
-            onAjouter={(codes) =>
-              setReponses({ ...reponses, interets: [...new Set([...reponses.interets, ...codes])] })
-            }
-            onRetour={() => setEtape('duree')}
-            onSuivant={() => setEtape('budget')}
-          />
-        )}
+          {etape === 'budget' && questions && (
+            <EcranBudget
+              choix={questions.budgets}
+              saisieLibre={questions.budgetLibre}
+              valeur={reponses.budget}
+              onChoisir={(budget) => setReponses({ ...reponses, budget })}
+              onRetour={() => setEtape('interets')}
+              onSuivant={() => {
+                setRecherche(null);
+                setEtape('resultats');
+              }}
+            />
+          )}
 
-        {etape === 'budget' && questions && (
-          <EcranBudget
-            choix={questions.budgets}
-            saisieLibre={questions.budgetLibre}
-            valeur={reponses.budget}
-            onChoisir={(budget) => setReponses({ ...reponses, budget })}
-            onRetour={() => setEtape('interets')}
-            onSuivant={() => {
-              setRecherche(null);
-              setEtape('resultats');
-            }}
-          />
-        )}
+          {etape === 'resultats' && questions && (
+            <EcranResultats
+              questions={questions}
+              reponses={reponses}
+              recherche={recherche}
+              onRecherche={setRecherche}
+              onChangerDuree={(duree) => {
+                setReponses({ ...reponses, duree });
+                setRecherche(null);
+              }}
+              onRetour={() => setEtape('budget')}
+              onOuvrir={(activite) => {
+                setActiviteChoisie(activite);
+                setEtape('fiche');
+              }}
+            />
+          )}
 
-        {etape === 'resultats' && questions && (
-          <EcranResultats
-            questions={questions}
-            reponses={reponses}
-            recherche={recherche}
-            onRecherche={setRecherche}
-            onChangerDuree={(duree) => {
-              setReponses({ ...reponses, duree });
-              setRecherche(null);
-            }}
-            onRetour={() => setEtape('budget')}
-            onOuvrir={(activite) => {
-              setActiviteChoisie(activite);
-              setEtape('fiche');
-            }}
-          />
-        )}
+          {etape === 'fiche' && activiteChoisie && (
+            <EcranFiche
+              activite={activiteChoisie}
+              onRetour={() => setEtape('resultats')}
+              onSignaler={() => setEtape('signalement')}
+            />
+          )}
 
-        {etape === 'fiche' && activiteChoisie && (
-          <EcranFiche
-            activite={activiteChoisie}
-            onRetour={() => setEtape('resultats')}
-            onSignaler={() => setEtape('signalement')}
-          />
-        )}
-
-        {etape === 'signalement' && activiteChoisie && (
-          <EcranSignalement
-            activite={activiteChoisie}
-            onRetour={() => setEtape('fiche')}
-            onEnvoyer={(signalement) =>
-              console.log('Signalement (non envoyé au serveur)', signalement)
-            }
-          />
-        )}
-      </SafeAreaView>
-    </SafeAreaProvider>
+          {etape === 'signalement' && activiteChoisie && (
+            <EcranSignalement
+              activite={activiteChoisie}
+              onRetour={() => setEtape('fiche')}
+              onEnvoyer={(signalement) =>
+                console.log('Signalement (non envoyé au serveur)', signalement)
+              }
+            />
+          )}
+        </SafeAreaView>
+      </SafeAreaProvider>
+    </LangueContext.Provider>
   );
 }
