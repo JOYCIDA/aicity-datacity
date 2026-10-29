@@ -11,6 +11,7 @@ import { Activite } from '../types/activite';
 import { Reponses } from '../types/parcours';
 import { Questions } from '../types/questions';
 import { couleurs, polices, tailles } from '../theme';
+import { colors } from '../theme/tokens';
 
 export type Recherche = { activites: Activite[]; elargie: boolean; remarquePosition: RemarquePosition | null };
 
@@ -104,12 +105,19 @@ export default function EcranResultats({
               )}
             </View>
           ) : (
-            <FlatList
-              data={recherche.activites}
-              keyExtractor={(a) => a.id}
-              renderItem={({ item }) => <CarteActivite activite={item} onPress={() => onOuvrir(item)} />}
-              contentContainerStyle={{ paddingTop: 16, paddingBottom: 24 }}
-            />
+            <View style={styles.panneau}>
+              <FlatList
+                data={recherche.activites}
+                keyExtractor={(a) => a.id}
+                renderItem={({ item }) => <CarteActivite activite={item} onPress={() => onOuvrir(item)} />}
+                contentContainerStyle={styles.liste}
+                ListFooterComponent={
+                  <Text style={styles.sources}>
+                    {t.resultats.sources([...new Set(recherche.activites.map((a) => a.source))].join(' / '))}
+                  </Text>
+                }
+              />
+            </View>
           )}
         </>
       )}
@@ -119,6 +127,10 @@ export default function EcranResultats({
 
 const styles = StyleSheet.create({
   page: { flex: 1, padding: 16 },
+  // Zone claire de la liste, comme la colonne de droite de la maquette.
+  panneau: { flex: 1, backgroundColor: colors.background, borderRadius: 24, marginTop: 16, overflow: 'hidden' },
+  liste: { padding: 12, width: '100%', maxWidth: 760, alignSelf: 'center' },
+  sources: { fontFamily: polices.texte, color: colors.mutedForeground, fontSize: tailles.petit, marginTop: 4 },
   titre: { fontFamily: polices.titre, color: couleurs.texte, fontSize: 28 },
   resume: {
     fontFamily: polices.texte,
