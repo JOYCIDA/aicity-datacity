@@ -18,11 +18,20 @@ type Props = {
   reponses: Reponses;
   recherche: Recherche | null; // null : pas encore chargée
   onRecherche: (r: Recherche) => void;
+  onChangerDuree: (minutes: number) => void;
   onRetour: () => void;
   onOuvrir: (activite: Activite) => void;
 };
 
-export default function EcranResultats({ questions, reponses, recherche, onRecherche, onRetour, onOuvrir }: Props) {
+export default function EcranResultats({
+  questions,
+  reponses,
+  recherche,
+  onRecherche,
+  onChangerDuree,
+  onRetour,
+  onOuvrir,
+}: Props) {
   const [erreur, setErreur] = useState<string | null>(null);
 
   const charger = useCallback(async () => {
@@ -55,6 +64,8 @@ export default function EcranResultats({ questions, reponses, recherche, onReche
     .join(' · ');
 
   const n = recherche?.activites.length ?? 0;
+  // Aucun résultat : on propose la durée suivante parmi celles du backend.
+  const dureeSuivante = questions.durees.find((d) => reponses.duree !== undefined && d.valeur > reponses.duree);
 
   return (
     <View style={styles.page}>
@@ -87,9 +98,23 @@ export default function EcranResultats({ questions, reponses, recherche, onReche
           )}
 
           {n === 0 ? (
-            <Text style={styles.vide}>
-              Aucune activité ne correspond à tes choix. Modifie ton budget ou tes centres d'intérêt.
-            </Text>
+            <View>
+              <Text style={styles.vide}>
+                {dureeSuivante
+                  ? "Aucune activité ne tient dans ce temps-là. Avec un peu plus de temps, tu auras plus de choix."
+                  : "Aucune activité ne correspond à tes choix. Modifie ton budget ou tes centres d'intérêt."}
+              </Text>
+              {dureeSuivante && (
+                <Pressable
+                  onPress={() => onChangerDuree(dureeSuivante.valeur)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Chercher avec plus de temps : ${dureeSuivante.libelle}`}
+                  style={styles.bouton}
+                >
+                  <Text style={styles.boutonTexte}>Chercher avec plus de temps ({dureeSuivante.libelle})</Text>
+                </Pressable>
+              )}
+            </View>
           ) : (
             <FlatList
               data={recherche.activites}
@@ -126,4 +151,14 @@ const styles = StyleSheet.create({
     fontSize: tailles.texte,
     marginTop: 24,
   },
+  bouton: {
+    alignSelf: 'flex-start',
+    minHeight: tailles.zoneMin + 12,
+    justifyContent: 'center',
+    backgroundColor: couleurs.primaire,
+    paddingHorizontal: 24,
+    borderRadius: 30,
+    marginTop: 16,
+  },
+  boutonTexte: { fontFamily: polices.titre, color: couleurs.fond, fontSize: 18 },
 });

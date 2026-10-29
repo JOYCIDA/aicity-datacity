@@ -126,6 +126,10 @@ export default function App() {
             reponses={reponses}
             recherche={recherche}
             onRecherche={setRecherche}
+            onChangerDuree={(duree) => {
+              setReponses({ ...reponses, duree });
+              setRecherche(null);
+            }}
             onRetour={() => setEtape('budget')}
             onOuvrir={(activite) => {
               setActiviteChoisie(activite);
