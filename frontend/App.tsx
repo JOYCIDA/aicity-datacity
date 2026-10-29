@@ -7,7 +7,7 @@ import EcranAccueil from './src/screens/EcranAccueil';
 import EcranDuree from './src/screens/EcranDuree';
 import EcranInterets from './src/screens/EcranInterets';
 import EcranBudget from './src/screens/EcranBudget';
-import EcranResultats from './src/screens/EcranResultats';
+import EcranResultats, { Recherche } from './src/screens/EcranResultats';
 import EcranFiche from './src/screens/EcranFiche';
 import EcranSignalement from './src/screens/EcranSignalement';
 import { couleurs } from './src/theme';
@@ -32,6 +32,7 @@ export default function App() {
   const [etape, setEtape] = useState<Etape>('accueil');
   const [reponses, setReponses] = useState<Reponses>({ interets: [] });
   const [activiteChoisie, setActiviteChoisie] = useState<Activite | null>(null);
+  const [recherche, setRecherche] = useState<Recherche | null>(null);
 
   if (!policesPretes) return null;
 
@@ -73,13 +74,18 @@ export default function App() {
             valeur={reponses.budget}
             onChoisir={(budget) => setReponses({ ...reponses, budget })}
             onRetour={() => setEtape('interets')}
-            onSuivant={() => setEtape('resultats')}
+            onSuivant={() => {
+              setRecherche(null);
+              setEtape('resultats');
+            }}
           />
         )}
 
         {etape === 'resultats' && (
           <EcranResultats
             reponses={reponses}
+            recherche={recherche}
+            onRecherche={setRecherche}
             onRetour={() => setEtape('budget')}
             onOuvrir={(activite) => {
               setActiviteChoisie(activite);
