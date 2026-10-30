@@ -3,6 +3,7 @@ import { View, Text, Pressable, FlatList, StyleSheet, useWindowDimensions } from
 import CarteActivite from '../components/CarteActivite';
 import CarteGeo from '../components/CarteGeo';
 import EtatChargement from '../components/EtatChargement';
+import BoutonTerminer from '../components/BoutonTerminer';
 import { recommander, ErreurApi } from '../api/client';
 import { versActivite } from '../api/adaptateur';
 import { obtenirPosition, Position, RemarquePosition } from '../utils/position';
@@ -28,6 +29,7 @@ type Props = {
   onRecherche: (r: Recherche) => void;
   onChangerDuree: (minutes: number) => void;
   onOuvrir: (activite: Activite) => void;
+  onTerminer: () => void;
 };
 
 export default function EcranResultats({
@@ -37,6 +39,7 @@ export default function EcranResultats({
   onRecherche,
   onChangerDuree,
   onOuvrir,
+  onTerminer,
 }: Props) {
   const t = useTextes();
   const langue = useLangue();
@@ -113,9 +116,12 @@ export default function EcranResultats({
         <EtatChargement message={t.resultats.chargement} erreur={erreur} onReessayer={charger} />
       ) : (
         <>
-          <Text accessibilityRole="header" style={styles.titre}>
-            {n === 0 ? t.resultats.aucune : t.resultats.trouvees(n)}
-          </Text>
+          <View style={styles.entete}>
+            <Text accessibilityRole="header" style={styles.titre}>
+              {n === 0 ? t.resultats.aucune : t.resultats.trouvees(n)}
+            </Text>
+            <BoutonTerminer onPress={onTerminer} />
+          </View>
           <Text style={styles.resume}>{resume}</Text>
           {recherche.remarquePosition && (
             <Text style={styles.resume} accessibilityRole="text">
@@ -171,7 +177,8 @@ export default function EcranResultats({
 
 const styles = StyleSheet.create({
   page: { flex: 1, padding: 16 },
-  titre: { fontFamily: polices.titre, color: couleurs.texte, fontSize: 28 },
+  entete: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
+  titre: { flexShrink: 1, fontFamily: polices.titre, color: couleurs.texte, fontSize: 28 },
   resume: {
     fontFamily: polices.texte,
     color: couleurs.texteSecondaire,
