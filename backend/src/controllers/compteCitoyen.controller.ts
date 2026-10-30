@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express';
-import { favoriSchema, preferencesSchema, supprimerCompteSchema } from '../schemas/citoyen.schema.js';
+import { favoriSchema, preferencesSchema, requeteLangueSchema, supprimerCompteSchema } from '../schemas/citoyen.schema.js';
 import * as compteService from '../services/compteCitoyen.service.js';
 
 // Montées derrière verifierJwt + exigerRole('CITOYEN') : tout porte sur le compte connecté.
@@ -14,7 +14,8 @@ export const enregistrerPreferences: RequestHandler = async (req, res) => {
 };
 
 export const favoris: RequestHandler = async (req, res) => {
-  res.json({ favoris: await compteService.favoris(req.utilisateur!.id) });
+  const { langue } = requeteLangueSchema.parse(req.query);
+  res.json({ favoris: await compteService.favoris(req.utilisateur!.id, langue) });
 };
 
 /** 201 au premier ajout, 200 si l'offre était déjà en favori. */

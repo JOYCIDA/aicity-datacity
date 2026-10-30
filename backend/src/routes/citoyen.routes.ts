@@ -11,6 +11,7 @@ import {
   sessionSiPresente,
   verifierJwt,
 } from '../middlewares/auth.middleware.js';
+import { env } from '../config/env.js';
 import { exigerBorne } from '../middlewares/borne.middleware.js';
 import { limiter } from '../middlewares/rateLimit.middleware.js';
 
@@ -27,10 +28,10 @@ citoyenRouter.post('/interpretations', sessionSiPresente, recommandation.interpr
 citoyenRouter.post('/recommandations', citoyenOuSession, recommandation.recommander);
 
 // Mobile sans compte : session anonyme, sans rien stocker (limitée par adresse IP).
-citoyenRouter.post('/sessions/anonyme', limiter(30, 15), session.ouvrirAnonyme);
+citoyenRouter.post('/sessions/anonyme', limiter(env.SESSIONS_ANONYMES_MAX, 15), session.ouvrirAnonyme);
 
 // Signalement d'un problème sur une offre : compte, borne ou session anonyme ; sans identité.
-citoyenRouter.post('/signalement', limiter(20, 60), citoyenOuSession, signalement.signaler);
+citoyenRouter.post('/signalement', limiter(env.SIGNALEMENTS_MAX, 60), citoyenOuSession, signalement.signaler);
 
 // Sessions de borne (UC1) : ouverture avec la clé de la borne, puis jeton de session.
 citoyenRouter.post('/sessions', exigerBorne, session.ouvrir);
