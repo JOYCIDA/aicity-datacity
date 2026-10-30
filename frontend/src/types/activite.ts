@@ -13,6 +13,9 @@ export type Activite = {
   lat: number;
   lng: number;
   horaires: string;
+  debut_iso: string; // ouverture de l'offre (vue Créneau)
+  fin_iso: string | null;
+  duree_min: number; // durée estimée de l'activité
   prix: number | null; // 0 = gratuit ; null = prix non communiqué
   distance_m: number;
   trajet_min: number;
