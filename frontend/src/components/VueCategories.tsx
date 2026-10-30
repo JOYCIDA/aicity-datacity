@@ -98,12 +98,15 @@ export default function VueCategories({ position, rayonM }: Props) {
                     </Text>
                   </View>
                 </View>
-                {l.prixMoyen !== null && (
-                  <View style={styles.prix}>
-                    <Tag size={14} color={couleurs.texte} />
-                    <Text style={styles.prixTexte}>{libellePrix(l.prixMoyen)}</Text>
-                  </View>
-                )}
+                {/* Largeur fixe, même sans prix : toutes les barres s'arrêtent au même endroit. */}
+                <View style={[styles.prix, l.prixMoyen === null && styles.prixVide]}>
+                  {l.prixMoyen !== null && (
+                    <>
+                      <Tag size={14} color={couleurs.texte} />
+                      <Text style={styles.prixTexte}>{libellePrix(l.prixMoyen)}</Text>
+                    </>
+                  )}
+                </View>
               </View>
             );
           })}
@@ -142,6 +145,7 @@ const styles = StyleSheet.create({
   },
   barreTexte: { fontFamily: polices.texteMoyen, color: couleurs.fond, fontSize: tailles.texte },
   prix: {
+    width: 150,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
@@ -150,6 +154,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: couleurs.carte,
   },
+  prixVide: { backgroundColor: 'transparent' },
   prixTexte: { fontFamily: polices.texte, color: couleurs.texte, fontSize: tailles.petit },
   chiffres: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   chiffresLarge: { flexDirection: 'column', width: 200 },
