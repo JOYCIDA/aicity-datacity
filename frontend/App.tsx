@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -11,9 +11,11 @@ import EcranBudget from './src/screens/EcranBudget';
 import EcranResultats, { Recherche } from './src/screens/EcranResultats';
 import EcranFiche from './src/screens/EcranFiche';
 import EcranSignalement from './src/screens/EcranSignalement';
+import EcranFin from './src/screens/EcranFin';
+import { INACTIVITE_FIN_MS } from './src/config';
 import EtatChargement from './src/components/EtatChargement';
 import KioskTopBar from './src/components/KioskTopBar';
-import { chargerQuestions, definirLangue, ErreurApi, QuestionApi } from './src/api/client';
+import { chargerQuestions, definirLangue, ErreurApi, oublierSession, QuestionApi } from './src/api/client';
 import { versQuestions } from './src/api/adaptateur';
 import { couleurs } from './src/theme';
 import { Reponses } from './src/types/parcours';
@@ -27,7 +29,8 @@ type Etape =
   | 'budget'
   | 'resultats'
   | 'fiche'
-  | 'signalement';
+  | 'signalement'
+  | 'fin';
 
 export default function App() {
   const [policesPretes] = useFonts({
@@ -64,6 +67,30 @@ export default function App() {
     chargerLesQuestions();
   }, [chargerLesQuestions]);
 
+  // Fin de session : on efface tout ce que le citoyen a donné (réponses, résultats, jeton).
+  const terminer = useCallback(() => {
+    oublierSession();
+    setReponses({ interets: [] });
+    setRecherche(null);
+    setActiviteChoisie(null);
+    setEtape('fin');
+  }, []);
+  const retourAccueil = useCallback(() => setEtape('accueil'), []);
+
+  // Borne laissée seule : sans aucun toucher pendant INACTIVITE_FIN_MS, la session se termine.
+  const minuteur = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const enParcours = etape !== 'accueil' && etape !== 'fin';
+  const relancerMinuteur = useCallback(() => {
+    if (minuteur.current) clearTimeout(minuteur.current);
+    if (enParcours) minuteur.current = setTimeout(terminer, INACTIVITE_FIN_MS);
+  }, [enParcours, terminer]);
+  useEffect(() => {
+    relancerMinuteur();
+    return () => {
+      if (minuteur.current) clearTimeout(minuteur.current);
+    };
+  }, [etape, relancerMinuteur]);
+
   if (!policesPretes) return null;
 
   const t = TEXTES[langue];
@@ -97,10 +124,19 @@ export default function App() {
   return (
     <LangueContext.Provider value={langue}>
       <SafeAreaProvider>
-        <SafeAreaView style={{ flex: 1, backgroundColor: couleurs.fond }}>
+        <SafeAreaView
+          style={{ flex: 1, backgroundColor: couleurs.fond }}
+          // Chaque toucher relance le minuteur d'inactivité, sans gêner les boutons.
+          onStartShouldSetResponderCapture={() => {
+            relancerMinuteur();
+            return false;
+          }}
+        >
           <StatusBar style="light" />
           <KioskTopBar
             showBack={precedent !== undefined}
+            // L'écran de fin a déjà son grand logo (maquette page 10).
+            showLogo={etape !== 'fin'}
             onBack={() => precedent && setEtape(precedent)}
             lang={langue}
             onLangChange={changerLangue}
@@ -117,7 +153,7 @@ export default function App() {
             />
           )}
 
-          {etape !== 'accueil' && !questions && (
+          {enParcours && !questions && (
             <View style={{ padding: 16 }}>
               <EtatChargement
                 message={t.chargementQuestions}
@@ -181,6 +217,7 @@ export default function App() {
                 setActiviteChoisie(activite);
                 setEtape('fiche');
               }}
+              onTerminer={terminer}
             />
           )}
 
@@ -188,6 +225,7 @@ export default function App() {
             <EcranFiche
               activite={activiteChoisie}
               onSignaler={() => setEtape('signalement')}
+              onTerminer={terminer}
             />
           )}
 
@@ -200,6 +238,8 @@ export default function App() {
               }
             />
           )}
+
+          {etape === 'fin' && <EcranFin onAccueil={retourAccueil} />}
         </SafeAreaView>
       </SafeAreaProvider>
     </LangueContext.Provider>
