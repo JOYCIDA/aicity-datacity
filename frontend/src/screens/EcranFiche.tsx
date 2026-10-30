@@ -9,7 +9,6 @@ import {
   Platform,
   Share,
   StyleSheet,
-  useWindowDimensions,
 } from 'react-native';
 import { Activite } from '../types/activite';
 import { colors } from '../theme/tokens';
@@ -18,6 +17,7 @@ import { formaterPrix, formaterDistance } from '../utils/format';
 import { ICONES_CATEGORIE } from '../components/Icones';
 import { useTextes } from '../i18n';
 import { SIGNALEMENT_ACTIF } from '../config';
+import { useDesign } from '../design';
 import BoutonTerminer from '../components/BoutonTerminer';
 
 type Props = {
@@ -36,14 +36,15 @@ function Tuile({ icone: Icone, libelle, valeur, accent = false }: {
   valeur: string;
   accent?: boolean;
 }) {
+  const d = useDesign();
   return (
     <View style={styles.tuile} accessible accessibilityLabel={`${libelle} : ${valeur}`}>
       <View style={[styles.tuileIcone, accent && styles.tuileIconeAccent]}>
-        <Icone size={20} color={colors.night} />
+        <Icone size={d.px(20)} color={colors.night} />
       </View>
       <View style={styles.tuileTextes}>
-        <Text style={styles.tuileLibelle}>{libelle}</Text>
-        <Text style={styles.tuileValeur}>{valeur}</Text>
+        <Text style={[styles.tuileLibelle, { fontSize: d.texte.surtitre }]}>{libelle}</Text>
+        <Text style={[styles.tuileValeur, { fontSize: d.texte.corps }]}>{valeur}</Text>
       </View>
     </View>
   );
@@ -51,7 +52,10 @@ function Tuile({ icone: Icone, libelle, valeur, accent = false }: {
 
 export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) {
   const t = useTextes();
-  const large = useWindowDimensions().width >= 768;
+  const d = useDesign();
+  // Photo à gauche sur ordinateur ; au-dessus sur téléphone et sur la borne (écran vertical).
+  const large = d.mode === 'bureau';
+  const photo = large ? styles.photoLarge : [styles.photo, { height: d.mode === 'borne' ? 560 : 220 }];
   const IconeCategorie = ICONES_CATEGORIE[activite.categorie];
   const itineraire = `https://www.google.com/maps/dir/?api=1&destination=${activite.lat},${activite.lng}&travelmode=walking`;
 
@@ -70,7 +74,7 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
   return (
     <ScrollView style={styles.ecran} contentContainerStyle={[styles.page, large && styles.pageLarge]}>
       {activite.photo_url ? (
-        <View style={large ? styles.photoLarge : styles.photo}>
+        <View style={photo}>
           <Image
             source={{ uri: activite.photo_url }}
             resizeMode="cover"
@@ -84,7 +88,7 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
           )}
         </View>
       ) : (
-        <View style={[large ? styles.photoLarge : styles.photo, styles.sansPhoto]}>
+        <View style={[photo, styles.sansPhoto]}>
           {IconeCategorie && <IconeCategorie size={64} color={colors.teal} />}
         </View>
       )}
@@ -92,18 +96,18 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
       <View style={styles.contenu}>
         <View style={styles.pastille}>
           {IconeCategorie && <IconeCategorie size={16} color={colors.night} />}
-          <Text style={styles.pastilleTexte}>{activite.categorieLibelle}</Text>
+          <Text style={[styles.pastilleTexte, { fontSize: d.texte.surtitre }]}>{activite.categorieLibelle}</Text>
         </View>
-        <Text accessibilityRole="header" style={styles.titre}>
+        <Text accessibilityRole="header" style={[styles.titre, { fontSize: d.texte.affiche, lineHeight: d.texte.affiche * 1.15 }]}>
           {activite.titre}
         </Text>
-        <Text style={styles.sousTitre}>{activite.lieu}</Text>
+        <Text style={[styles.sousTitre, { fontSize: d.texte.choix }]}>{activite.lieu}</Text>
 
         <View style={styles.pourquoi}>
-          <Text accessibilityRole="header" style={styles.pourquoiTitre}>
+          <Text accessibilityRole="header" style={[styles.pourquoiTitre, { fontSize: d.texte.intertitre }]}>
             {t.fiche.pourquoi}
           </Text>
-          <Text style={styles.texte}>{activite.explication}</Text>
+          <Text style={[styles.texte, { fontSize: d.texte.corps, lineHeight: d.texte.corps * 1.5 }]}>{activite.explication}</Text>
         </View>
 
         <View style={styles.tuiles}>
@@ -120,10 +124,10 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
 
         {activite.description && (
           <View>
-            <Text accessibilityRole="header" style={styles.sectionTitre}>
+            <Text accessibilityRole="header" style={[styles.sectionTitre, { fontSize: d.texte.intertitre }]}>
               {t.fiche.description}
             </Text>
-            <Text style={styles.texte}>{activite.description}</Text>
+            <Text style={[styles.texte, { fontSize: d.texte.corps, lineHeight: d.texte.corps * 1.5 }]}>{activite.description}</Text>
           </View>
         )}
 
@@ -135,7 +139,7 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
             style={styles.yAller}
           >
             <Navigation size={24} color={colors.night} />
-            <Text style={styles.yAllerTexte}>{t.fiche.yAller}</Text>
+            <Text style={[styles.yAllerTexte, { fontSize: d.px(22) }]}>{t.fiche.yAller}</Text>
           </Pressable>
           {PARTAGE_DISPONIBLE && (
             <Pressable
@@ -145,7 +149,7 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
               style={styles.partager}
             >
               <Share2 size={20} color={colors.night} />
-              <Text style={styles.partagerTexte}>{t.fiche.partager}</Text>
+              <Text style={[styles.partagerTexte, { fontSize: d.texte.corps }]}>{t.fiche.partager}</Text>
             </Pressable>
           )}
         </View>
@@ -157,7 +161,7 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
             accessibilityLabel={t.fiche.voirSur(activite.source)}
             style={styles.lien}
           >
-            <Text style={styles.lienTexte}>{t.fiche.voirSur(activite.source)}</Text>
+            <Text style={[styles.lienTexte, { fontSize: d.texte.corps }]}>{t.fiche.voirSur(activite.source)}</Text>
             <ExternalLink size={18} color={colors.night} />
           </Pressable>
         )}
@@ -169,11 +173,11 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
             accessibilityLabel={t.fiche.signaler}
             style={styles.lien}
           >
-            <Text style={styles.lienTexte}>{t.fiche.signaler}</Text>
+            <Text style={[styles.lienTexte, { fontSize: d.texte.corps }]}>{t.fiche.signaler}</Text>
           </Pressable>
         )}
 
-        <Text style={styles.source}>{t.sourceMaj(activite.source, activite.date_maj)}</Text>
+        <Text style={[styles.source, { fontSize: d.texte.surtitre }]}>{t.sourceMaj(activite.source, activite.date_maj)}</Text>
 
         <BoutonTerminer onPress={onTerminer} clair />
       </View>

@@ -6,7 +6,8 @@ import VueCreneau from '../components/VueCreneau';
 import VueCategories from '../components/VueCategories';
 import EtatChargement from '../components/EtatChargement';
 import BoutonTerminer from '../components/BoutonTerminer';
-import { Message } from '../design';
+import { Message, useDesign } from '../design';
+import { Apparition, Squelette } from '../animations';
 import { recommander, ErreurApi } from '../api/client';
 import { versActivite } from '../api/adaptateur';
 import { obtenirPosition, Position, RemarquePosition } from '../utils/position';
@@ -50,7 +51,10 @@ export default function EcranResultats({
   const t = useTextes();
   const langue = useLangue();
   // Grand écran (ordinateur, borne) : carte et liste côte à côte, comme la maquette.
+  const d = useDesign();
   const large = useWindowDimensions().width >= 900;
+  // Borne (écran vertical) : carte en haut, liste dessous ; ordinateur : côte à côte.
+  const borne = d.mode === 'borne';
   const [vue, setVue] = useState<Vue>('liste');
   // Sur grand écran, la liste est toujours à côté de la carte : pas d'onglet Liste.
   const onglets: Vue[] = large ? ['carte', 'creneau', 'categories'] : ['liste', 'carte', 'creneau', 'categories'];
@@ -97,12 +101,15 @@ export default function EcranResultats({
   const dureeSuivante = questions.durees.find((d) => reponses.duree !== undefined && d.valeur > reponses.duree);
 
   const liste = recherche && (
-    <View style={[styles.panneau, large && styles.colonneListe]}>
+    <View style={[styles.panneau, large && !borne && styles.colonneListe, borne && styles.listeBorne]}>
       <FlatList
         data={recherche.activites}
         keyExtractor={(a) => a.id}
         renderItem={({ item, index }) => (
-          <CarteActivite activite={item} numero={index + 1} onPress={() => onOuvrir(item)} />
+          // Cartes en cascade : 70 ms d'écart entre chacune.
+          <Apparition delai={index * 70}>
+            <CarteActivite activite={item} numero={index + 1} onPress={() => onOuvrir(item)} />
+          </Apparition>
         )}
         contentContainerStyle={styles.liste}
         ListFooterComponent={
@@ -122,17 +129,26 @@ export default function EcranResultats({
 
   return (
     <View style={styles.page}>
-      {erreur || !recherche ? (
+      {erreur ? (
         <EtatChargement message={t.resultats.chargement} erreur={erreur} onReessayer={charger} />
+      ) : !recherche ? (
+        // Squelette de la page pendant la recherche : on devine déjà la forme des résultats.
+        <View accessible accessibilityLabel={t.resultats.chargement} accessibilityRole="progressbar">
+          <Squelette style={{ width: '60%', height: 32, marginBottom: 12 }} />
+          <Squelette style={{ width: '35%', height: 18, marginBottom: 24 }} />
+          {[0, 1, 2].map((i) => (
+            <Squelette key={i} style={{ height: 150, borderRadius: 24, marginBottom: 12, maxWidth: 760 }} />
+          ))}
+        </View>
       ) : (
         <>
           <View style={styles.entete}>
-            <Text accessibilityRole="header" style={styles.titre}>
+            <Text accessibilityRole="header" style={[styles.titre, { fontSize: d.texte.titre }]}>
               {n === 0 ? t.resultats.aucune : t.resultats.trouvees(n)}
             </Text>
             <BoutonTerminer onPress={onTerminer} />
           </View>
-          <Text style={styles.resume}>{resume}</Text>
+          <Text style={[styles.resume, { fontSize: d.texte.corps }]}>{resume}</Text>
           {recherche.remarquePosition && <Message type="info" texte={t.position[recherche.remarquePosition]} />}
           {recherche.elargie && n > 0 && <Message type="info" texte={t.resultats.elargie} />}
 
@@ -159,9 +175,13 @@ export default function EcranResultats({
                     onPress={() => setVue(v)}
                     accessibilityRole="tab"
                     accessibilityState={{ selected: vueAffichee === v }}
-                    style={[styles.basculeBouton, vueAffichee === v && styles.basculeActif]}
+                    style={[
+                      styles.basculeBouton,
+                      { minHeight: d.px(44), paddingHorizontal: d.px(16) },
+                      vueAffichee === v && styles.basculeActif,
+                    ]}
                   >
-                    <Text style={[styles.basculeTexte, vueAffichee === v && styles.basculeTexteActif]}>
+                    <Text style={[styles.basculeTexte, { fontSize: d.texte.corps }, vueAffichee === v && styles.basculeTexteActif]}>
                       {t.carte[v]}
                     </Text>
                   </Pressable>
@@ -169,7 +189,12 @@ export default function EcranResultats({
               </View>
               {vueAffichee === 'liste' && liste}
               {vueAffichee === 'carte' &&
-                (large ? (
+                (borne ? (
+                  <View style={styles.empile}>
+                    <View style={styles.carteHaute}>{carte}</View>
+                    {liste}
+                  </View>
+                ) : large ? (
                   <View style={styles.deuxColonnes}>
                     {carte}
                     {liste}
@@ -206,6 +231,9 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   deuxColonnes: { flex: 1, flexDirection: 'row', gap: 16, marginTop: 16 },
+  empile: { flex: 1, gap: 16, marginTop: 16 },
+  carteHaute: { height: '42%' },
+  listeBorne: { marginTop: 0 },
   zoneCarte: { flex: 1, marginTop: 16 },
   zoneCarteLarge: { marginTop: 0 },
   // Zone claire de la liste, comme la colonne de droite de la maquette.
