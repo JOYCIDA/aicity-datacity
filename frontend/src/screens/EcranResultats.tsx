@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { View, Text, Pressable, FlatList, StyleSheet, useWindowDimensions } from 'react-native';
 import CarteActivite from '../components/CarteActivite';
 import CarteGeo from '../components/CarteGeo';
+import VueCreneau from '../components/VueCreneau';
+import VueCategories from '../components/VueCategories';
 import EtatChargement from '../components/EtatChargement';
 import BoutonTerminer from '../components/BoutonTerminer';
 import { recommander, ErreurApi } from '../api/client';
@@ -18,9 +20,12 @@ import { colors } from '../theme/tokens';
 export type Recherche = {
   activites: Activite[];
   elargie: boolean;
+  rayonM: number; // rayon finalement utilisé par le backend (doublé si élargi)
   position: Position; // utilisée seulement pour la carte, jamais enregistrée
   remarquePosition: RemarquePosition | null;
 };
+
+type Vue = 'liste' | 'carte' | 'creneau' | 'categories';
 
 type Props = {
   questions: Questions;
@@ -45,7 +50,10 @@ export default function EcranResultats({
   const langue = useLangue();
   // Grand écran (ordinateur, borne) : carte et liste côte à côte, comme la maquette.
   const large = useWindowDimensions().width >= 900;
-  const [vue, setVue] = useState<'liste' | 'carte'>('liste');
+  const [vue, setVue] = useState<Vue>('liste');
+  // Sur grand écran, la liste est toujours à côté de la carte : pas d'onglet Liste.
+  const onglets: Vue[] = large ? ['carte', 'creneau', 'categories'] : ['liste', 'carte', 'creneau', 'categories'];
+  const vueAffichee: Vue = large && vue === 'liste' ? 'carte' : vue;
   const [erreur, setErreur] = useState<string | null>(null);
 
   const charger = useCallback(async () => {
@@ -61,6 +69,7 @@ export default function EcranResultats({
       onRecherche({
         activites: r.resultats.map((x) => versActivite(x, langue)),
         elargie: r.elargie,
+        rayonM: r.rayonM,
         position,
         remarquePosition: remarque,
       });
@@ -144,29 +153,43 @@ export default function EcranResultats({
                 </Pressable>
               )}
             </View>
-          ) : large ? (
-            <View style={styles.deuxColonnes}>
-              {carte}
-              {liste}
-            </View>
           ) : (
             <>
-              <View style={styles.bascule} accessibilityRole="radiogroup" accessibilityLabel={t.carte.vue}>
-                {(['liste', 'carte'] as const).map((v) => (
+              <View style={styles.bascule} accessibilityRole="tablist" accessibilityLabel={t.carte.vue}>
+                {onglets.map((v) => (
                   <Pressable
                     key={v}
                     onPress={() => setVue(v)}
-                    accessibilityRole="radio"
-                    accessibilityState={{ selected: vue === v }}
-                    style={[styles.basculeBouton, vue === v && styles.basculeActif]}
+                    accessibilityRole="tab"
+                    accessibilityState={{ selected: vueAffichee === v }}
+                    style={[styles.basculeBouton, vueAffichee === v && styles.basculeActif]}
                   >
-                    <Text style={[styles.basculeTexte, vue === v && styles.basculeTexteActif]}>
-                      {v === 'liste' ? t.carte.liste : t.carte.carte}
+                    <Text style={[styles.basculeTexte, vueAffichee === v && styles.basculeTexteActif]}>
+                      {t.carte[v]}
                     </Text>
                   </Pressable>
                 ))}
               </View>
-              {vue === 'carte' ? carte : liste}
+              {vueAffichee === 'liste' && liste}
+              {vueAffichee === 'carte' &&
+                (large ? (
+                  <View style={styles.deuxColonnes}>
+                    {carte}
+                    {liste}
+                  </View>
+                ) : (
+                  carte
+                ))}
+              {vueAffichee === 'creneau' && (
+                <VueCreneau
+                  activites={recherche.activites}
+                  tempsLibreMinutes={reponses.duree!}
+                  onOuvrir={onOuvrir}
+                />
+              )}
+              {vueAffichee === 'categories' && (
+                <VueCategories position={recherche.position} rayonM={recherche.rayonM} />
+              )}
             </>
           )}
         </>
@@ -196,6 +219,7 @@ const styles = StyleSheet.create({
   sources: { fontFamily: polices.texte, color: colors.mutedForeground, fontSize: tailles.petit, marginTop: 4 },
   bascule: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignSelf: 'flex-start',
     gap: 4,
     padding: 4,

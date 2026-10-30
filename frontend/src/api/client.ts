@@ -151,6 +151,19 @@ export async function interpreter(texte: string): Promise<Interpretation> {
   return interpretation;
 }
 
+// Toutes les offres visibles autour d'un point (vue Catégories), page par page.
+export async function chargerOffresAutour(latitude: number, longitude: number, rayonM: number): Promise<OffreApi[]> {
+  const offres: OffreApi[] = [];
+  for (let page = 1; page <= 10; page++) {
+    const r = await requete<{ elements: OffreApi[]; total: number }>(
+      `/citoyen/offres?latitude=${latitude}&longitude=${longitude}&rayonM=${rayonM}&taille=500&page=${page}`,
+    );
+    offres.push(...r.elements);
+    if (r.elements.length === 0 || offres.length >= r.total) break;
+  }
+  return offres;
+}
+
 export function recommander(criteres: Criteres): Promise<ReponseRecommandations> {
   return avecSession(() =>
     requete<ReponseRecommandations>('/citoyen/recommandations', {
