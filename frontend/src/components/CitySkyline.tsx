@@ -1,23 +1,56 @@
 import { StyleSheet, View } from 'react-native';
-import Svg, { Rect } from 'react-native-svg';
+import Svg, { Path, Rect } from 'react-native-svg';
 
 import { colors } from '../theme/tokens';
 
-// [x, y, width, height] des immeubles, sur un viewBox de 1440x80.
-const buildings = [
-  [0, 40, 80, 40], [90, 20, 60, 60], [160, 10, 80, 70], [250, 30, 50, 50],
-  [310, 0, 70, 80], [390, 25, 55, 55], [455, 15, 90, 65], [555, 35, 60, 45],
-  [625, 5, 75, 75], [710, 20, 50, 60], [770, 30, 80, 50], [860, 10, 65, 70],
-  [935, 25, 55, 55], [1000, 0, 70, 80], [1080, 20, 60, 60], [1150, 35, 80, 45],
-  [1240, 15, 55, 65], [1305, 30, 70, 50], [1385, 10, 55, 70],
-];
+type Immeuble = { x: number; l: number; h: number; toit: 'plat' | 'pointe' | 'antenne' };
+
+// Générateur pseudo-aléatoire à graine fixe : la même silhouette à chaque affichage.
+function graine(n: number) {
+  let s = n;
+  return () => {
+    s = (s * 9301 + 49297) % 233280;
+    return s / 233280;
+  };
+}
+
+function rangee(seed: number, hMin: number, hMax: number): Immeuble[] {
+  const alea = graine(seed);
+  const liste: Immeuble[] = [];
+  for (let x = 0; x < 1440; ) {
+    const l = 18 + Math.round(alea() * 34);
+    const t = alea();
+    liste.push({ x, l, h: hMin + Math.round(alea() * (hMax - hMin)), toit: t < 0.15 ? 'pointe' : t < 0.25 ? 'antenne' : 'plat' });
+    x += l + 2 + Math.round(alea() * 4);
+  }
+  return liste;
+}
+
+// Deux plans : un fond haut et pâle, un premier plan plus bas et plus net (effet de profondeur).
+const FOND = rangee(7, 40, 104);
+const PREMIER_PLAN = rangee(23, 16, 64);
+const H = 120;
+
+function dessin(b: Immeuble) {
+  const haut = H - b.h;
+  if (b.toit === 'pointe') {
+    return `M${b.x} ${H}V${haut}L${b.x + b.l / 2} ${haut - 12}L${b.x + b.l} ${haut}V${H}Z`;
+  }
+  return `M${b.x} ${H}V${haut}H${b.x + b.l}V${H}Z`;
+}
 
 export default function CitySkyline() {
   return (
-    <View style={styles.container} pointerEvents="none">
-      <Svg viewBox="0 0 1440 80" width="100%" height="100%" preserveAspectRatio="xMidYMax slice">
-        {buildings.map(([x, y, width, height]) => (
-          <Rect key={x} x={x} y={y} width={width} height={height} rx={4} fill={colors.teal} />
+    <View style={styles.container} pointerEvents="none" accessible={false}>
+      <Svg viewBox={`0 0 1440 ${H}`} width="100%" height="100%" preserveAspectRatio="xMidYMax slice">
+        {FOND.map((b) => (
+          <Path key={`f${b.x}`} d={dessin(b)} fill={colors.teal} opacity={0.07} />
+        ))}
+        {FOND.filter((b) => b.toit === 'antenne').map((b) => (
+          <Rect key={`a${b.x}`} x={b.x + b.l / 2 - 1} y={H - b.h - 16} width={2} height={16} fill={colors.teal} opacity={0.07} />
+        ))}
+        {PREMIER_PLAN.map((b) => (
+          <Path key={`p${b.x}`} d={dessin(b)} fill={colors.teal} opacity={0.13} />
         ))}
       </Svg>
     </View>
@@ -27,8 +60,7 @@ export default function CitySkyline() {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: 80,
-    opacity: 0.1,
+    height: 96,
     overflow: 'hidden',
   },
 });
