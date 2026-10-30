@@ -14,14 +14,16 @@ const sizes = {
 type Props = {
   size?: Size;
   dark?: boolean;
+  compact?: boolean; // sur une ligne, sans slogan (barre du haut)
+  echelle?: number; // agrandissement de la version compacte (borne)
 };
 
-export default function AiCityLogo({ size = 'md', dark = false }: Props) {
-  const s = sizes[size];
+export default function AiCityLogo({ size = 'md', dark = false, compact = false, echelle = 1 }: Props) {
+  const s = compact ? { icon: 30 * echelle, title: 22 * echelle, slogan: 0 } : sizes[size];
   const textColor = dark ? colors.nightForeground : colors.night;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, compact && styles.compact]} accessible accessibilityRole={compact ? 'image' : 'header'} accessibilityLabel="AiCity">
       {/* Skyline + circuit */}
       <Svg viewBox="0 0 80 80" width={s.icon} height={s.icon} fill="none">
         <Rect x="6" y="38" width="12" height="28" rx="2" fill={colors.teal} />
@@ -46,7 +48,7 @@ export default function AiCityLogo({ size = 'md', dark = false }: Props) {
         Ai<Text style={styles.accent}>City</Text>
       </Text>
 
-      <Text style={[styles.slogan, { fontSize: s.slogan }]}>From A to B</Text>
+      {!compact && <Text style={[styles.slogan, { fontSize: s.slogan }]}>From A to B</Text>}
     </View>
   );
 }
@@ -54,6 +56,10 @@ export default function AiCityLogo({ size = 'md', dark = false }: Props) {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+    gap: 8,
+  },
+  compact: {
+    flexDirection: 'row',
     gap: 8,
   },
   title: {

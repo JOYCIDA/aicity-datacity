@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, fonts, radius, textSize } from '../theme/tokens';
 import { useTextes } from '../i18n';
+import { useDesign } from '../design';
 import AiCityLogo from './AiCityLogo';
 import LanguageSelector, { type Lang } from './LanguageSelector';
 
@@ -24,25 +25,30 @@ export default function KioskTopBar({
   onBack,
 }: Props) {
   const t = useTextes();
+  const d = useDesign();
   const backColor = dark ? colors.nightForeground : colors.night;
 
   return (
-    <View style={[styles.container, dark ? styles.dark : styles.light]}>
+    <View style={[styles.container, { minHeight: d.px(64), paddingHorizontal: d.marge }, dark ? styles.dark : styles.light]}>
       <View style={styles.side}>
         {showBack && (
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={t.retour}
             onPress={onBack}
-            style={[styles.back, { backgroundColor: dark ? colors.cardDark : colors.muted }]}
+            style={({ pressed }) => [
+              styles.back,
+              { minHeight: d.px(44), paddingHorizontal: d.px(14), backgroundColor: dark ? colors.cardDark : colors.muted },
+              pressed && { opacity: 0.8 },
+            ]}
           >
-            <ChevronLeft size={22} color={backColor} />
-            <Text style={[styles.backLabel, { color: backColor }]}>{t.retour}</Text>
+            <ChevronLeft size={d.px(22)} color={backColor} />
+            <Text style={[styles.backLabel, { color: backColor, fontSize: d.texte.corps }]}>{t.retour}</Text>
           </Pressable>
         )}
       </View>
 
-      {showLogo && <AiCityLogo size="sm" dark={dark} />}
+      {showLogo && <AiCityLogo compact echelle={d.px(100) / 100} dark={dark} />}
 
       <View style={[styles.side, styles.sideEnd]}>
         <LanguageSelector active={lang} onChange={onLangChange} />
@@ -57,10 +63,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 8,
+    minHeight: 64,
   },
   dark: {
     backgroundColor: colors.night,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(66, 168, 183, 0.18)',
   },
   light: {
     backgroundColor: colors.background,

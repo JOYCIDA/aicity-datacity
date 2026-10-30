@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { ShieldCheck } from 'lucide-react-native';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 import BoutonChoix from '../components/BoutonChoix';
-import { couleurs, polices, tailles } from '../theme';
+import { iconeBudget } from '../components/Icones';
+import { Bouton, EnteteQuestion, Message, Page, useDesign } from '../design';
+import { couleurs, espace, polices, rayons } from '../theme';
+import { useTextes } from '../i18n';
 import { Budget } from '../types/parcours';
 import { Choix, SaisieLibre } from '../types/questions';
-import { useTextes } from '../i18n';
-import { iconeBudget } from '../components/Icones';
 
 type Props = {
   choix: Choix<Budget>[];
@@ -20,6 +22,7 @@ const FORMAT_MONTANT = /^\d+([.,]\d{1,2})?$/;
 
 export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onSuivant }: Props) {
   const t = useTextes();
+  const d = useDesign();
   const [aEssaye, setAEssaye] = useState(false);
   const montantLibre = valeur !== undefined && !choix.some((c) => c.valeur === valeur);
   const [texte, setTexte] = useState(montantLibre ? String(valeur).replace('.', ',') : '');
@@ -29,13 +32,12 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
     saisieLibre !== null &&
     texte.trim() !== '' &&
     (!FORMAT_MONTANT.test(texte.trim()) || montant < saisieLibre.min || montant > saisieLibre.max);
-  const afficherErreur = aEssaye && valeur === undefined && !texteInvalide;
 
-  const saisir = (t: string) => {
-    setTexte(t);
-    const m = Number(t.trim().replace(',', '.'));
+  const saisir = (saisie: string) => {
+    setTexte(saisie);
+    const m = Number(saisie.trim().replace(',', '.'));
     const valide =
-      saisieLibre !== null && FORMAT_MONTANT.test(t.trim()) && m >= saisieLibre.min && m <= saisieLibre.max;
+      saisieLibre !== null && FORMAT_MONTANT.test(saisie.trim()) && m >= saisieLibre.min && m <= saisieLibre.max;
     onChoisir(valide ? m : undefined);
   };
 
@@ -53,21 +55,26 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
-      <View style={styles.progression} accessible accessibilityLabel={t.etape(3)}>
-        {[1, 2, 3].map((n) => (
-          <View key={n} style={[styles.barre, styles.barreActive]} />
-        ))}
-        <Text style={styles.compteur}>3 / 3</Text>
-      </View>
+    <Page
+      pied={
+        <>
+          <View style={styles.confidentialite}>
+            <ShieldCheck size={d.px(18)} color={couleurs.primaire} />
+            <Text style={[styles.confidentialiteTexte, { fontSize: d.texte.surtitre }]}>{t.budget.confidentialite}</Text>
+          </View>
+          <Bouton libelle={t.budget.voirResultats} a11y={t.budget.voirResultatsA11y} onPress={suivant} />
+        </>
+      }
+    >
+      <EnteteQuestion
+        etape={3}
+        etapeA11y={t.etape(3)}
+        surtitre={t.budget.etiquette}
+        titre={t.budget.titre}
+        aide={t.uneReponse}
+      />
 
-      <Text style={styles.etiquette}>{t.budget.etiquette}</Text>
-      <Text accessibilityRole="header" style={styles.titre}>
-        {t.budget.titre}
-      </Text>
-      <Text style={styles.aide}>{t.uneReponse}</Text>
-
-      <View accessibilityRole="radiogroup" style={{ marginTop: 24 }}>
+      <View accessibilityRole="radiogroup">
         {choix.map((c) => (
           <BoutonChoix
             key={String(c.valeur)}
@@ -80,8 +87,8 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
       </View>
 
       {saisieLibre && (
-        <View style={styles.champ}>
-          <Text nativeID="libelle-montant" style={styles.champLibelle}>
+        <View style={{ marginTop: espace.s }}>
+          <Text nativeID="libelle-montant" style={[styles.champLibelle, { fontSize: d.texte.corps }]}>
             {saisieLibre.libelle} ({saisieLibre.unite})
           </Text>
           <TextInput
@@ -92,83 +99,41 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
             placeholderTextColor={couleurs.texteSecondaire}
             accessibilityLabel={t.budget.montantA11y(saisieLibre.libelle, saisieLibre.unite)}
             accessibilityLabelledBy="libelle-montant"
-            style={[styles.champSaisie, texte !== '' && !texteInvalide && styles.champActif]}
+            style={[
+              styles.champ,
+              { minHeight: d.px(56), fontSize: d.texte.choix },
+              texte !== '' && !texteInvalide && styles.champActif,
+            ]}
           />
           {texteInvalide && (
-            <View style={styles.erreur} accessibilityRole="alert">
-              <Text style={styles.erreurIcone}>⚠</Text>
-              <Text style={styles.erreurTexte}>
-                {t.budget.montantInvalide(
-                  saisieLibre.min.toLocaleString(t.locale),
-                  saisieLibre.max.toLocaleString(t.locale),
-                  saisieLibre.unite,
-                )}
-              </Text>
-            </View>
+            <Message
+              type="erreur"
+              texte={t.budget.montantInvalide(
+                saisieLibre.min.toLocaleString(t.locale),
+                saisieLibre.max.toLocaleString(t.locale),
+                saisieLibre.unite,
+              )}
+            />
           )}
         </View>
       )}
 
-      {afficherErreur && (
-        <View style={styles.erreur} accessibilityRole="alert">
-          <Text style={styles.erreurIcone}>⚠</Text>
-          <Text style={styles.erreurTexte}>{t.erreurChoix}</Text>
-        </View>
-      )}
-
-      <Text style={styles.confidentialite}>{t.budget.confidentialite}</Text>
-
-      <Pressable
-        onPress={suivant}
-        accessibilityRole="button"
-        accessibilityLabel={t.budget.voirResultatsA11y}
-        style={styles.suivant}
-      >
-        <Text style={styles.suivantTexte}>{t.budget.voirResultats}</Text>
-      </Pressable>
-    </ScrollView>
+      {aEssaye && valeur === undefined && !texteInvalide && <Message type="erreur" texte={t.erreurChoix} />}
+    </Page>
   );
 }
 
 const styles = StyleSheet.create({
-  page: { flexGrow: 1, padding: 16 },
-  progression: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 20 },
-  barre: { flex: 1, height: 10, borderRadius: 5, backgroundColor: couleurs.barreInactive },
-  barreActive: { backgroundColor: couleurs.primaire },
-  compteur: { fontFamily: polices.texte, color: couleurs.texteSecondaire, fontSize: tailles.texte, marginLeft: 8 },
-  etiquette: { fontFamily: polices.texte, color: couleurs.primaire, letterSpacing: 1.5, fontSize: tailles.petit },
-  titre: { fontFamily: polices.titre, color: couleurs.texte, fontSize: 30, marginTop: 8 },
-  aide: { fontFamily: polices.texte, color: couleurs.texteSecondaire, fontSize: tailles.texte, marginTop: 8 },
-  champ: { marginTop: 8 },
-  champLibelle: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: tailles.texte, marginBottom: 6 },
-  champSaisie: {
-    minHeight: 56,
+  champLibelle: { fontFamily: polices.texteMoyen, color: couleurs.texte, marginBottom: espace.s },
+  champ: {
     borderWidth: 2,
-    borderColor: couleurs.primaire,
-    borderRadius: 16,
-    paddingHorizontal: 16,
+    borderColor: 'rgba(66, 168, 183, 0.55)',
+    borderRadius: rayons.m,
+    paddingHorizontal: espace.l,
     fontFamily: polices.texteMoyen,
-    fontSize: 18,
     color: couleurs.texte,
   },
-  champActif: { borderWidth: 3 },
-  erreur: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 },
-  erreurIcone: { color: couleurs.erreur, fontSize: 20 },
-  erreurTexte: { flex: 1, fontFamily: polices.texteMoyen, color: couleurs.erreur, fontSize: tailles.texte },
-  confidentialite: {
-    fontFamily: polices.texte,
-    color: couleurs.texteSecondaire,
-    fontSize: tailles.texte,
-    marginTop: 12,
-  },
-  suivant: {
-    alignSelf: 'flex-end',
-    marginTop: 'auto',
-    minHeight: tailles.zoneMin + 12,
-    justifyContent: 'center',
-    backgroundColor: couleurs.primaire,
-    paddingHorizontal: 32,
-    borderRadius: 30,
-  },
-  suivantTexte: { fontFamily: polices.titre, color: couleurs.fond, fontSize: 20 },
+  champActif: { borderColor: couleurs.primaire },
+  confidentialite: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: espace.s },
+  confidentialiteTexte: { flexShrink: 1, fontFamily: polices.texte, color: couleurs.texteSecondaire },
 });

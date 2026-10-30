@@ -1,4 +1,4 @@
-import { Clock, MapPin, Navigation, Share2, Tag, type LucideIcon } from 'lucide-react-native';
+import { Clock, ExternalLink, MapPin, Navigation, Share2, Tag, type LucideIcon } from 'lucide-react-native';
 import {
   View,
   Text,
@@ -157,7 +157,8 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
             accessibilityLabel={t.fiche.voirSur(activite.source)}
             style={styles.lien}
           >
-            <Text style={styles.lienTexte}>{t.fiche.voirSur(activite.source)} ↗</Text>
+            <Text style={styles.lienTexte}>{t.fiche.voirSur(activite.source)}</Text>
+            <ExternalLink size={18} color={colors.night} />
           </Pressable>
         )}
 
@@ -275,6 +276,8 @@ const styles = StyleSheet.create({
   },
   partagerTexte: { fontFamily: polices.texteMoyen, color: colors.night, fontSize: tailles.texte },
   lien: {
+    flexDirection: 'row',
+    gap: 8,
     minHeight: tailles.zoneMin,
     borderWidth: 2,
     borderColor: colors.teal,

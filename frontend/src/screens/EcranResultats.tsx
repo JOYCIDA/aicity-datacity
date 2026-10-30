@@ -6,6 +6,7 @@ import VueCreneau from '../components/VueCreneau';
 import VueCategories from '../components/VueCategories';
 import EtatChargement from '../components/EtatChargement';
 import BoutonTerminer from '../components/BoutonTerminer';
+import { Message } from '../design';
 import { recommander, ErreurApi } from '../api/client';
 import { versActivite } from '../api/adaptateur';
 import { obtenirPosition, Position, RemarquePosition } from '../utils/position';
@@ -132,12 +133,8 @@ export default function EcranResultats({
             <BoutonTerminer onPress={onTerminer} />
           </View>
           <Text style={styles.resume}>{resume}</Text>
-          {recherche.remarquePosition && (
-            <Text style={styles.resume} accessibilityRole="text">
-              ℹ {t.position[recherche.remarquePosition]}
-            </Text>
-          )}
-          {recherche.elargie && n > 0 && <Text style={styles.resume}>{t.resultats.elargie}</Text>}
+          {recherche.remarquePosition && <Message type="info" texte={t.position[recherche.remarquePosition]} />}
+          {recherche.elargie && n > 0 && <Message type="info" texte={t.resultats.elargie} />}
 
           {n === 0 ? (
             <View>
