@@ -15,6 +15,7 @@ import EcranFin from './src/screens/EcranFin';
 import { INACTIVITE_FIN_MS } from './src/config';
 import EtatChargement from './src/components/EtatChargement';
 import KioskTopBar from './src/components/KioskTopBar';
+import { Apparition } from './src/animations';
 import { chargerQuestions, definirLangue, ErreurApi, oublierSession, QuestionApi } from './src/api/client';
 import { versQuestions } from './src/api/adaptateur';
 import { couleurs } from './src/theme';
@@ -135,111 +136,115 @@ export default function App() {
           <StatusBar style="light" />
           <KioskTopBar
             showBack={precedent !== undefined}
-            // L'écran de fin a déjà son grand logo (maquette page 10).
-            showLogo={etape !== 'fin'}
+            // L'accueil et l'écran de fin ont déjà leur grand logo : pas de doublon en haut.
+            showLogo={etape !== 'fin' && etape !== 'accueil'}
             onBack={() => precedent && setEtape(precedent)}
             lang={langue}
             onLangChange={changerLangue}
           />
 
-          {etape === 'accueil' && (
-            <EcranAccueil
-              categories={questions?.categories ?? null}
-              onRaccourci={(categorie) => {
-                setReponses({ ...reponses, interets: [categorie] });
-                setEtape('duree');
-              }}
-              onCommencer={() => setEtape('duree')}
-            />
-          )}
+          {/* Chaque changement d'écran rejoue l'apparition (clé = étape). */}
+          <Apparition key={etape} style={{ flex: 1 }}>
 
-          {enParcours && !questions && (
-            <View style={{ padding: 16 }}>
-              <EtatChargement
-                message={t.chargementQuestions}
-                erreur={
-                  erreurQuestions === null
-                    ? null
-                    : erreurQuestions instanceof ErreurApi
-                      ? erreurQuestions.message
-                      : t.erreurs.generique
-                }
-                onReessayer={chargerLesQuestions}
+            {etape === 'accueil' && (
+              <EcranAccueil
+                categories={questions?.categories ?? null}
+                onRaccourci={(categorie) => {
+                  setReponses({ ...reponses, interets: [categorie] });
+                  setEtape('duree');
+                }}
+                onCommencer={() => setEtape('duree')}
               />
-            </View>
-          )}
+            )}
 
-          {etape === 'duree' && questions && (
-            <EcranDuree
-              choix={questions.durees}
-              valeur={reponses.duree}
-              onChoisir={(duree) => setReponses({ ...reponses, duree })}
-              onSuivant={() => setEtape('interets')}
-            />
-          )}
+            {enParcours && !questions && (
+              <View style={{ padding: 16 }}>
+                <EtatChargement
+                  message={t.chargementQuestions}
+                  erreur={
+                    erreurQuestions === null
+                      ? null
+                      : erreurQuestions instanceof ErreurApi
+                        ? erreurQuestions.message
+                        : t.erreurs.generique
+                  }
+                  onReessayer={chargerLesQuestions}
+                />
+              </View>
+            )}
 
-          {etape === 'interets' && questions && (
-            <EcranInterets
-              choix={questions.categories}
-              valeurs={reponses.interets}
-              onBasculer={basculerInteret}
-              onAjouter={(codes) =>
-                setReponses({ ...reponses, interets: [...new Set([...reponses.interets, ...codes])] })
-              }
-              onSuivant={() => setEtape('budget')}
-            />
-          )}
+            {etape === 'duree' && questions && (
+              <EcranDuree
+                choix={questions.durees}
+                valeur={reponses.duree}
+                onChoisir={(duree) => setReponses({ ...reponses, duree })}
+                onSuivant={() => setEtape('interets')}
+              />
+            )}
 
-          {etape === 'budget' && questions && (
-            <EcranBudget
-              choix={questions.budgets}
-              saisieLibre={questions.budgetLibre}
-              valeur={reponses.budget}
-              onChoisir={(budget) => setReponses({ ...reponses, budget })}
-              onSuivant={() => {
-                setRecherche(null);
-                setEtape('resultats');
-              }}
-            />
-          )}
+            {etape === 'interets' && questions && (
+              <EcranInterets
+                choix={questions.categories}
+                valeurs={reponses.interets}
+                onBasculer={basculerInteret}
+                onAjouter={(codes) =>
+                  setReponses({ ...reponses, interets: [...new Set([...reponses.interets, ...codes])] })
+                }
+                onSuivant={() => setEtape('budget')}
+              />
+            )}
 
-          {etape === 'resultats' && questions && (
-            <EcranResultats
-              questions={questions}
-              reponses={reponses}
-              recherche={recherche}
-              onRecherche={setRecherche}
-              onChangerDuree={(duree) => {
-                setReponses({ ...reponses, duree });
-                setRecherche(null);
-              }}
-              onOuvrir={(activite) => {
-                setActiviteChoisie(activite);
-                setEtape('fiche');
-              }}
-              onTerminer={terminer}
-            />
-          )}
+            {etape === 'budget' && questions && (
+              <EcranBudget
+                choix={questions.budgets}
+                saisieLibre={questions.budgetLibre}
+                valeur={reponses.budget}
+                onChoisir={(budget) => setReponses({ ...reponses, budget })}
+                onSuivant={() => {
+                  setRecherche(null);
+                  setEtape('resultats');
+                }}
+              />
+            )}
 
-          {etape === 'fiche' && activiteChoisie && (
-            <EcranFiche
-              activite={activiteChoisie}
-              onSignaler={() => setEtape('signalement')}
-              onTerminer={terminer}
-            />
-          )}
+            {etape === 'resultats' && questions && (
+              <EcranResultats
+                questions={questions}
+                reponses={reponses}
+                recherche={recherche}
+                onRecherche={setRecherche}
+                onChangerDuree={(duree) => {
+                  setReponses({ ...reponses, duree });
+                  setRecherche(null);
+                }}
+                onOuvrir={(activite) => {
+                  setActiviteChoisie(activite);
+                  setEtape('fiche');
+                }}
+                onTerminer={terminer}
+              />
+            )}
 
-          {etape === 'signalement' && activiteChoisie && (
-            <EcranSignalement
-              activite={activiteChoisie}
-              onRetour={() => setEtape('fiche')}
-              onEnvoyer={(signalement) =>
-                console.log('Signalement (non envoyé au serveur)', signalement)
-              }
-            />
-          )}
+            {etape === 'fiche' && activiteChoisie && (
+              <EcranFiche
+                activite={activiteChoisie}
+                onSignaler={() => setEtape('signalement')}
+                onTerminer={terminer}
+              />
+            )}
 
-          {etape === 'fin' && <EcranFin onAccueil={retourAccueil} />}
+            {etape === 'signalement' && activiteChoisie && (
+              <EcranSignalement
+                activite={activiteChoisie}
+                onRetour={() => setEtape('fiche')}
+                onEnvoyer={(signalement) =>
+                  console.log('Signalement (non envoyé au serveur)', signalement)
+                }
+              />
+            )}
+
+            {etape === 'fin' && <EcranFin onAccueil={retourAccueil} />}
+          </Apparition>
         </SafeAreaView>
       </SafeAreaProvider>
     </LangueContext.Provider>

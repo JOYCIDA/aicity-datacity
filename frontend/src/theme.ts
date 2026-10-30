@@ -19,3 +19,16 @@ export const tailles = {
   petit: 14, // surtitres seulement
   zoneMin: 44, // zone cliquable minimale
 };
+// ——— Système de design ———
+// Une seule échelle d'espacements et de textes pour tous les écrans. Sur la borne (grand écran
+// vertical lu à distance), tout est agrandi par `facteur`.
+
+export const espace = { xs: 4, s: 8, m: 12, l: 16, xl: 24, xxl: 32, xxxl: 48 } as const;
+export const rayons = { s: 12, m: 16, l: 24, pilule: 999 } as const;
+
+export type Mode = 'telephone' | 'bureau' | 'borne';
+
+export function modeEcran(largeur: number, hauteur: number): Mode {
+  if (hauteur >= 1400 && hauteur > largeur) return 'borne';
+  return largeur >= 900 ? 'bureau' : 'telephone';
+}
