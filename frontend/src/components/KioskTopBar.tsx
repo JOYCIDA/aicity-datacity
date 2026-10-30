@@ -8,13 +8,21 @@ import LanguageSelector, { type Lang } from './LanguageSelector';
 
 type Props = {
   showBack?: boolean;
+  showLogo?: boolean;
   dark?: boolean;
   lang: Lang;
   onLangChange?: (lang: Lang) => void;
   onBack?: () => void;
 };
 
-export default function KioskTopBar({ showBack = false, dark = true, lang, onLangChange, onBack }: Props) {
+export default function KioskTopBar({
+  showBack = false,
+  showLogo = true,
+  dark = true,
+  lang,
+  onLangChange,
+  onBack,
+}: Props) {
   const t = useTextes();
   const backColor = dark ? colors.nightForeground : colors.night;
 
@@ -34,7 +42,7 @@ export default function KioskTopBar({ showBack = false, dark = true, lang, onLan
         )}
       </View>
 
-      <AiCityLogo size="sm" dark={dark} />
+      {showLogo && <AiCityLogo size="sm" dark={dark} />}
 
       <View style={[styles.side, styles.sideEnd]}>
         <LanguageSelector active={lang} onChange={onLangChange} />

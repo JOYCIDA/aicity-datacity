@@ -107,6 +107,11 @@ async function requete<T>(chemin: string, init: RequestInit = {}): Promise<T> {
   return corps as T;
 }
 
+// Fin de session : on oublie le jeton (le backend ne garde rien d'une session anonyme).
+export function oublierSession() {
+  jeton = null;
+}
+
 export async function ouvrirSessionAnonyme(): Promise<void> {
   jeton = null;
   const session = await requete<{ jeton: string; expireLe: string }>('/citoyen/sessions/anonyme', {
