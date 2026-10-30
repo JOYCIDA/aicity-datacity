@@ -6,6 +6,7 @@ import { polices, tailles } from '../theme';
 import { formaterPrix, formaterDistance } from '../utils/format';
 import { ICONES_CATEGORIE } from './Icones';
 import { useTextes } from '../i18n';
+import { useDesign } from '../design';
 
 type Props = {
   activite: Activite;
@@ -14,16 +15,18 @@ type Props = {
 };
 
 function Ligne({ icone: Icone, texte, accent = false }: { icone: LucideIcon; texte: string; accent?: boolean }) {
+  const d = useDesign();
   return (
     <View style={styles.ligne}>
-      <Icone size={16} color={accent ? colors.teal : colors.night} />
-      <Text style={styles.ligneTexte}>{texte}</Text>
+      <Icone size={d.px(16)} color={accent ? colors.teal : colors.night} />
+      <Text style={[styles.ligneTexte, { fontSize: d.texte.corps, lineHeight: d.texte.corps * 1.4 }]}>{texte}</Text>
     </View>
   );
 }
 
 export default function CarteActivite({ activite, numero, onPress }: Props) {
   const t = useTextes();
+  const d = useDesign();
   const prix = formaterPrix(activite.prix, t);
   const distance = `${formaterDistance(activite.distance_m)} · ${t.aPied(activite.trajet_min)}`;
   const IconeCategorie = ICONES_CATEGORIE[activite.categorie];
@@ -50,10 +53,10 @@ export default function CarteActivite({ activite, numero, onPress }: Props) {
       )}
 
       <View style={styles.contenu}>
-        <Text style={styles.titre} numberOfLines={3}>
+        <Text style={[styles.titre, { fontSize: d.px(18), lineHeight: d.px(22) }]} numberOfLines={3}>
           {activite.titre}
         </Text>
-        <Text style={styles.categorie}>{activite.categorieLibelle}</Text>
+        <Text style={[styles.categorie, { fontSize: d.texte.surtitre }]}>{activite.categorieLibelle}</Text>
         <Ligne icone={MapPin} texte={activite.lieu} />
         <Ligne icone={Clock} texte={activite.horaires} />
         <Ligne icone={Tag} texte={prix} />
@@ -74,7 +77,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 12,
   },
-  carteAppuyee: { borderColor: colors.teal },
+  carteAppuyee: { borderColor: colors.teal, transform: [{ scale: 0.99 }] },
   photo: { width: '34%', minHeight: 160 },
   sansPhoto: { backgroundColor: colors.muted, alignItems: 'center', justifyContent: 'center' },
   contenu: { flex: 1, padding: 12, gap: 4 },

@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
+import { ArrowRight } from 'lucide-react-native';
+import { View, Text, TextInput, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
 import BoutonChoix from '../components/BoutonChoix';
-import { interpreter, ErreurApi } from '../api/client';
-import { couleurs, polices, tailles } from '../theme';
-import { Choix } from '../types/questions';
-import { useTextes } from '../i18n';
 import { ICONES_CATEGORIE } from '../components/Icones';
+import { interpreter, ErreurApi } from '../api/client';
+import { Bouton, EnteteQuestion, Message, Page, useDesign } from '../design';
+import { couleurs, espace, polices, rayons } from '../theme';
+import { useTextes } from '../i18n';
+import { Choix } from '../types/questions';
 
 type Props = {
   choix: Choix<string>[];
@@ -15,16 +17,16 @@ type Props = {
   onSuivant: () => void;
 };
 
-// Retour affiché sous le champ « Autre… » : ✓ si compris, ⚠ sinon.
+// Retour affiché sous le champ « Autre… ».
 type Retour = { ok: boolean; message: string };
 
 export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, onSuivant }: Props) {
   const t = useTextes();
+  const d = useDesign();
   const [aEssaye, setAEssaye] = useState(false);
   const [texte, setTexte] = useState('');
   const [enCours, setEnCours] = useState(false);
   const [retour, setRetour] = useState<Retour | null>(null);
-  const afficherErreur = aEssaye && valeurs.length === 0;
 
   const comprendre = async () => {
     if (texte.trim() === '' || enCours) return;
@@ -56,19 +58,14 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
-      <View style={styles.progression} accessible accessibilityLabel={t.etape(2)}>
-        {[1, 2, 3].map((n) => (
-          <View key={n} style={[styles.barre, n <= 2 && styles.barreActive]} />
-        ))}
-        <Text style={styles.compteur}>2 / 3</Text>
-      </View>
-
-      <Text style={styles.etiquette}>{t.question(2)}</Text>
-      <Text accessibilityRole="header" style={styles.titre}>
-        {t.interets.titre}
-      </Text>
-      <Text style={styles.aide}>{t.interets.aide}</Text>
+    <Page pied={<Bouton libelle={t.suivant} a11y={t.suivantA11y} onPress={suivant} />}>
+      <EnteteQuestion
+        etape={2}
+        etapeA11y={t.etape(2)}
+        surtitre={t.question(2)}
+        titre={t.interets.titre}
+        aide={t.interets.aide}
+      />
 
       <View style={styles.grille}>
         {choix.map((c) => (
@@ -84,119 +81,61 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
         ))}
       </View>
 
-      <View style={styles.champ}>
-        <Text nativeID="libelle-autre" style={styles.champLibelle}>
-          {t.interets.autreLibelle}
-        </Text>
-        <View style={styles.ligne}>
-          <TextInput
-            value={texte}
-            onChangeText={setTexte}
-            onSubmitEditing={comprendre}
-            maxLength={500}
-            returnKeyType="done"
-            placeholder={t.interets.autrePlaceholder}
-            placeholderTextColor={couleurs.texteSecondaire}
-            accessibilityLabel={t.interets.autreA11y}
-            accessibilityLabelledBy="libelle-autre"
-            style={styles.champSaisie}
-          />
-          <Pressable
-            onPress={comprendre}
-            disabled={enCours}
-            accessibilityRole="button"
-            accessibilityLabel={t.interets.validerA11y}
-            accessibilityState={{ disabled: enCours, busy: enCours }}
-            style={styles.valider}
-          >
-            {enCours ? (
-              <ActivityIndicator color={couleurs.fond} />
-            ) : (
-              <Text style={styles.validerTexte}>{t.interets.valider}</Text>
-            )}
-          </Pressable>
-        </View>
-        <Text style={styles.confidentialite}>{t.interets.phraseNonEnregistree}</Text>
-        {retour && (
-          <View style={styles.erreur} accessibilityRole="alert">
-            <Text style={retour.ok ? styles.succesIcone : styles.erreurIcone}>{retour.ok ? '✓' : '⚠'}</Text>
-            <Text style={retour.ok ? styles.succesTexte : styles.erreurTexte}>{retour.message}</Text>
-          </View>
-        )}
+      <Text nativeID="libelle-autre" style={[styles.champLibelle, { fontSize: d.texte.corps }]}>
+        {t.interets.autreLibelle}
+      </Text>
+      <View style={styles.ligne}>
+        <TextInput
+          value={texte}
+          onChangeText={setTexte}
+          onSubmitEditing={comprendre}
+          maxLength={500}
+          returnKeyType="done"
+          placeholder={t.interets.autrePlaceholder}
+          placeholderTextColor={couleurs.texteSecondaire}
+          accessibilityLabel={t.interets.autreA11y}
+          accessibilityLabelledBy="libelle-autre"
+          style={[styles.champ, { minHeight: d.px(56), fontSize: d.texte.choix }]}
+        />
+        <Pressable
+          onPress={comprendre}
+          disabled={enCours}
+          accessibilityRole="button"
+          accessibilityLabel={t.interets.validerA11y}
+          accessibilityState={{ disabled: enCours, busy: enCours }}
+          style={({ pressed }) => [styles.valider, { width: d.px(56), height: d.px(56) }, pressed && styles.appuye]}
+        >
+          {enCours ? <ActivityIndicator color={couleurs.fond} /> : <ArrowRight size={d.px(24)} color={couleurs.fond} />}
+        </Pressable>
       </View>
+      <Text style={[styles.note, { fontSize: d.texte.surtitre }]}>{t.interets.phraseNonEnregistree}</Text>
+      {retour && <Message type={retour.ok ? 'succes' : 'erreur'} texte={retour.message} />}
 
-      {afficherErreur && (
-        <View style={styles.erreur} accessibilityRole="alert">
-          <Text style={styles.erreurIcone}>⚠</Text>
-          <Text style={styles.erreurTexte}>{t.interets.erreur}</Text>
-        </View>
-      )}
-
-      <Pressable
-        onPress={suivant}
-        accessibilityRole="button"
-        accessibilityLabel={t.suivantA11y}
-        style={styles.suivant}
-      >
-        <Text style={styles.suivantTexte}>{t.suivant}</Text>
-      </Pressable>
-    </ScrollView>
+      {aEssaye && valeurs.length === 0 && <Message type="erreur" texte={t.interets.erreur} />}
+    </Page>
   );
 }
 
 const styles = StyleSheet.create({
-  page: { flexGrow: 1, padding: 16 },
-  grille: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 24, marginBottom: 12 },
-  case: { flexGrow: 1, flexBasis: 220, marginBottom: 0 },
-  progression: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 20 },
-  barre: { flex: 1, height: 10, borderRadius: 5, backgroundColor: couleurs.barreInactive },
-  barreActive: { backgroundColor: couleurs.primaire },
-  compteur: { fontFamily: polices.texte, color: couleurs.texteSecondaire, fontSize: tailles.texte, marginLeft: 8 },
-  etiquette: { fontFamily: polices.texte, color: couleurs.primaire, letterSpacing: 1.5, fontSize: tailles.petit },
-  titre: { fontFamily: polices.titre, color: couleurs.texte, fontSize: 30, marginTop: 8 },
-  aide: { fontFamily: polices.texte, color: couleurs.texteSecondaire, fontSize: tailles.texte, marginTop: 8 },
-  champ: { marginTop: 8 },
-  champLibelle: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: tailles.texte, marginBottom: 6 },
-  ligne: { flexDirection: 'row', gap: 8 },
-  champSaisie: {
+  grille: { flexDirection: 'row', flexWrap: 'wrap', columnGap: espace.m, marginBottom: espace.l },
+  case: { flexGrow: 1, flexBasis: 240 },
+  champLibelle: { fontFamily: polices.texteMoyen, color: couleurs.texte, marginBottom: espace.s },
+  ligne: { flexDirection: 'row', gap: espace.s },
+  champ: {
     flex: 1,
-    minHeight: 56,
     borderWidth: 2,
-    borderColor: couleurs.primaire,
-    borderRadius: 16,
-    paddingHorizontal: 16,
+    borderColor: 'rgba(66, 168, 183, 0.55)',
+    borderRadius: rayons.m,
+    paddingHorizontal: espace.l,
     fontFamily: polices.texteMoyen,
-    fontSize: 18,
     color: couleurs.texte,
   },
   valider: {
-    minWidth: 64,
-    minHeight: 56,
-    borderRadius: 16,
+    borderRadius: rayons.m,
     backgroundColor: couleurs.primaire,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  validerTexte: { fontFamily: polices.titre, color: couleurs.fond, fontSize: 18 },
-  confidentialite: {
-    fontFamily: polices.texte,
-    color: couleurs.texteSecondaire,
-    fontSize: tailles.texte,
-    marginTop: 6,
-  },
-  erreur: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 },
-  erreurIcone: { color: couleurs.erreur, fontSize: 20 },
-  erreurTexte: { flex: 1, fontFamily: polices.texteMoyen, color: couleurs.erreur, fontSize: tailles.texte },
-  succesIcone: { color: couleurs.primaire, fontSize: 20 },
-  succesTexte: { flex: 1, fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: tailles.texte },
-  suivant: {
-    alignSelf: 'flex-end',
-    marginTop: 'auto',
-    minHeight: tailles.zoneMin + 12,
-    justifyContent: 'center',
-    backgroundColor: couleurs.primaire,
-    paddingHorizontal: 32,
-    borderRadius: 30,
-  },
-  suivantTexte: { fontFamily: polices.titre, color: couleurs.fond, fontSize: 20 },
+  appuye: { opacity: 0.85, transform: [{ scale: 0.97 }] },
+  note: { fontFamily: polices.texte, color: couleurs.texteSecondaire, marginTop: espace.s },
 });

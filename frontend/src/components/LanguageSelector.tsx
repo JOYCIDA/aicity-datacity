@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, fonts, radius, textSize } from '../theme/tokens';
 import { Langue, LANGUES, TEXTES, useTextes } from '../i18n';
+import { useDesign } from '../design';
 
 export type Lang = Langue;
 
@@ -12,6 +13,7 @@ type Props = {
 
 export default function LanguageSelector({ active, onChange }: Props) {
   const t = useTextes();
+  const d = useDesign();
   return (
     <View style={styles.container} accessibilityRole="radiogroup" accessibilityLabel={t.accueil.choixLangue}>
       {LANGUES.map((lang) => {
@@ -23,9 +25,9 @@ export default function LanguageSelector({ active, onChange }: Props) {
             accessibilityState={{ selected: isActive }}
             accessibilityLabel={TEXTES[lang].nomLangue}
             onPress={() => onChange?.(lang)}
-            style={[styles.option, isActive && styles.optionActive]}
+            style={[styles.option, { minWidth: d.px(44), minHeight: d.px(44) }, isActive && styles.optionActive]}
           >
-            <Text style={[styles.label, isActive && styles.labelActive]}>{lang}</Text>
+            <Text style={[styles.label, { fontSize: d.texte.corps }, isActive && styles.labelActive]}>{lang}</Text>
           </Pressable>
         );
       })}

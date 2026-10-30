@@ -1,6 +1,7 @@
 import { View, Text, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
 import { couleurs, polices, tailles } from '../theme';
 import { useTextes } from '../i18n';
+import { Message } from '../design';
 
 type Props = {
   message: string; // affiché pendant le chargement
@@ -13,10 +14,7 @@ export default function EtatChargement({ message, erreur, onReessayer }: Props) 
   if (erreur) {
     return (
       <View>
-        <View style={styles.erreur} accessibilityRole="alert">
-          <Text style={styles.erreurIcone}>⚠</Text>
-          <Text style={styles.erreurTexte}>{erreur}</Text>
-        </View>
+        <Message type="erreur" texte={erreur} />
         <Pressable
           onPress={onReessayer}
           accessibilityRole="button"
@@ -40,9 +38,6 @@ export default function EtatChargement({ message, erreur, onReessayer }: Props) 
 const styles = StyleSheet.create({
   chargement: { alignItems: 'center', gap: 12, marginTop: 48 },
   message: { fontFamily: polices.texte, color: couleurs.texteSecondaire, fontSize: tailles.texte },
-  erreur: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 24 },
-  erreurIcone: { color: couleurs.erreur, fontSize: 20 },
-  erreurTexte: { flex: 1, fontFamily: polices.texteMoyen, color: couleurs.erreur, fontSize: tailles.texte },
   bouton: {
     alignSelf: 'flex-start',
     minHeight: tailles.zoneMin + 12,

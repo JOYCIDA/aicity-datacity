@@ -89,7 +89,7 @@ export default function VueCreneau({ activites, tempsLibreMinutes, onOuvrir }: P
 
       <View style={styles.ligne}>
         {!etroit && <View style={styles.libelle} />}
-        <Text style={styles.maintenant}>▲ {t.creneau.maintenant}</Text>
+        <Text style={styles.maintenant}>{t.creneau.maintenant}</Text>
       </View>
 
       <View style={styles.legende}>
