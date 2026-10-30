@@ -18,10 +18,12 @@ import { formaterPrix, formaterDistance } from '../utils/format';
 import { ICONES_CATEGORIE } from '../components/Icones';
 import { useTextes } from '../i18n';
 import { SIGNALEMENT_ACTIF } from '../config';
+import BoutonTerminer from '../components/BoutonTerminer';
 
 type Props = {
   activite: Activite;
   onSignaler: () => void;
+  onTerminer: () => void;
 };
 
 // Sur le web, le partage n'existe que si le navigateur le propose.
@@ -47,7 +49,7 @@ function Tuile({ icone: Icone, libelle, valeur, accent = false }: {
   );
 }
 
-export default function EcranFiche({ activite, onSignaler }: Props) {
+export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) {
   const t = useTextes();
   const large = useWindowDimensions().width >= 768;
   const IconeCategorie = ICONES_CATEGORIE[activite.categorie];
@@ -171,6 +173,8 @@ export default function EcranFiche({ activite, onSignaler }: Props) {
         )}
 
         <Text style={styles.source}>{t.sourceMaj(activite.source, activite.date_maj)}</Text>
+
+        <BoutonTerminer onPress={onTerminer} clair />
       </View>
     </ScrollView>
   );

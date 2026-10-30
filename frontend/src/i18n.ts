@@ -59,6 +59,15 @@ const FR = {
     jusqua: (prix: string) => `Jusqu'à ${prix}`,
     sources: (sources: string) => `Source : ${sources}`,
   },
+  fin: {
+    terminer: 'Terminer',
+    terminerA11y: 'Terminer ma session et effacer mes choix',
+    titre: 'Bonne découverte !',
+    texte: "Ta session est terminée. Toutes tes données ont été effacées. La borne reviendra à l'accueil dans quelques secondes.",
+    retourAuto: (s: number) => `Retour automatique dans ${s} seconde${s > 1 ? 's' : ''}`,
+    revenir: "Revenir à l'accueil",
+    badge: 'Session effacée · Aucun compte · Aucune donnée conservée',
+  },
   carte: {
     a11y: 'Carte des activités proposées',
     ici: 'Vous êtes ici',
@@ -168,6 +177,15 @@ const EN: Textes = {
     plusDeTemps: (duree) => `Search with more time (${duree})`,
     jusqua: (prix) => `Up to ${prix}`,
     sources: (sources) => `Source: ${sources}`,
+  },
+  fin: {
+    terminer: 'Finish',
+    terminerA11y: 'Finish my session and erase my answers',
+    titre: 'Enjoy your outing!',
+    texte: 'Your session is over. All your data has been erased. The kiosk will return to the home screen in a few seconds.',
+    retourAuto: (s) => `Back to home in ${s} second${s > 1 ? 's' : ''}`,
+    revenir: 'Back to home',
+    badge: 'Session erased · No account · No data kept',
   },
   carte: {
     a11y: 'Map of the suggested activities',
