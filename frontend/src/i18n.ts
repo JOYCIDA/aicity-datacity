@@ -59,6 +59,13 @@ const FR = {
     jusqua: (prix: string) => `Jusqu'à ${prix}`,
     sources: (sources: string) => `Source : ${sources}`,
   },
+  carte: {
+    a11y: 'Carte des activités proposées',
+    ici: 'Vous êtes ici',
+    vue: 'Affichage',
+    liste: 'Liste',
+    carte: 'Carte',
+  },
   position: {
     refusee: "Tu n'as pas autorisé l'accès à ta position : nous cherchons autour du centre de Paris.",
     horsParis: 'Tu sembles être hors de Paris : nous cherchons autour du centre de Paris.',
@@ -161,6 +168,13 @@ const EN: Textes = {
     plusDeTemps: (duree) => `Search with more time (${duree})`,
     jusqua: (prix) => `Up to ${prix}`,
     sources: (sources) => `Source: ${sources}`,
+  },
+  carte: {
+    a11y: 'Map of the suggested activities',
+    ici: 'You are here',
+    vue: 'View',
+    liste: 'List',
+    carte: 'Map',
   },
   position: {
     refusee: "You didn't allow access to your location: we are searching around central Paris.",
