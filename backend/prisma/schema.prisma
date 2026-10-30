@@ -137,6 +137,11 @@ model Offre {
   prix          Decimal?    @db.Decimal(8, 2)
   gratuit       Boolean     @default(false)
   photoUrl      String?
+  photoCredit   String?
+  photoAlt      String?
+  titreEn       String?
+  descriptionEn String?
+  lieuEn        String?
   source        SourceOffre @default(ENTREPRISE)
   sourceUrl     String?
   idExterne     String?

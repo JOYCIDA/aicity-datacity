@@ -25,6 +25,14 @@ export interface OffreNormalisee {
   prix: number | null;
   gratuit: boolean;
   photoUrl: string | null;
+  /** Crédit (droit d'auteur) à afficher sous la photo, si la source le fournit. */
+  photoCredit?: string | null;
+  /** Description de la photo, lue par les lecteurs d'écran. */
+  photoAlt?: string | null;
+  /** Version anglaise, si la source la fournit (sinon la traduction s'en charge). */
+  titreEn?: string | null;
+  descriptionEn?: string | null;
+  lieuEn?: string | null;
   sourceUrl: string | null;
 }
 

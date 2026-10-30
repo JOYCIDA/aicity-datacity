@@ -22,6 +22,13 @@ const champsOffre = {
   prix: z.number().min(0).max(999_999.99).multipleOf(0.01).nullish(),
   gratuit: z.boolean().default(false),
   photoUrl: z.url().max(2048).nullish(),
+  /** Crédit à afficher sous la photo (droit d'auteur) et sa description pour les lecteurs d'écran. */
+  photoCredit: texte(1, 200).nullish(),
+  photoAlt: texte(1, 300).nullish(),
+  /** Version anglaise facultative ; absente, elle est traduite automatiquement si possible. */
+  titreEn: texte(3, 150).nullish(),
+  descriptionEn: texte(1, 4000).nullish(),
+  lieuEn: texte(2, 200).nullish(),
 };
 
 const finApresDebut = (o: { debut?: Date; fin?: Date | null }) =>

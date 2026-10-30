@@ -2,7 +2,7 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from '../prisma/client.js';
 import type { PreferencesDto } from '../schemas/citoyen.schema.js';
-import { offrePubliqueDto, selectionOffre } from '../utils/dto.js';
+import { type LangueContenu, offrePubliqueDto, selectionOffre } from '../utils/dto.js';
 import { forbidden, invalid, notFound, unauthorized } from '../utils/errors.js';
 import { whereVisible } from './offre.service.js';
 import { incrementer } from './stats.service.js';
@@ -55,7 +55,7 @@ export async function enregistrerPreferences(utilisateurId: string, dto: Prefere
 }
 
 /** Favoris, du plus récent au plus ancien. `disponible` : l'offre est encore proposée au public. */
-export async function favoris(utilisateurId: string) {
+export async function favoris(utilisateurId: string, langue: LangueContenu = 'FR') {
   await compte(utilisateurId);
   const lignes = await prisma.favori.findMany({
     where: { utilisateurId },
@@ -73,7 +73,7 @@ export async function favoris(utilisateurId: string) {
   return lignes.map((l) => ({
     ajouteLe: l.ajouteLe,
     disponible: visibles.has(l.offre.id),
-    offre: offrePubliqueDto(l.offre),
+    offre: offrePubliqueDto(l.offre, langue),
   }));
 }
 

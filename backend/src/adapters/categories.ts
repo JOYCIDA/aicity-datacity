@@ -15,15 +15,30 @@ const RACINES: [CodeCategorie, string[]][] = [
   ['loisirs', ['loisir', 'atelier', 'enfant', 'famille', 'jeu', 'nuit', 'salon', 'kids', 'game', 'fun\\b']],
 ];
 
+// Mots du langage courant, utilisés seulement pour interpréter une demande (« manger un bon
+// resto »). Ils sont trop larges pour classer un événement : « café-théâtre » n'est pas de la
+// gastronomie. L'import n'utilise donc que RACINES.
+const RACINES_DEMANDE: Partial<Record<CodeCategorie, string[]>> = {
+  gastronomie: ['resto', 'manger', 'mange', 'repas', 'dejeuner', 'diner', 'souper', 'gouter', 'bistro', 'brasserie', 'cafe', 'bar\\b', 'boire', 'boisson', 'glace', 'patisserie', 'boulangerie', 'pizza', 'burger', 'sushi', 'dessert', 'snack', 'eat\\b', 'lunch', 'dinner', 'coffee', 'drink'],
+  sport: ['bouger', 'courir', 'nager', 'pedaler', 'muscu', 'gym\\b', 'piscine', 'foot\\b', 'cycl', 'work-?out', 'swim'],
+  nature: ['balade', 'promenade', 'se promener', 'pique-?nique', 'lac\\b', 'canal', 'berges?\\b', 'plein air', 'verdure', 'fleur', 'walk\\b', 'stroll', 'picnic', 'fresh air'],
+  loisirs: ['amuser', 'divertir', 'bowling', 'karting', 'escape', 'laser', 'billard', 'jouer', 'entertain'],
+  shopping: ['acheter', 'magasin', 'courses\\b', 'buy\\b', 'store\\b'],
+};
+
 const TABLES = RACINES.map(([code, racines]) => [code, new RegExp(`\\b(${racines.join('|')})`)] as const);
 
 export const sansAccents = (s: string) =>
   s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/’/g, "'").toLowerCase();
 
+const TABLES_DEMANDE = RACINES.map(
+  ([code, racines]) => [code, new RegExp(`\\b(${[...racines, ...(RACINES_DEMANDE[code] ?? [])].join('|')})`)] as const,
+);
+
 /** Toutes les catégories évoquées dans un texte libre, sans catégorie par défaut. */
 export function categoriesMentionnees(texte: string): CodeCategorie[] {
   const t = sansAccents(texte);
-  return TABLES.filter(([, motif]) => motif.test(t)).map(([code]) => code);
+  return TABLES_DEMANDE.filter(([, motif]) => motif.test(t)).map(([code]) => code);
 }
 
 function chercher(texte: string): CodeCategorie | null {
