@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { AlertCircle, CheckCircle2, ChevronRight, Info, type LucideIcon } from 'lucide-react-native';
 import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { couleurs, espace, modeEcran, polices, rayons, tailles, type Mode } from './theme';
+import { vibrer } from './animations';
 
 // Facteur d'agrandissement : la borne se lit à un mètre, le reste à 30 cm.
 const FACTEUR: Record<Mode, number> = { telephone: 1, bureau: 1, borne: 1.4 };
@@ -98,7 +99,10 @@ export function Bouton({ libelle, onPress, a11y, icone = ChevronRight, variante 
   const primaire = variante === 'primaire';
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        vibrer('action');
+        onPress();
+      }}
       accessibilityRole="button"
       accessibilityLabel={a11y ?? libelle}
       style={({ pressed }) => [

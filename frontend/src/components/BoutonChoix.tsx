@@ -2,6 +2,7 @@ import { Check, type LucideIcon } from 'lucide-react-native';
 import { Pressable, Text, View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { couleurs, espace, polices, rayons } from '../theme';
 import { useDesign } from '../design';
+import { vibrer } from '../animations';
 
 type Props = {
   libelle: string;
@@ -17,7 +18,10 @@ export default function BoutonChoix({ libelle, selectionne, onPress, multiple = 
   const couleur = selectionne ? couleurs.fond : couleurs.texte;
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        vibrer('choix');
+        onPress();
+      }}
       accessibilityRole={multiple ? 'checkbox' : 'radio'}
       accessibilityState={multiple ? { checked: selectionne } : { selected: selectionne }}
       accessibilityLabel={libelle}
