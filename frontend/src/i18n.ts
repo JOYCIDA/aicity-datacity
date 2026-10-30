@@ -15,7 +15,7 @@ const FR = {
     raccourciA11y: (categorie: string) => `${categorie} : commencer avec cette envie`,
   },
   retour: 'Retour',
-  suivant: 'Suivant ›',
+  suivant: 'Suivant',
   suivantA11y: 'Suivant',
   reessayer: 'Réessayer',
   etape: (n: number) => `Étape ${n} sur 3`,
@@ -45,7 +45,7 @@ const FR = {
     montantInvalide: (min: string, max: string, unite: string) =>
       `Entre un montant entre ${min} et ${max} ${unite}, avec au plus 2 chiffres après la virgule.`,
     confidentialite: 'Tes données ne sont pas enregistrées.',
-    voirResultats: 'Voir les résultats ›',
+    voirResultats: 'Voir les résultats',
     voirResultatsA11y: 'Voir les résultats',
   },
   resultats: {
@@ -153,7 +153,7 @@ const EN: Textes = {
     raccourciA11y: (categorie) => `${categorie}: start with this interest`,
   },
   retour: 'Back',
-  suivant: 'Next ›',
+  suivant: 'Next',
   suivantA11y: 'Next',
   reessayer: 'Try again',
   etape: (n) => `Step ${n} of 3`,
@@ -183,7 +183,7 @@ const EN: Textes = {
     montantInvalide: (min, max, unite) =>
       `Enter an amount between ${min} and ${max} ${unite}, with at most 2 decimal places.`,
     confidentialite: 'Your data is not stored.',
-    voirResultats: 'See results ›',
+    voirResultats: 'See results',
     voirResultatsA11y: 'See results',
   },
   resultats: {
