@@ -190,7 +190,8 @@ const styles = StyleSheet.create({
   page: { padding: 16, paddingBottom: 32, gap: 20 },
   pageLarge: { flexDirection: 'row', alignItems: 'flex-start', padding: 24, gap: 32 },
   photo: { width: '100%', height: 220, borderRadius: 24, overflow: 'hidden' },
-  photoLarge: { width: '38%', aspectRatio: 3 / 4, borderRadius: 24, overflow: 'hidden' },
+  // Format paysage : la photo reste entière à l'écran, sans recadrage excessif.
+  photoLarge: { width: '40%', aspectRatio: 4 / 3, borderRadius: 24, overflow: 'hidden' },
   image: { width: '100%', height: '100%' },
   // Bandeau sombre en bas de la photo : lisible quelle que soit l'image.
   credit: {
