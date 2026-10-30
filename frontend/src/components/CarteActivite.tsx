@@ -9,6 +9,7 @@ import { useTextes } from '../i18n';
 
 type Props = {
   activite: Activite;
+  numero?: number; // même numéro que la pastille sur la carte
   onPress?: () => void;
 };
 
@@ -21,7 +22,7 @@ function Ligne({ icone: Icone, texte, accent = false }: { icone: LucideIcon; tex
   );
 }
 
-export default function CarteActivite({ activite, onPress }: Props) {
+export default function CarteActivite({ activite, numero, onPress }: Props) {
   const t = useTextes();
   const prix = formaterPrix(activite.prix, t);
   const distance = `${formaterDistance(activite.distance_m)} · ${t.aPied(activite.trajet_min)}`;
@@ -31,7 +32,7 @@ export default function CarteActivite({ activite, onPress }: Props) {
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${activite.titre}, ${activite.categorieLibelle}, ${activite.lieu}, ${activite.horaires}, ${prix}, ${distance}`}
+      accessibilityLabel={`${numero ? `${numero}. ` : ''}${activite.titre}, ${activite.categorieLibelle}, ${activite.lieu}, ${activite.horaires}, ${prix}, ${distance}`}
       style={({ pressed }) => [styles.carte, pressed && styles.carteAppuyee]}
     >
       {activite.photo_url ? (
@@ -39,6 +40,12 @@ export default function CarteActivite({ activite, onPress }: Props) {
       ) : (
         <View style={[styles.photo, styles.sansPhoto]}>
           {IconeCategorie && <IconeCategorie size={36} color={colors.teal} />}
+        </View>
+      )}
+
+      {numero !== undefined && (
+        <View style={styles.numero}>
+          <Text style={styles.numeroTexte}>{numero}</Text>
         </View>
       )}
 
@@ -71,6 +78,20 @@ const styles = StyleSheet.create({
   photo: { width: '34%', minHeight: 160 },
   sansPhoto: { backgroundColor: colors.muted, alignItems: 'center', justifyContent: 'center' },
   contenu: { flex: 1, padding: 12, gap: 4 },
+  numero: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.night,
+    borderWidth: 2,
+    borderColor: colors.teal,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  numeroTexte: { fontFamily: polices.titre, color: colors.cream, fontSize: tailles.texte },
   titre: { fontFamily: polices.titre, fontSize: 18, lineHeight: 22, color: colors.night },
   categorie: { fontFamily: polices.texte, fontSize: tailles.petit, color: colors.mutedForeground, marginBottom: 2 },
   ligne: { flexDirection: 'row', alignItems: 'flex-start', gap: 6 },

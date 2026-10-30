@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { View, Text, Pressable, FlatList, StyleSheet } from 'react-native';
+import { View, Text, Pressable, FlatList, StyleSheet, useWindowDimensions } from 'react-native';
 import CarteActivite from '../components/CarteActivite';
+import CarteGeo from '../components/CarteGeo';
 import EtatChargement from '../components/EtatChargement';
 import { recommander, ErreurApi } from '../api/client';
 import { versActivite } from '../api/adaptateur';
-import { obtenirPosition, RemarquePosition } from '../utils/position';
+import { obtenirPosition, Position, RemarquePosition } from '../utils/position';
 import { formaterPrix } from '../utils/format';
 import { useLangue, useTextes } from '../i18n';
 import { Activite } from '../types/activite';
@@ -13,7 +14,12 @@ import { Questions } from '../types/questions';
 import { couleurs, polices, tailles } from '../theme';
 import { colors } from '../theme/tokens';
 
-export type Recherche = { activites: Activite[]; elargie: boolean; remarquePosition: RemarquePosition | null };
+export type Recherche = {
+  activites: Activite[];
+  elargie: boolean;
+  position: Position; // utilisée seulement pour la carte, jamais enregistrée
+  remarquePosition: RemarquePosition | null;
+};
 
 type Props = {
   questions: Questions;
@@ -34,6 +40,9 @@ export default function EcranResultats({
 }: Props) {
   const t = useTextes();
   const langue = useLangue();
+  // Grand écran (ordinateur, borne) : carte et liste côte à côte, comme la maquette.
+  const large = useWindowDimensions().width >= 900;
+  const [vue, setVue] = useState<'liste' | 'carte'>('liste');
   const [erreur, setErreur] = useState<string | null>(null);
 
   const charger = useCallback(async () => {
@@ -49,6 +58,7 @@ export default function EcranResultats({
       onRecherche({
         activites: r.resultats.map((x) => versActivite(x, langue)),
         elargie: r.elargie,
+        position,
         remarquePosition: remarque,
       });
     } catch (e) {
@@ -72,6 +82,30 @@ export default function EcranResultats({
   const n = recherche?.activites.length ?? 0;
   // Aucun résultat : on propose la durée suivante parmi celles du backend.
   const dureeSuivante = questions.durees.find((d) => reponses.duree !== undefined && d.valeur > reponses.duree);
+
+  const liste = recherche && (
+    <View style={[styles.panneau, large && styles.colonneListe]}>
+      <FlatList
+        data={recherche.activites}
+        keyExtractor={(a) => a.id}
+        renderItem={({ item, index }) => (
+          <CarteActivite activite={item} numero={index + 1} onPress={() => onOuvrir(item)} />
+        )}
+        contentContainerStyle={styles.liste}
+        ListFooterComponent={
+          <Text style={styles.sources}>
+            {t.resultats.sources([...new Set(recherche.activites.map((a) => a.source))].join(' / '))}
+          </Text>
+        }
+      />
+    </View>
+  );
+
+  const carte = recherche && (
+    <View style={[styles.zoneCarte, large && styles.zoneCarteLarge]}>
+      <CarteGeo position={recherche.position} activites={recherche.activites} onOuvrir={onOuvrir} />
+    </View>
+  );
 
   return (
     <View style={styles.page}>
@@ -104,20 +138,30 @@ export default function EcranResultats({
                 </Pressable>
               )}
             </View>
-          ) : (
-            <View style={styles.panneau}>
-              <FlatList
-                data={recherche.activites}
-                keyExtractor={(a) => a.id}
-                renderItem={({ item }) => <CarteActivite activite={item} onPress={() => onOuvrir(item)} />}
-                contentContainerStyle={styles.liste}
-                ListFooterComponent={
-                  <Text style={styles.sources}>
-                    {t.resultats.sources([...new Set(recherche.activites.map((a) => a.source))].join(' / '))}
-                  </Text>
-                }
-              />
+          ) : large ? (
+            <View style={styles.deuxColonnes}>
+              {carte}
+              {liste}
             </View>
+          ) : (
+            <>
+              <View style={styles.bascule} accessibilityRole="radiogroup" accessibilityLabel={t.carte.vue}>
+                {(['liste', 'carte'] as const).map((v) => (
+                  <Pressable
+                    key={v}
+                    onPress={() => setVue(v)}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: vue === v }}
+                    style={[styles.basculeBouton, vue === v && styles.basculeActif]}
+                  >
+                    <Text style={[styles.basculeTexte, vue === v && styles.basculeTexteActif]}>
+                      {v === 'liste' ? t.carte.liste : t.carte.carte}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+              {vue === 'carte' ? carte : liste}
+            </>
           )}
         </>
       )}
@@ -127,10 +171,6 @@ export default function EcranResultats({
 
 const styles = StyleSheet.create({
   page: { flex: 1, padding: 16 },
-  // Zone claire de la liste, comme la colonne de droite de la maquette.
-  panneau: { flex: 1, backgroundColor: colors.background, borderRadius: 24, marginTop: 16, overflow: 'hidden' },
-  liste: { padding: 12, width: '100%', maxWidth: 760, alignSelf: 'center' },
-  sources: { fontFamily: polices.texte, color: colors.mutedForeground, fontSize: tailles.petit, marginTop: 4 },
   titre: { fontFamily: polices.titre, color: couleurs.texte, fontSize: 28 },
   resume: {
     fontFamily: polices.texte,
@@ -138,6 +178,35 @@ const styles = StyleSheet.create({
     fontSize: tailles.texte,
     marginTop: 6,
   },
+  deuxColonnes: { flex: 1, flexDirection: 'row', gap: 16, marginTop: 16 },
+  zoneCarte: { flex: 1, marginTop: 16 },
+  zoneCarteLarge: { marginTop: 0 },
+  // Zone claire de la liste, comme la colonne de droite de la maquette.
+  panneau: { flex: 1, backgroundColor: colors.background, borderRadius: 24, marginTop: 16, overflow: 'hidden' },
+  // flexBasis plutôt que flex: 0 (qui donne une largeur nulle sur le web).
+  colonneListe: { flexGrow: 0, flexShrink: 0, flexBasis: 460, marginTop: 0 },
+  liste: { padding: 12, width: '100%', maxWidth: 760, alignSelf: 'center' },
+  sources: { fontFamily: polices.texte, color: colors.mutedForeground, fontSize: tailles.petit, marginTop: 4 },
+  bascule: {
+    flexDirection: 'row',
+    alignSelf: 'flex-start',
+    gap: 4,
+    padding: 4,
+    marginTop: 16,
+    borderRadius: 28,
+    backgroundColor: couleurs.carte,
+  },
+  basculeBouton: {
+    minHeight: tailles.zoneMin,
+    minWidth: 88,
+    paddingHorizontal: 16,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  basculeActif: { backgroundColor: couleurs.primaire },
+  basculeTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: tailles.texte },
+  basculeTexteActif: { color: couleurs.fond },
   vide: {
     fontFamily: polices.texte,
     color: couleurs.texte,
