@@ -10,7 +10,7 @@ export type ResultatPosition = { position: Position; remarque: RemarquePosition 
 // Les données couvrent Paris : au-delà, on cherche autour du centre.
 const DISTANCE_MAX_PARIS_M = 15_000;
 
-function distanceM(a: Position, b: Position): number {
+export function distanceM(a: Position, b: Position): number {
   const rad = (d: number) => (d * Math.PI) / 180;
   const dLat = rad(b.latitude - a.latitude);
   const dLng = rad(b.longitude - a.longitude);
