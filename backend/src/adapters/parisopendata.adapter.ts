@@ -22,6 +22,8 @@ export interface EvenementParis {
   date_start: string | null;
   date_end: string | null;
   cover_url: string | null;
+  cover_credit: string | null;
+  cover_alt: string | null;
   address_name: string | null;
   address_street: string | null;
   address_zipcode: string | null;
@@ -37,6 +39,7 @@ const EXPORT =
   'https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/exports/json';
 const CHAMPS: (keyof EvenementParis)[] = [
   'id', 'url', 'title', 'lead_text', 'description', 'date_start', 'date_end', 'cover_url',
+  'cover_credit', 'cover_alt',
   'address_name', 'address_street', 'address_zipcode', 'address_city', 'lat_lon',
   'price_type', 'price_detail', 'qfap_tags', 'updated_at',
 ];
@@ -79,6 +82,8 @@ export function creerParisOpenDataAdapter({ fetch = globalThis.fetch }: { fetch?
         gratuit: e.price_type === 'gratuit',
         prix: e.price_type === 'payant' ? prixMinimum(texteBrut(e.price_detail)) : null,
         photoUrl: texteOuNull(e.cover_url),
+        photoCredit: texteBrut(e.cover_credit, 200),
+        photoAlt: texteBrut(e.cover_alt, 300),
         sourceUrl: texteOuNull(e.url),
       };
     },

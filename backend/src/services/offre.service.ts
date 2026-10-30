@@ -8,7 +8,7 @@ import type {
   PaginationDto,
   StatutOffreDto,
 } from '../schemas/offre.schema.js';
-import { offreDto, offrePubliqueDto, page, selectionOffre } from '../utils/dto.js';
+import { type LangueContenu, offreDto, offrePubliqueDto, page, selectionOffre } from '../utils/dto.js';
 import { conflict, forbidden, invalid, notFound } from '../utils/errors.js';
 import { boiteEnglobante } from '../utils/geo.js';
 import { entrepriseActive, entrepriseDe } from './entreprise.service.js';
@@ -131,12 +131,20 @@ export async function modifier(utilisateurId: string, offreId: string, dto: Modi
 
   const statut = statutApresModification(avant, dto);
   const { categorieCode, ...champs } = dto;
+  // Un texte français modifié sans sa version anglaise rend l'ancienne traduction fausse : on
+  // l'efface, elle sera retraduite.
+  const traductionsPerimees = {
+    ...(dto.titre !== undefined && dto.titreEn === undefined ? { titreEn: null } : {}),
+    ...(dto.description !== undefined && dto.descriptionEn === undefined ? { descriptionEn: null } : {}),
+    ...(dto.lieu !== undefined && dto.lieuEn === undefined ? { lieuEn: null } : {}),
+  };
   try {
     const offre = await prisma.offre.update({
       // Le filtre sur le statut lu évite d'écraser une décision de modération intervenue entre-temps.
       where: { id: offreId, statut: avant.statut },
       data: {
         ...champs,
+        ...traductionsPerimees,
         ...(categorieCode ? { categorieId: await categorieId(categorieCode) } : {}),
         statut,
         ...(statut === 'EN_ATTENTE' ? { motifRefus: null } : {}),
@@ -208,11 +216,11 @@ export async function listerPubliques(q: PaginationDto & Partial<CarteDto>) {
     }),
     prisma.offre.count({ where }),
   ]);
-  return page(offres.map(offrePubliqueDto), total, q);
+  return page(offres.map((o) => offrePubliqueDto(o, q.langue ?? 'FR')), total, q);
 }
 
 /** Fiche publique (UC8) : 404 si l'offre n'est pas visible ; chaque lecture compte une vue. */
-export async function detailPublique(offreId: string) {
+export async function detailPublique(offreId: string, langue: LangueContenu = 'FR') {
   const maintenant = new Date();
   const visible = await prisma.offre.findFirst({
     where: { id: offreId, ...whereVisible(maintenant) },
@@ -225,5 +233,5 @@ export async function detailPublique(offreId: string) {
     prisma.offre.update({ where: { id: offreId }, data: { vues: { increment: 1 } }, select: selectionOffre }),
     incrementer(offreId, 'vues', maintenant),
   ]);
-  return offrePubliqueDto(offre);
+  return offrePubliqueDto(offre, langue);
 }

@@ -89,7 +89,7 @@ export async function recommander(dto: RecommandationDto, auteur: Auteur, mainte
         explication: c.explication[dto.langue],
         distanceM: c.distanceM,
         trajetMinutes: c.trajetMinutes,
-        offre: offrePubliqueDto(parId.get(c.offre.id)!),
+        offre: offrePubliqueDto(parId.get(c.offre.id)!, dto.langue),
       })),
     };
   }
@@ -131,7 +131,7 @@ export async function recommander(dto: RecommandationDto, auteur: Auteur, mainte
       explication: c.explication[dto.langue],
       distanceM: c.distanceM,
       trajetMinutes: c.trajetMinutes,
-      offre: offrePubliqueDto(parId.get(c.offre.id)!),
+      offre: offrePubliqueDto(parId.get(c.offre.id)!, dto.langue),
     })),
   };
 }

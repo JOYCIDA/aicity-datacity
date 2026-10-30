@@ -1,3 +1,4 @@
+import { categoriser } from '../../src/adapters/categories.js';
 import { describe, expect, it } from 'vitest';
 import { heuristiqueLocale } from '../../src/clients/llm.client.js';
 
@@ -41,8 +42,23 @@ describe('interprétation locale (sans LLM)', () => {
   });
 
   it('repère plusieurs catégories, en français comme en anglais', async () => {
-    expect((await lire('un resto puis du shopping')).categories).toEqual(['shopping']);
+    expect((await lire('un resto puis du shopping')).categories).toEqual(['gastronomie', 'shopping']);
     expect((await lire('a museum then a walk in the park')).categories).toEqual(['nature', 'culture']);
     expect((await lire('dégustation de vins et concert')).categories).toEqual(['gastronomie', 'culture']);
+  });
+
+  it('comprend le langage courant : manger, resto, café, balade, vélo', async () => {
+    expect((await lire('manger un bon resto')).categories).toEqual(['gastronomie']);
+    expect((await lire('envie de manger un morceau')).categories).toEqual(['gastronomie']);
+    expect((await lire('un café au calme')).categories).toEqual(['gastronomie']);
+    expect((await lire('vélo au parc')).categories).toEqual(['sport', 'nature']);
+    expect((await lire('une balade au bord du canal')).categories).toEqual(['nature']);
+    expect((await lire('pique-nique et bowling')).categories).toEqual(['nature', 'loisirs']);
+    expect((await lire('I want to eat something and drink a coffee')).categories).toEqual(['gastronomie']);
+  });
+
+  it('ne classe pas pour autant un événement « café-théâtre » en gastronomie à l’import', () => {
+    expect(categoriser(['Café-théâtre'], null)).toBe('culture');
+    expect(categoriser([], 'Café-concert du dimanche')).toBe('culture');
   });
 });

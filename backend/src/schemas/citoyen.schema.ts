@@ -7,6 +7,13 @@ import { paginationSchema } from './offre.schema.js';
 const latitude = z.number().min(-90).max(90);
 const longitude = z.number().min(-180).max(180);
 const langue = z.enum(['FR', 'EN']);
+/** Paramètre d'URL `?langue=fr|en` (casse libre) ; absent, la langue de la session ou le français. */
+export const langueRequete = z
+  .string()
+  .transform((v) => v.toUpperCase())
+  .pipe(langue)
+  .optional();
+export const requeteLangueSchema = z.object({ langue: langueRequete });
 
 // Un des raccourcis de la question, ou un montant saisi librement (centimes inclus) ; null : sans limite.
 const budgetMax = z.number().min(BUDGET_SAISI.min).max(BUDGET_SAISI.max).multipleOf(BUDGET_SAISI.pas).nullable();
@@ -45,6 +52,7 @@ export const carteSchema = paginationSchema
     longitude: z.coerce.number().min(-180).max(180).optional(),
     rayonM: z.coerce.number().int().min(100).max(20_000).default(2000),
     categorie: z.enum(CODES_CATEGORIES).optional(),
+    langue: langueRequete,
   })
   .refine((q) => (q.latitude === undefined) === (q.longitude === undefined), {
     message: 'latitude et longitude vont ensemble',

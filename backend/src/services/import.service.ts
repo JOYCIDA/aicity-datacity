@@ -1,6 +1,7 @@
 import type { OffreNormalisee, SourceAdapter } from '../adapters/source.adapter.js';
 import type { ImportRapport, Prisma } from '../generated/prisma/client.js';
 import { prisma } from '../prisma/client.js';
+import { ecarterCoordonneesDouteuses } from '../adapters/qualite.js';
 import { page } from '../utils/dto.js';
 import { conflict } from '../utils/errors.js';
 
@@ -98,13 +99,33 @@ async function executer(adapter: SourceAdapter, rapport: ImportRapport, maintena
         prix: o.prix,
         gratuit: o.gratuit,
         photoUrl: o.photoUrl,
+        photoCredit: o.photoUrl ? (o.photoCredit ?? null) : null,
+        photoAlt: o.photoUrl ? (o.photoAlt ?? null) : null,
+        titreEn: o.titreEn ?? undefined,
+        descriptionEn: o.descriptionEn ?? undefined,
+        lieuEn: o.lieuEn ?? undefined,
         sourceUrl: o.sourceUrl,
         statut: 'VALIDE', // RG5 : seules les offres d'entreprise passent par la modération
         motifRefus: null,
       });
     }
 
-    const { nbCrees, nbMisAJour } = await enregistrer(adapter, [...offres.values()]);
+    // Coordonnées par défaut ou partagées par trop d'adresses : rejetées, et retirées de l'affichage
+    // si une version précédente de l'import les avait déjà publiées.
+    const { gardees, ecartees } = ecarterCoordonneesDouteuses([...offres.values()]);
+    rejets.coordonnees += ecartees.length;
+    if (ecartees.length) {
+      await prisma.offre.updateMany({
+        where: {
+          source: adapter.source,
+          idExterne: { in: ecartees.map((o) => o.idExterne!) },
+          statut: { in: ['VALIDE', 'EN_PAUSE'] },
+        },
+        data: { statut: 'EXPIREE' },
+      });
+    }
+
+    const { nbCrees, nbMisAJour } = await enregistrer(adapter, gardees);
     const nbExpirees = await expirerOffres(maintenant);
     const nbRejetes = Object.values(rejets).reduce((a, b) => a + b, 0);
     const detailRejets = Object.entries(rejets)
@@ -141,22 +162,33 @@ async function enregistrer(adapter: SourceAdapter, offres: Prisma.OffreUnchecked
   let nbMisAJour = 0;
   for (let i = 0; i < offres.length; i += TAILLE_LOT) {
     const lot = offres.slice(i, i + TAILLE_LOT);
-    const existants = new Set(
+    const existants = new Map(
       (
         await prisma.offre.findMany({
           where: { source: adapter.source, idExterne: { in: lot.map((o) => o.idExterne!) } },
-          select: { idExterne: true },
+          select: { idExterne: true, titre: true, description: true, lieu: true },
         })
-      ).map((o) => o.idExterne),
+      ).map((o) => [o.idExterne, o] as const),
     );
     await prisma.$transaction(
-      lot.map(({ source, idExterne, ...champs }) =>
-        prisma.offre.upsert({
+      lot.map(({ source, idExterne, ...champs }) => {
+        const avant = existants.get(idExterne!);
+        // Texte français modifié par la source : l'ancienne traduction n'est plus valable.
+        const traductionsPerimees = avant
+          ? {
+              ...(champs.titre !== avant.titre && champs.titreEn === undefined ? { titreEn: null } : {}),
+              ...(champs.description !== avant.description && champs.descriptionEn === undefined
+                ? { descriptionEn: null }
+                : {}),
+              ...(champs.lieu !== avant.lieu && champs.lieuEn === undefined ? { lieuEn: null } : {}),
+            }
+          : {};
+        return prisma.offre.upsert({
           where: { source_idExterne: { source: source!, idExterne: idExterne! } },
           create: { source, idExterne, ...champs },
-          update: champs,
-        }),
-      ),
+          update: { ...champs, ...traductionsPerimees },
+        });
+      }),
     );
     for (const o of lot) {
       if (existants.has(o.idExterne!)) nbMisAJour++;

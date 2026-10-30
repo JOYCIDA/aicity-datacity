@@ -90,3 +90,18 @@ describe('filtres de recommandation', () => {
     expect(filtrer(offres, demande(), 1000).map((r) => r.offre.id)).toEqual(['a']);
   });
 });
+
+describe('temps libre court et durée par défaut des catégories', () => {
+  // Offre à 400 m (7 min à pied) : avec 30 min libres, la durée de visite doit rester ≤ 23 min.
+  it('« 30 min » donne des résultats avec les durées par défaut du seed (15 à 20 min)', () => {
+    for (const duree of [15, 20]) {
+      expect(motif(offre({ dureeMinutes: duree }), demande({ tempsLibreMinutes: 30 }))).toBeNull();
+    }
+  });
+
+  it('une visite de 30 ou 45 min ne tient jamais dans 30 min (RG11) : d’où les durées par défaut courtes', () => {
+    for (const duree of [30, 45]) {
+      expect(motif(offre({ dureeMinutes: duree }), demande({ tempsLibreMinutes: 30 }))).toBe('creneau');
+    }
+  });
+});

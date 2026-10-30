@@ -1,5 +1,6 @@
 import { adaptateurs, type SourceAdapter } from '../adapters/index.js';
 import { importer } from '../services/import.service.js';
+import { executerTraduction } from './traduction.job.js';
 
 /**
  * Import de toutes les sources configurées, l'une après l'autre (UC21). Chaque source est
@@ -25,5 +26,6 @@ export async function executerImports(sources: SourceAdapter[] = Object.values(a
     }
   }
   console.log(`[import] ${bilan.join(' | ')}`);
+  await executerTraduction(); // anglais des offres nouvelles ou modifiées, si un traducteur est configuré
   return bilan;
 }

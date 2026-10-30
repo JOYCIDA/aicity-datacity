@@ -55,6 +55,12 @@ const PAGES_MAX = 50; // garde-fou : 15 000 événements par agenda
 const STATUT_ANNULE = 6;
 const MODE_EN_LIGNE = 2;
 
+/** Version anglaise d'un champ multilingue, seulement si l'agenda la renseigne. */
+function localiseEn<T>(v: Localise<T>): T | null {
+  if (v == null || typeof v !== 'object' || Array.isArray(v)) return null;
+  return (v as Record<string, T>).en ?? null;
+}
+
 function localise<T>(v: Localise<T>): T | null {
   if (v == null) return null;
   if (typeof v === 'object' && !Array.isArray(v)) {
@@ -127,6 +133,8 @@ export function creerOpenAgendaAdapter({
         gratuit: mentionneGratuit(conditions),
         prix: prixMinimum(conditions),
         photoUrl: e.image ? `${e.image.base}${e.image.filename}` : null,
+        titreEn: texteBrut(localiseEn(e.title), 150),
+        descriptionEn: texteBrut(localiseEn(e.description)),
         sourceUrl: texteOuNull(e.canonicalUrl),
       };
     },
