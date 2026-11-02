@@ -175,5 +175,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 24,
   },
-  boutonTexte: { fontFamily: polices.titre, color: couleurs.fond, fontSize: 18 },
+  boutonTexte: { fontFamily: polices.titre, color: couleurs.surPrimaire, fontSize: 18 },
 });

@@ -12,7 +12,7 @@ function pastille(numero: number) {
     className: '',
     iconSize: [36, 36],
     iconAnchor: [18, 18],
-    html: `<div style="width:36px;height:36px;border-radius:18px;background:${colors.night};border:3px solid ${colors.teal};color:${colors.cream};font:700 16px 'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center">${numero}</div>`,
+    html: `<div style="width:36px;height:36px;border-radius:18px;background:${colors.night};border:2px solid ${colors.cream};box-shadow:0 1px 4px rgba(8,43,56,.35);color:${colors.cream};font:15px InstrumentSans_600SemiBold,sans-serif;display:flex;align-items:center;justify-content:center">${numero}</div>`,
   });
 }
 
@@ -67,5 +67,5 @@ export default function CarteGeo({ position, activites, onOuvrir }: PropsCarteGe
 
 const styles = StyleSheet.create({
   // zIndex 0 : les calques de Leaflet restent sous la barre du haut.
-  conteneur: { flex: 1, zIndex: 0, borderRadius: 24, overflow: 'hidden', backgroundColor: colors.muted },
+  conteneur: { flex: 1, zIndex: 0, borderRadius: 12, overflow: 'hidden', backgroundColor: colors.muted },
 });

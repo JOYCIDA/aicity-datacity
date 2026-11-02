@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { House, ShieldCheck } from 'lucide-react-native';
+import { ShieldCheck } from 'lucide-react-native';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import AiCityLogo from '../components/AiCityLogo';
 import CitySkyline from '../components/CitySkyline';
 import { RETOUR_ACCUEIL_SECONDES } from '../config';
-import { couleurs, polices, tailles } from '../theme';
+import { sombre, polices, rayons, tailles } from '../theme';
 import { useTextes } from '../i18n';
 
 type Props = {
@@ -39,7 +39,7 @@ export default function EcranFin({ onAccueil }: Props) {
           <Text style={styles.compteurChiffre}>{reste}</Text>
         </View>
         <Text style={styles.retourAuto} importantForAccessibility="no-hide-descendants">
-          {t.fin.retourAuto(reste).toUpperCase()}
+          {t.fin.retourAuto(reste)}
         </Text>
 
         <Pressable
@@ -48,12 +48,11 @@ export default function EcranFin({ onAccueil }: Props) {
           accessibilityLabel={t.fin.revenir}
           style={styles.bouton}
         >
-          <House size={24} color={couleurs.fond} />
           <Text style={styles.boutonTexte}>{t.fin.revenir}</Text>
         </Pressable>
 
         <View style={styles.badge}>
-          <ShieldCheck size={18} color={couleurs.primaire} />
+          <ShieldCheck size={18} color={sombre.primaire} />
           <Text style={styles.badgeTexte}>{t.fin.badge}</Text>
         </View>
       </ScrollView>
@@ -64,12 +63,12 @@ export default function EcranFin({ onAccueil }: Props) {
 }
 
 const styles = StyleSheet.create({
-  ecran: { flex: 1 },
+  ecran: { flex: 1, backgroundColor: sombre.fond },
   page: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', padding: 16, gap: 16 },
-  titre: { fontFamily: polices.titre, color: couleurs.texte, fontSize: 36, textAlign: 'center' },
+  titre: { fontFamily: polices.titre, color: sombre.texte, fontSize: 36, letterSpacing: -0.6, textAlign: 'center' },
   texte: {
     fontFamily: polices.texte,
-    color: couleurs.texteSecondaire,
+    color: sombre.texteSecondaire,
     fontSize: 18,
     lineHeight: 26,
     textAlign: 'center',
@@ -80,17 +79,16 @@ const styles = StyleSheet.create({
     height: 88,
     borderRadius: 44,
     borderWidth: 3,
-    borderColor: couleurs.primaire,
+    borderColor: sombre.primaire,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
   },
-  compteurChiffre: { fontFamily: polices.titre, color: couleurs.texte, fontSize: 40 },
+  compteurChiffre: { fontFamily: polices.titre, color: sombre.texte, fontSize: 40 },
   retourAuto: {
     fontFamily: polices.texte,
-    color: couleurs.texteSecondaire,
-    fontSize: tailles.petit,
-    letterSpacing: 1.5,
+    color: sombre.texteSecondaire,
+    fontSize: tailles.texte,
     textAlign: 'center',
   },
   bouton: {
@@ -98,21 +96,21 @@ const styles = StyleSheet.create({
     gap: 10,
     minHeight: 64,
     paddingHorizontal: 32,
-    borderRadius: 32,
-    backgroundColor: couleurs.primaire,
+    borderRadius: rayons.s,
+    backgroundColor: sombre.primaire,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
   },
-  boutonTexte: { fontFamily: polices.titre, color: couleurs.fond, fontSize: 22 },
+  boutonTexte: { fontFamily: polices.titre, color: sombre.surPrimaire, fontSize: 20 },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 24,
-    backgroundColor: couleurs.carte,
+    borderRadius: rayons.s,
+    backgroundColor: sombre.carte,
   },
-  badgeTexte: { flexShrink: 1, fontFamily: polices.texte, color: couleurs.texteSecondaire, fontSize: tailles.petit },
+  badgeTexte: { flexShrink: 1, fontFamily: polices.texte, color: sombre.texteSecondaire, fontSize: tailles.petit },
 });
