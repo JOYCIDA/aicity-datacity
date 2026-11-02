@@ -71,7 +71,7 @@ export function Squelette({ style }: { style?: StyleProp<ViewStyle> }) {
   }, [opacite, moins]);
 
   return (
-    <Animated.View style={[{ backgroundColor: 'rgba(90, 143, 160, 0.35)', borderRadius: 12 }, style, { opacity: opacite }]}>
+    <Animated.View style={[{ backgroundColor: '#E6ECEE', borderRadius: 12 }, style, { opacity: opacite }]}>
       <View />
     </Animated.View>
   );

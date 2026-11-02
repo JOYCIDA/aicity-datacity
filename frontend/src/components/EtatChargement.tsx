@@ -29,7 +29,7 @@ export default function EtatChargement({ message, erreur, onReessayer }: Props) 
 
   return (
     <View style={styles.chargement} accessible accessibilityLabel={message}>
-      <ActivityIndicator size="large" color={couleurs.primaire} />
+      <ActivityIndicator size="large" color={couleurs.lien} />
       <Text style={styles.message}>{message}</Text>
     </View>
   );
@@ -44,8 +44,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: couleurs.primaire,
     paddingHorizontal: 32,
-    borderRadius: 30,
+    borderRadius: 12,
     marginTop: 16,
   },
-  boutonTexte: { fontFamily: polices.titre, color: couleurs.fond, fontSize: 20 },
+  boutonTexte: { fontFamily: polices.titre, color: couleurs.surPrimaire, fontSize: 18 },
 });

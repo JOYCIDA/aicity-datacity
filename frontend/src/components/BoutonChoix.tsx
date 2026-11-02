@@ -13,9 +13,10 @@ type Props = {
   style?: StyleProp<ViewStyle>;
 };
 
+// Choix unique : rond (bouton radio) ; choix multiple : case carrée (case à cocher).
 export default function BoutonChoix({ libelle, selectionne, onPress, multiple = false, icone: Icone, style }: Props) {
   const d = useDesign();
-  const couleur = selectionne ? couleurs.fond : couleurs.texte;
+  const taille = d.px(22);
   return (
     <Pressable
       onPress={() => {
@@ -27,41 +28,55 @@ export default function BoutonChoix({ libelle, selectionne, onPress, multiple = 
       accessibilityLabel={libelle}
       style={({ pressed }) => [
         styles.bouton,
-        { minHeight: d.px(60), paddingHorizontal: d.px(20) },
+        { minHeight: d.px(60), paddingHorizontal: d.px(18) },
         selectionne && styles.selectionne,
         pressed && styles.appuye,
         style,
       ]}
     >
-      {Icone && <Icone size={d.px(22)} color={couleur} />}
-      <Text style={[styles.texte, { fontSize: d.texte.choix, color: couleur }]}>{libelle}</Text>
-      {/* Coche : la sélection ne repose pas que sur la couleur. */}
-      <View style={[styles.coche, { width: d.px(24), height: d.px(24) }, selectionne && styles.cocheActive]}>
-        {selectionne && <Check size={d.px(16)} color={couleurs.primaire} strokeWidth={3} />}
+      {Icone && <Icone size={d.px(22)} color={couleurs.texte} strokeWidth={1.75} />}
+      <Text style={[styles.texte, { fontSize: d.texte.choix }, selectionne && styles.texteSelectionne]}>{libelle}</Text>
+      {/* La coche : la sélection ne repose pas que sur la couleur. */}
+      <View
+        style={[
+          styles.coche,
+          { width: taille, height: taille, borderRadius: multiple ? 6 : taille / 2 },
+          selectionne && styles.cocheActive,
+        ]}
+      >
+        {selectionne &&
+          (multiple ? (
+            <Check size={d.px(15)} color={couleurs.fond} strokeWidth={3} />
+          ) : (
+            <View style={[styles.point, { width: taille / 2.6, height: taille / 2.6, borderRadius: taille }]} />
+          ))}
       </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  // Bordure de 2 px dans les deux états : la sélection ne fait pas bouger le contenu.
   bouton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: espace.m,
-    borderRadius: rayons.pilule,
+    borderRadius: rayons.s,
     borderWidth: 2,
-    borderColor: 'rgba(66, 168, 183, 0.55)',
-    marginBottom: espace.m,
+    borderColor: couleurs.trait,
+    backgroundColor: '#FFFFFF',
+    marginBottom: espace.s,
   },
-  selectionne: { backgroundColor: couleurs.primaire, borderColor: couleurs.primaire },
-  appuye: { transform: [{ scale: 0.985 }], opacity: 0.9 },
-  texte: { flex: 1, fontFamily: polices.texteMoyen },
+  selectionne: { borderColor: couleurs.texte, backgroundColor: couleurs.carte },
+  appuye: { backgroundColor: couleurs.carte },
+  texte: { flex: 1, fontFamily: polices.texteMoyen, color: couleurs.texte },
+  texteSelectionne: { fontFamily: polices.titre },
   coche: {
-    borderRadius: 999,
     borderWidth: 2,
-    borderColor: 'rgba(255, 253, 248, 0.35)',
+    borderColor: couleurs.champ,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cocheActive: { backgroundColor: couleurs.fond, borderColor: couleurs.fond },
+  cocheActive: { backgroundColor: couleurs.texte, borderColor: couleurs.texte },
+  point: { backgroundColor: couleurs.fond },
 });

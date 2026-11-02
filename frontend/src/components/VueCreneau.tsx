@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { Activite } from '../types/activite';
 import { couleurs, polices, tailles } from '../theme';
+
+// Plage d'ouverture du lieu, un ton plus soutenu que la piste.
+const OUVERTURE = '#D3E0E3';
 import { ICONES_CATEGORIE } from './Icones';
 import { useTextes } from '../i18n';
 
@@ -98,7 +101,7 @@ export default function VueCreneau({ activites, tempsLibreMinutes, onOuvrir }: P
           <Text style={styles.legendeTexte}>{t.creneau.legendeActivite}</Text>
         </View>
         <View style={styles.legendeElement}>
-          <View style={[styles.pastille, { backgroundColor: couleurs.carte }]} />
+          <View style={[styles.pastille, { backgroundColor: OUVERTURE }]} />
           <Text style={styles.legendeTexte}>{t.creneau.legendeOuverture}</Text>
         </View>
       </View>
@@ -127,12 +130,12 @@ const styles = StyleSheet.create({
   },
   graduationDebut: { marginLeft: 0, textAlign: 'left' },
   graduationFin: { marginLeft: -60, textAlign: 'right' },
-  piste: { flexGrow: 1, height: 44, borderRadius: 22, backgroundColor: 'rgba(13, 60, 79, 0.45)' },
-  ouverture: { position: 'absolute', top: 0, bottom: 0, borderRadius: 22, backgroundColor: couleurs.carte },
-  barre: { position: 'absolute', top: 4, bottom: 4, borderRadius: 18, backgroundColor: couleurs.primaire },
-  maintenant: { fontFamily: polices.texteMoyen, color: couleurs.primaire, fontSize: tailles.petit },
+  piste: { flexGrow: 1, height: 44, borderRadius: 8, backgroundColor: couleurs.carte },
+  ouverture: { position: 'absolute', top: 0, bottom: 0, borderRadius: 8, backgroundColor: OUVERTURE },
+  barre: { position: 'absolute', top: 4, bottom: 4, borderRadius: 6, backgroundColor: couleurs.primaire },
+  maintenant: { fontFamily: polices.texteMoyen, color: couleurs.lien, fontSize: tailles.petit },
   legende: { flexDirection: 'row', flexWrap: 'wrap', gap: 20, marginTop: 8 },
   legendeElement: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  pastille: { width: 16, height: 16, borderRadius: 8, borderWidth: 1, borderColor: couleurs.primaire },
+  pastille: { width: 16, height: 16, borderRadius: 4 },
   legendeTexte: { fontFamily: polices.texte, color: couleurs.texteSecondaire, fontSize: tailles.texte },
 });

@@ -1,8 +1,6 @@
-import { Clock, MapPin, Navigation, Tag, type LucideIcon } from 'lucide-react-native';
 import { Pressable, View, Text, Image, StyleSheet } from 'react-native';
 import { Activite } from '../types/activite';
-import { colors } from '../theme/tokens';
-import { polices, tailles } from '../theme';
+import { couleurs, polices } from '../theme';
 import { formaterPrix, formaterDistance } from '../utils/format';
 import { ICONES_CATEGORIE } from './Icones';
 import MentionFrancais from './MentionFrancais';
@@ -15,54 +13,59 @@ type Props = {
   onPress?: () => void;
 };
 
-function Ligne({ icone: Icone, texte, accent = false }: { icone: LucideIcon; texte: string; accent?: boolean }) {
-  const d = useDesign();
-  return (
-    <View style={styles.ligne}>
-      <Icone size={d.px(16)} color={accent ? colors.teal : colors.night} />
-      <Text style={[styles.ligneTexte, { fontSize: d.texte.corps, lineHeight: d.texte.corps * 1.4 }]}>{texte}</Text>
-    </View>
-  );
-}
-
+// Une ligne de liste : vignette à gauche, texte à droite, trait fin entre deux activités.
 export default function CarteActivite({ activite, numero, onPress }: Props) {
   const t = useTextes();
   const d = useDesign();
   const prix = formaterPrix(activite.prix, t);
-  const distance = `${formaterDistance(activite.distance_m)} · ${t.aPied(activite.trajet_min)}`;
+  const distance = `${t.aPied(activite.trajet_min)} · ${formaterDistance(activite.distance_m)}`;
   const IconeCategorie = ICONES_CATEGORIE[activite.categorie];
+  const vignette = d.px(104);
 
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${numero ? `${numero}. ` : ''}${activite.titre}, ${activite.categorieLibelle}, ${activite.lieu}, ${activite.horaires}, ${prix}, ${distance}`}
-      style={({ pressed }) => [styles.carte, pressed && styles.carteAppuyee]}
+      style={({ pressed }) => [styles.carte, { paddingVertical: d.px(16), gap: d.px(16) }, pressed && styles.appuyee]}
     >
-      {activite.photo_url ? (
-        <Image source={{ uri: activite.photo_url }} resizeMode="cover" style={styles.photo} accessible={false} />
-      ) : (
-        <View style={[styles.photo, styles.sansPhoto]}>
-          {IconeCategorie && <IconeCategorie size={36} color={colors.teal} />}
-        </View>
-      )}
-
-      {numero !== undefined && (
-        <View style={styles.numero}>
-          <Text style={styles.numeroTexte}>{numero}</Text>
-        </View>
-      )}
+      <View>
+        {activite.photo_url ? (
+          <Image
+            source={{ uri: activite.photo_url }}
+            resizeMode="cover"
+            style={[styles.photo, { width: vignette, height: vignette }]}
+            accessible={false}
+          />
+        ) : (
+          <View style={[styles.photo, styles.sansPhoto, { width: vignette, height: vignette }]}>
+            {IconeCategorie && <IconeCategorie size={d.px(32)} color={couleurs.texteSecondaire} />}
+          </View>
+        )}
+        {numero !== undefined && (
+          <View style={[styles.numero, { minWidth: d.px(26), height: d.px(26), borderRadius: d.px(13) }]}>
+            <Text style={[styles.numeroTexte, { fontSize: d.px(14) }]}>{numero}</Text>
+          </View>
+        )}
+      </View>
 
       <View style={styles.contenu}>
-        <Text style={[styles.titre, { fontSize: d.px(18), lineHeight: d.px(22) }]} numberOfLines={3}>
+        <View style={styles.entete}>
+          <Text style={[styles.secondaire, { fontSize: d.px(14) }]}>{activite.categorieLibelle}</Text>
+          {activite.non_traduit && <MentionFrancais />}
+        </View>
+        <Text style={[styles.titre, { fontSize: d.px(17), lineHeight: d.px(22) }]} numberOfLines={2}>
           {activite.titre}
         </Text>
-        <Text style={[styles.categorie, { fontSize: d.texte.surtitre }]}>{activite.categorieLibelle}</Text>
-        {activite.non_traduit && <MentionFrancais />}
-        <Ligne icone={MapPin} texte={activite.lieu} />
-        <Ligne icone={Clock} texte={activite.horaires} />
-        <Ligne icone={Tag} texte={prix} />
-        <Ligne icone={Navigation} texte={distance} accent />
+        <Text style={[styles.secondaire, { fontSize: d.px(15), lineHeight: d.px(20) }]} numberOfLines={1}>
+          {activite.lieu}
+        </Text>
+        <Text style={[styles.secondaire, { fontSize: d.px(15), lineHeight: d.px(20) }]} numberOfLines={2}>
+          {activite.horaires}
+        </Text>
+        <Text style={[styles.cle, { fontSize: d.px(15), marginTop: d.px(4) }]}>
+          {prix} · {distance}
+        </Text>
       </View>
     </Pressable>
   );
@@ -71,35 +74,27 @@ export default function CarteActivite({ activite, numero, onPress }: Props) {
 const styles = StyleSheet.create({
   carte: {
     flexDirection: 'row',
-    minHeight: 160,
-    backgroundColor: colors.background,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: colors.border,
-    overflow: 'hidden',
-    marginBottom: 12,
+    alignItems: 'flex-start',
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: couleurs.trait,
   },
-  carteAppuyee: { borderColor: colors.teal, transform: [{ scale: 0.99 }] },
-  photo: { width: '34%', minHeight: 160 },
-  sansPhoto: { backgroundColor: colors.muted, alignItems: 'center', justifyContent: 'center' },
-  contenu: { flex: 1, padding: 12, gap: 4 },
+  appuyee: { backgroundColor: couleurs.carte },
+  photo: { borderRadius: 10, backgroundColor: couleurs.carte },
+  sansPhoto: { alignItems: 'center', justifyContent: 'center' },
   numero: {
     position: 'absolute',
-    top: 8,
-    left: 8,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.night,
-    borderWidth: 2,
-    borderColor: colors.teal,
+    top: 6,
+    left: 6,
+    paddingHorizontal: 6,
+    backgroundColor: couleurs.texte,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  numeroTexte: { fontFamily: polices.titre, color: colors.cream, fontSize: tailles.texte },
-  titre: { fontFamily: polices.titre, fontSize: 18, lineHeight: 22, color: colors.night },
-  categorie: { fontFamily: polices.texte, fontSize: tailles.petit, color: colors.mutedForeground, marginBottom: 2 },
-  ligne: { flexDirection: 'row', alignItems: 'flex-start', gap: 6 },
-  // 16 px minimum pour le texte courant (accessibilité), même si la maquette est plus petite.
-  ligneTexte: { flex: 1, fontFamily: polices.texte, fontSize: tailles.texte, lineHeight: 22, color: colors.night },
+  numeroTexte: { fontFamily: polices.titre, color: couleurs.fond },
+  contenu: { flex: 1, gap: 2 },
+  entete: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  titre: { fontFamily: polices.titre, color: couleurs.texte, letterSpacing: -0.2 },
+  secondaire: { fontFamily: polices.texte, color: couleurs.texteSecondaire },
+  cle: { fontFamily: polices.texteMoyen, color: couleurs.texte },
 });

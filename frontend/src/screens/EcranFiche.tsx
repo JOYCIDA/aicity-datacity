@@ -11,7 +11,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Activite } from '../types/activite';
-import { clair, typo } from '../theme';
+import { couleurs, polices } from '../theme';
 import { formaterPrix, formaterDistance } from '../utils/format';
 import { ICONES_CATEGORIE } from '../components/Icones';
 import MentionFrancais from '../components/MentionFrancais';
@@ -77,7 +77,7 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
         accessibilityLabel={t.fiche.yAllerA11y}
         style={({ pressed }) => [styles.yAller, { minHeight: d.px(56) }, pressed && styles.appuye]}
       >
-        <Navigation size={d.px(20)} color={clair.encre} />
+        <Navigation size={d.px(20)} color={couleurs.surPrimaire} />
         <Text style={[styles.yAllerTexte, { fontSize: d.px(18) }]}>{t.fiche.yAller}</Text>
       </Pressable>
       {PARTAGE_DISPONIBLE && (
@@ -87,7 +87,7 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
           accessibilityLabel={t.fiche.partager}
           style={({ pressed }) => [styles.secondaireBouton, { minHeight: d.px(48) }, pressed && styles.appuye]}
         >
-          <Share2 size={d.px(18)} color={clair.encre} />
+          <Share2 size={d.px(18)} color={couleurs.texte} />
           <Text style={[styles.secondaireBoutonTexte, { fontSize: d.px(16) }]}>{t.fiche.partager}</Text>
         </Pressable>
       )}
@@ -107,7 +107,7 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
             />
           ) : (
             <View style={[styles.photo, large && styles.photoLarge, styles.sansPhoto, { height: hauteurPhoto }]}>
-              {IconeCategorie && <IconeCategorie size={d.px(56)} color={clair.secondaire} />}
+              {IconeCategorie && <IconeCategorie size={d.px(56)} color={couleurs.texteSecondaire} />}
             </View>
           )}
           {activite.photo_credit && (
@@ -161,7 +161,7 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
                   style={styles.lien}
                 >
                   <Text style={[styles.lienTexte, { fontSize: d.px(16) }]}>{t.fiche.voirSur(activite.source)}</Text>
-                  <ArrowUpRight size={d.px(18)} color={clair.encre} />
+                  <ArrowUpRight size={d.px(18)} color={couleurs.texte} />
                 </Pressable>
               )}
               {SIGNALEMENT_ACTIF && (
@@ -170,7 +170,7 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
                 </Pressable>
               )}
               <Text style={[styles.secondaire, { fontSize: d.px(14) }]}>{t.sourceMaj(activite.source, activite.date_maj)}</Text>
-              <BoutonTerminer onPress={onTerminer} clair />
+              <BoutonTerminer onPress={onTerminer} />
             </View>
           </View>
 
@@ -182,43 +182,43 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
 }
 
 const styles = StyleSheet.create({
-  ecran: { flex: 1, backgroundColor: clair.fond },
+  ecran: { flex: 1, backgroundColor: couleurs.fond },
   page: { paddingBottom: 48 },
   colonne: { width: '100%' },
   colonneLarge: { maxWidth: 1120, alignSelf: 'center' },
-  photo: { width: '100%', backgroundColor: clair.surface },
+  photo: { width: '100%', backgroundColor: couleurs.carte },
   photoLarge: { borderRadius: 16 },
   sansPhoto: { alignItems: 'center', justifyContent: 'center' },
-  credit: { fontFamily: typo.normal, color: clair.secondaire, marginTop: 8, textAlign: 'right' },
+  credit: { fontFamily: polices.texte, color: couleurs.texteSecondaire, marginTop: 8, textAlign: 'right' },
   corps: {},
   corpsLarge: { flexDirection: 'row', alignItems: 'flex-start', gap: 56 },
   principal: { flex: 1 },
   cote: { width: 340 },
   categorie: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
-  categorieTexte: { fontFamily: typo.moyen, color: clair.secondaire },
-  titre: { fontFamily: typo.fort, color: clair.encre, letterSpacing: -0.6 },
-  secondaire: { fontFamily: typo.normal, color: clair.secondaire },
-  texte: { fontFamily: typo.normal, color: clair.encre },
-  intertitre: { fontFamily: typo.fort, color: clair.encre, letterSpacing: -0.2 },
-  pourquoi: { backgroundColor: clair.surface, borderRadius: 12, gap: 4 },
-  pourquoiTitre: { fontFamily: typo.fort, color: clair.encre },
-  lignes: { borderTopWidth: 1, borderColor: clair.trait },
-  ligne: { flexDirection: 'row', gap: 16, borderBottomWidth: 1, borderColor: clair.trait },
-  ligneLibelle: { fontFamily: typo.normal, color: clair.secondaire },
-  ligneValeur: { flex: 1, fontFamily: typo.moyen, color: clair.encre },
+  categorieTexte: { fontFamily: polices.texteMoyen, color: couleurs.texteSecondaire },
+  titre: { fontFamily: polices.titre, color: couleurs.texte, letterSpacing: -0.6 },
+  secondaire: { fontFamily: polices.texte, color: couleurs.texteSecondaire },
+  texte: { fontFamily: polices.texte, color: couleurs.texte },
+  intertitre: { fontFamily: polices.titre, color: couleurs.texte, letterSpacing: -0.2 },
+  pourquoi: { backgroundColor: couleurs.carte, borderRadius: 12, gap: 4 },
+  pourquoiTitre: { fontFamily: polices.titre, color: couleurs.texte },
+  lignes: { borderTopWidth: 1, borderColor: couleurs.trait },
+  ligne: { flexDirection: 'row', gap: 16, borderBottomWidth: 1, borderColor: couleurs.trait },
+  ligneLibelle: { fontFamily: polices.texte, color: couleurs.texteSecondaire },
+  ligneValeur: { flex: 1, fontFamily: polices.texteMoyen, color: couleurs.texte },
   action: {},
-  actionLarge: { borderWidth: 1, borderColor: clair.trait, borderRadius: 16, backgroundColor: '#FFFFFF' },
-  prix: { fontFamily: typo.fort, color: clair.encre, letterSpacing: -0.4 },
+  actionLarge: { borderWidth: 1, borderColor: couleurs.trait, borderRadius: 16, backgroundColor: '#FFFFFF' },
+  prix: { fontFamily: polices.titre, color: couleurs.texte, letterSpacing: -0.4 },
   yAller: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
     borderRadius: 12,
-    backgroundColor: clair.accent,
+    backgroundColor: couleurs.primaire,
     paddingHorizontal: 20,
   },
-  yAllerTexte: { fontFamily: typo.fort, color: clair.encre },
+  yAllerTexte: { fontFamily: polices.titre, color: couleurs.surPrimaire },
   secondaireBouton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -226,12 +226,12 @@ const styles = StyleSheet.create({
     gap: 8,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: clair.trait,
+    borderColor: couleurs.trait,
     paddingHorizontal: 20,
   },
-  secondaireBoutonTexte: { fontFamily: typo.moyen, color: clair.encre },
+  secondaireBoutonTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte },
   appuye: { opacity: 0.85 },
   pied: { alignItems: 'flex-start' },
   lien: { flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 44 },
-  lienTexte: { fontFamily: typo.moyen, color: clair.encre, textDecorationLine: 'underline' },
+  lienTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, textDecorationLine: 'underline' },
 });
