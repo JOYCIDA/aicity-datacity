@@ -32,3 +32,21 @@ export function modeEcran(largeur: number, hauteur: number): Mode {
   if (hauteur >= 1400 && hauteur > largeur) return 'borne';
   return largeur >= 900 ? 'bureau' : 'telephone';
 }
+
+// ——— Nouvelle direction visuelle (pilote : écran fiche) ———
+// Une seule famille, peu de tailles, la hiérarchie vient de la taille et de la graisse ;
+// la couleur d'accent est réservée à l'action principale.
+export const typo = {
+  normal: 'InstrumentSans_400Regular',
+  moyen: 'InstrumentSans_500Medium',
+  fort: 'InstrumentSans_600SemiBold',
+};
+
+export const clair = {
+  fond: '#FFFDF8',
+  encre: '#0B2530', // texte principal (15,6:1 sur le fond)
+  secondaire: '#52656C', // texte secondaire (6:1 sur le fond)
+  trait: '#E2E8EA',
+  surface: '#F3F6F6',
+  accent: '#42A8B7', // action principale, avec texte encre (5,7:1)
+};
