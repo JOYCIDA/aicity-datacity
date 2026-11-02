@@ -4,6 +4,11 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
 import { DMSans_400Regular, DMSans_500Medium, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
+import {
+  InstrumentSans_400Regular,
+  InstrumentSans_500Medium,
+  InstrumentSans_600SemiBold,
+} from '@expo-google-fonts/instrument-sans';
 import EcranAccueil from './src/screens/EcranAccueil';
 import EcranDuree from './src/screens/EcranDuree';
 import EcranInterets from './src/screens/EcranInterets';
@@ -39,6 +44,9 @@ export default function App() {
     DMSans_400Regular,
     DMSans_500Medium,
     DMSans_700Bold,
+    InstrumentSans_400Regular,
+    InstrumentSans_500Medium,
+    InstrumentSans_600SemiBold,
   });
   const [etape, setEtape] = useState<Etape>('accueil');
   const [reponses, setReponses] = useState<Reponses>({ interets: [] });
