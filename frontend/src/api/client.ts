@@ -19,9 +19,10 @@ export type OffreApi = {
   prix: number | null;
   gratuit: boolean;
   photoUrl: string | null;
-  // Pas encore renvoyés par le backend (demandés à Elfried) : facultatifs en attendant.
   photoCredit?: string | null;
   photoAlt?: string | null;
+  langue?: 'FR' | 'EN';
+  traduit?: boolean; // false : titre, description ou lieu restés en français malgré langue=EN
   source: SourceOffre;
   sourceUrl: string | null;
   creeLe: string;
@@ -156,7 +157,7 @@ export async function chargerOffresAutour(latitude: number, longitude: number, r
   const offres: OffreApi[] = [];
   for (let page = 1; page <= 10; page++) {
     const r = await requete<{ elements: OffreApi[]; total: number }>(
-      `/citoyen/offres?latitude=${latitude}&longitude=${longitude}&rayonM=${rayonM}&taille=500&page=${page}`,
+      `/citoyen/offres?latitude=${latitude}&longitude=${longitude}&rayonM=${rayonM}&taille=500&page=${page}&langue=${langue}`,
     );
     offres.push(...r.elements);
     if (r.elements.length === 0 || offres.length >= r.total) break;

@@ -15,6 +15,7 @@ import { colors } from '../theme/tokens';
 import { polices, tailles } from '../theme';
 import { formaterPrix, formaterDistance } from '../utils/format';
 import { ICONES_CATEGORIE } from '../components/Icones';
+import MentionFrancais from '../components/MentionFrancais';
 import { useTextes } from '../i18n';
 import { SIGNALEMENT_ACTIF } from '../config';
 import { useDesign } from '../design';
@@ -94,9 +95,12 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
       )}
 
       <View style={styles.contenu}>
-        <View style={styles.pastille}>
-          {IconeCategorie && <IconeCategorie size={16} color={colors.night} />}
-          <Text style={[styles.pastilleTexte, { fontSize: d.texte.surtitre }]}>{activite.categorieLibelle}</Text>
+        <View style={styles.pastilles}>
+          <View style={styles.pastille}>
+            {IconeCategorie && <IconeCategorie size={16} color={colors.night} />}
+            <Text style={[styles.pastilleTexte, { fontSize: d.texte.surtitre }]}>{activite.categorieLibelle}</Text>
+          </View>
+          {activite.non_traduit && <MentionFrancais />}
         </View>
         <Text accessibilityRole="header" style={[styles.titre, { fontSize: d.texte.affiche, lineHeight: d.texte.affiche * 1.15 }]}>
           {activite.titre}
@@ -208,6 +212,7 @@ const styles = StyleSheet.create({
   },
   sansPhoto: { backgroundColor: colors.muted, alignItems: 'center', justifyContent: 'center' },
   contenu: { flex: 1, gap: 16 },
+  pastilles: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   pastille: {
     flexDirection: 'row',
     alignItems: 'center',

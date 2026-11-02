@@ -5,6 +5,7 @@ import { colors } from '../theme/tokens';
 import { polices, tailles } from '../theme';
 import { formaterPrix, formaterDistance } from '../utils/format';
 import { ICONES_CATEGORIE } from './Icones';
+import MentionFrancais from './MentionFrancais';
 import { useTextes } from '../i18n';
 import { useDesign } from '../design';
 
@@ -57,6 +58,7 @@ export default function CarteActivite({ activite, numero, onPress }: Props) {
           {activite.titre}
         </Text>
         <Text style={[styles.categorie, { fontSize: d.texte.surtitre }]}>{activite.categorieLibelle}</Text>
+        {activite.non_traduit && <MentionFrancais />}
         <Ligne icone={MapPin} texte={activite.lieu} />
         <Ligne icone={Clock} texte={activite.horaires} />
         <Ligne icone={Tag} texte={prix} />
