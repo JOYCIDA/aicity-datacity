@@ -105,7 +105,7 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
           accessibilityState={{ disabled: enCours, busy: enCours }}
           style={({ pressed }) => [styles.valider, { width: d.px(56), height: d.px(56) }, pressed && styles.appuye]}
         >
-          {enCours ? <ActivityIndicator color={couleurs.fond} /> : <ArrowRight size={d.px(24)} color={couleurs.fond} />}
+          {enCours ? <ActivityIndicator color={couleurs.surPrimaire} /> : <ArrowRight size={d.px(24)} color={couleurs.surPrimaire} />}
         </Pressable>
       </View>
       <Text style={[styles.note, { fontSize: d.texte.surtitre }]}>{t.interets.phraseNonEnregistree}</Text>
@@ -123,19 +123,20 @@ const styles = StyleSheet.create({
   ligne: { flexDirection: 'row', gap: espace.s },
   champ: {
     flex: 1,
-    borderWidth: 2,
-    borderColor: 'rgba(66, 168, 183, 0.55)',
-    borderRadius: rayons.m,
+    borderWidth: 1,
+    borderColor: couleurs.champ,
+    borderRadius: rayons.s,
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: espace.l,
     fontFamily: polices.texteMoyen,
     color: couleurs.texte,
   },
   valider: {
-    borderRadius: rayons.m,
+    borderRadius: rayons.s,
     backgroundColor: couleurs.primaire,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  appuye: { opacity: 0.85, transform: [{ scale: 0.97 }] },
+  appuye: { opacity: 0.85 },
   note: { fontFamily: polices.texte, color: couleurs.texteSecondaire, marginTop: espace.s },
 });

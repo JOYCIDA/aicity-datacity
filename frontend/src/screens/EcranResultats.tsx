@@ -16,8 +16,7 @@ import { useLangue, useTextes } from '../i18n';
 import { Activite } from '../types/activite';
 import { Reponses } from '../types/parcours';
 import { Questions } from '../types/questions';
-import { couleurs, polices, tailles } from '../theme';
-import { colors } from '../theme/tokens';
+import { couleurs, polices, rayons, tailles } from '../theme';
 
 export type Recherche = {
   activites: Activite[];
@@ -128,7 +127,7 @@ export default function EcranResultats({
   );
 
   return (
-    <View style={styles.page}>
+    <View style={[styles.page, { padding: d.marge }]}>
       {erreur ? (
         <EtatChargement message={t.resultats.chargement} erreur={erreur} onReessayer={charger} />
       ) : !recherche ? (
@@ -137,7 +136,7 @@ export default function EcranResultats({
           <Squelette style={{ width: '60%', height: 32, marginBottom: 12 }} />
           <Squelette style={{ width: '35%', height: 18, marginBottom: 24 }} />
           {[0, 1, 2].map((i) => (
-            <Squelette key={i} style={{ height: 150, borderRadius: 24, marginBottom: 12, maxWidth: 760 }} />
+            <Squelette key={i} style={{ height: 120, marginBottom: 12, maxWidth: 760 }} />
           ))}
         </View>
       ) : (
@@ -168,7 +167,7 @@ export default function EcranResultats({
             </View>
           ) : (
             <>
-              <View style={styles.bascule} accessibilityRole="tablist" accessibilityLabel={t.carte.vue}>
+              <View style={[styles.bascule, !large && styles.basculeEtroite]} accessibilityRole="tablist" accessibilityLabel={t.carte.vue}>
                 {onglets.map((v) => (
                   <Pressable
                     key={v}
@@ -177,11 +176,15 @@ export default function EcranResultats({
                     accessibilityState={{ selected: vueAffichee === v }}
                     style={[
                       styles.basculeBouton,
-                      { minHeight: d.px(44), paddingHorizontal: d.px(16) },
+                      { minHeight: d.px(44), paddingHorizontal: large ? d.px(16) : 2 },
+                      !large && styles.basculeBoutonEtroit,
                       vueAffichee === v && styles.basculeActif,
                     ]}
                   >
-                    <Text style={[styles.basculeTexte, { fontSize: d.texte.corps }, vueAffichee === v && styles.basculeTexteActif]}>
+                    <Text
+                      numberOfLines={1}
+                      style={[styles.basculeTexte, { fontSize: large ? d.texte.corps : 14 }, vueAffichee === v && styles.basculeTexteActif]}
+                    >
                       {t.carte[v]}
                     </Text>
                   </Pressable>
@@ -221,9 +224,9 @@ export default function EcranResultats({
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, padding: 16 },
+  page: { flex: 1 },
   entete: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-  titre: { flexShrink: 1, fontFamily: polices.titre, color: couleurs.texte, fontSize: 28 },
+  titre: { flexShrink: 1, fontFamily: polices.titre, color: couleurs.texte, fontSize: 28, letterSpacing: -0.5 },
   resume: {
     fontFamily: polices.texte,
     color: couleurs.texteSecondaire,
@@ -236,12 +239,11 @@ const styles = StyleSheet.create({
   listeBorne: { marginTop: 0 },
   zoneCarte: { flex: 1, marginTop: 16 },
   zoneCarteLarge: { marginTop: 0 },
-  // Zone claire de la liste, comme la colonne de droite de la maquette.
-  panneau: { flex: 1, backgroundColor: colors.background, borderRadius: 24, marginTop: 16, overflow: 'hidden' },
+  panneau: { flex: 1, marginTop: 16 },
   // flexBasis plutôt que flex: 0 (qui donne une largeur nulle sur le web).
   colonneListe: { flexGrow: 0, flexShrink: 0, flexBasis: 460, marginTop: 0 },
-  liste: { padding: 12, width: '100%', maxWidth: 760, alignSelf: 'center' },
-  sources: { fontFamily: polices.texte, color: colors.mutedForeground, fontSize: tailles.petit, marginTop: 4 },
+  liste: { width: '100%', maxWidth: 760, alignSelf: 'center' },
+  sources: { fontFamily: polices.texte, color: couleurs.texteSecondaire, fontSize: tailles.petit, marginTop: 16 },
   bascule: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -249,20 +251,25 @@ const styles = StyleSheet.create({
     gap: 4,
     padding: 4,
     marginTop: 16,
-    borderRadius: 28,
+    borderRadius: rayons.s,
     backgroundColor: couleurs.carte,
   },
   basculeBouton: {
     minHeight: tailles.zoneMin,
     minWidth: 88,
     paddingHorizontal: 16,
-    borderRadius: 24,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  basculeActif: { backgroundColor: couleurs.primaire },
-  basculeTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: tailles.texte },
-  basculeTexteActif: { color: couleurs.fond },
+  // Téléphone : les 4 onglets se partagent toute la largeur, sur une seule ligne.
+  basculeEtroite: { alignSelf: 'stretch', flexWrap: 'nowrap', gap: 2 },
+  basculeBoutonEtroit: { flex: 1, minWidth: 0 },
+  basculeActif: { backgroundColor: '#FFFFFF', borderColor: couleurs.trait },
+  basculeTexte: { fontFamily: polices.texteMoyen, color: couleurs.texteSecondaire, fontSize: tailles.texte },
+  basculeTexteActif: { fontFamily: polices.titre, color: couleurs.texte },
   vide: {
     fontFamily: polices.texte,
     color: couleurs.texte,
@@ -275,8 +282,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: couleurs.primaire,
     paddingHorizontal: 24,
-    borderRadius: 30,
+    borderRadius: rayons.s,
     marginTop: 16,
   },
-  boutonTexte: { fontFamily: polices.titre, color: couleurs.fond, fontSize: 18 },
+  boutonTexte: { fontFamily: polices.titre, color: couleurs.surPrimaire, fontSize: 18 },
 });

@@ -115,7 +115,7 @@ export function Bouton({ libelle, onPress, a11y, icone = ChevronRight, variante 
       <Text style={[styles.boutonTexte, { fontSize: d.texte.choix }, !primaire && styles.boutonTexteSecondaire]}>
         {libelle}
       </Text>
-      {Icone && <Icone size={d.px(20)} color={primaire ? couleurs.fond : couleurs.texte} />}
+      {Icone && <Icone size={d.px(20)} color={primaire ? couleurs.surPrimaire : couleurs.texte} />}
     </Pressable>
   );
 }
@@ -130,7 +130,7 @@ const ICONES_MESSAGE: Record<'erreur' | 'info' | 'succes', LucideIcon> = {
 export function Message({ type, texte }: { type: 'erreur' | 'info' | 'succes'; texte: string }) {
   const d = useDesign();
   const Icone = ICONES_MESSAGE[type];
-  const couleur = type === 'erreur' ? couleurs.erreur : type === 'succes' ? couleurs.primaire : couleurs.texteSecondaire;
+  const couleur = type === 'erreur' ? couleurs.erreur : type === 'succes' ? couleurs.lien : couleurs.texteSecondaire;
   return (
     <View style={styles.message} accessibilityRole={type === 'info' ? 'text' : 'alert'}>
       <Icone size={d.px(20)} color={couleur} />
@@ -149,29 +149,29 @@ const styles = StyleSheet.create({
   pied: {
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(66, 168, 183, 0.18)',
+    borderTopColor: couleurs.trait,
     backgroundColor: couleurs.fond,
   },
   piedContenu: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: espace.m },
   progression: { flexDirection: 'row', alignItems: 'center', gap: espace.s },
-  segment: { flex: 1, height: 6, borderRadius: 3, backgroundColor: 'rgba(90, 143, 160, 0.45)' },
-  segmentActif: { backgroundColor: couleurs.primaire },
+  segment: { flex: 1, height: 4, borderRadius: 2, backgroundColor: couleurs.trait },
+  segmentActif: { backgroundColor: couleurs.texte },
   compteur: { fontFamily: polices.texteMoyen, color: couleurs.texteSecondaire, marginLeft: espace.xs },
-  surtitre: { fontFamily: polices.texteMoyen, color: couleurs.primaire, letterSpacing: 1.2, textTransform: 'uppercase' },
-  titre: { fontFamily: polices.titre, color: couleurs.texte, letterSpacing: -0.3 },
+  surtitre: { fontFamily: polices.texteMoyen, color: couleurs.texteSecondaire },
+  titre: { fontFamily: polices.titre, color: couleurs.texte, letterSpacing: -0.5 },
   aide: { fontFamily: polices.texte, color: couleurs.texteSecondaire },
   bouton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: espace.s,
-    borderRadius: rayons.pilule,
+    borderRadius: rayons.s,
   },
   boutonPrimaire: { backgroundColor: couleurs.primaire },
-  boutonSecondaire: { borderWidth: 2, borderColor: couleurs.primaire },
-  boutonTexte: { fontFamily: polices.titre, color: couleurs.fond },
+  boutonSecondaire: { borderWidth: 1, borderColor: couleurs.champ },
+  boutonTexte: { fontFamily: polices.titre, color: couleurs.surPrimaire },
   boutonTexteSecondaire: { color: couleurs.texte },
-  appuye: { opacity: 0.85, transform: [{ scale: 0.98 }] },
+  appuye: { opacity: 0.85 },
   message: { flexDirection: 'row', alignItems: 'flex-start', gap: espace.s, marginTop: espace.s },
   messageTexte: { flex: 1, fontFamily: polices.texteMoyen },
 });

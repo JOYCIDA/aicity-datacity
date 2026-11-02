@@ -59,7 +59,7 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
       pied={
         <>
           <View style={styles.confidentialite}>
-            <ShieldCheck size={d.px(18)} color={couleurs.primaire} />
+            <ShieldCheck size={d.px(18)} color={couleurs.lien} />
             <Text style={[styles.confidentialiteTexte, { fontSize: d.texte.surtitre }]}>{t.budget.confidentialite}</Text>
           </View>
           <Bouton libelle={t.budget.voirResultats} a11y={t.budget.voirResultatsA11y} onPress={suivant} />
@@ -126,14 +126,15 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
 const styles = StyleSheet.create({
   champLibelle: { fontFamily: polices.texteMoyen, color: couleurs.texte, marginBottom: espace.s },
   champ: {
-    borderWidth: 2,
-    borderColor: 'rgba(66, 168, 183, 0.55)',
-    borderRadius: rayons.m,
+    borderWidth: 1,
+    borderColor: couleurs.champ,
+    borderRadius: rayons.s,
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: espace.l,
     fontFamily: polices.texteMoyen,
     color: couleurs.texte,
   },
-  champActif: { borderColor: couleurs.primaire },
+  champActif: { borderColor: couleurs.texte },
   confidentialite: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: espace.s },
   confidentialiteTexte: { flexShrink: 1, fontFamily: polices.texte, color: couleurs.texteSecondaire },
 });

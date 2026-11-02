@@ -33,9 +33,10 @@ export const radius = {
 
 // En React Native chaque graisse est une famille distincte, chargée dans App.tsx.
 export const fonts = {
-  body: 'DMSans_400Regular',
-  bodyMedium: 'DMSans_500Medium',
-  bodyBold: 'DMSans_700Bold',
+  // Texte : Instrument Sans ; Space Grotesk ne reste que pour le logotype.
+  body: 'InstrumentSans_400Regular',
+  bodyMedium: 'InstrumentSans_500Medium',
+  bodyBold: 'InstrumentSans_600SemiBold',
   headings: 'SpaceGrotesk_400Regular',
   headingsBold: 'SpaceGrotesk_700Bold',
 } as const;

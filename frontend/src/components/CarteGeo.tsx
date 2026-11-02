@@ -41,18 +41,18 @@ export default function CarteGeo({ position, activites, onOuvrir }: PropsCarteGe
 }
 
 const styles = StyleSheet.create({
-  conteneur: { flex: 1, borderRadius: 24, overflow: 'hidden', backgroundColor: colors.muted },
+  conteneur: { flex: 1, borderRadius: 12, overflow: 'hidden', backgroundColor: colors.muted },
   pastille: {
     width: 36,
     height: 36,
     borderRadius: 18,
     backgroundColor: colors.night,
-    borderWidth: 3,
-    borderColor: colors.teal,
+    borderWidth: 2,
+    borderColor: colors.cream,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  numero: { color: colors.cream, fontWeight: '700', fontSize: 16 },
+  numero: { color: colors.cream, fontFamily: 'InstrumentSans_600SemiBold', fontSize: 15 },
   ici: {
     width: 22,
     height: 22,

@@ -1,9 +1,8 @@
-import { CirclePlay } from 'lucide-react-native';
 import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import AiCityLogo from '../components/AiCityLogo';
 import CitySkyline from '../components/CitySkyline';
 import { ICONES_CATEGORIE } from '../components/Icones';
-import { couleurs, polices, tailles } from '../theme';
+import { sombre, polices, rayons, tailles } from '../theme';
 import { useTextes } from '../i18n';
 import { Choix } from '../types/questions';
 
@@ -42,7 +41,7 @@ export default function EcranAccueil({ categories, onRaccourci, onCommencer }: P
                     accessibilityLabel={t.accueil.raccourciA11y(c.libelle)}
                     style={({ pressed }) => [styles.tuile, !petitEcran && styles.tuileLarge, pressed && styles.tuileAppuyee]}
                   >
-                    {Icone && <Icone size={28} color={couleurs.texte} />}
+                    {Icone && <Icone size={26} color={sombre.texte} strokeWidth={1.75} />}
                     <Text style={styles.tuileTexte}>{c.libelle}</Text>
                   </Pressable>
                 );
@@ -57,7 +56,6 @@ export default function EcranAccueil({ categories, onRaccourci, onCommencer }: P
           accessibilityLabel={t.accueil.commencer}
           style={styles.bouton}
         >
-          <CirclePlay size={30} color={couleurs.fond} />
           <Text style={styles.boutonTexte}>{t.accueil.commencer}</Text>
         </Pressable>
 
@@ -70,32 +68,30 @@ export default function EcranAccueil({ categories, onRaccourci, onCommencer }: P
 }
 
 const styles = StyleSheet.create({
-  ecran: { flex: 1 },
+  ecran: { flex: 1, backgroundColor: sombre.fond },
   page: { flexGrow: 1, padding: 16, gap: 20, justifyContent: 'center' },
   centre: { alignItems: 'center', gap: 12 },
   accroche: {
     fontFamily: polices.texte,
-    color: couleurs.texteSecondaire,
+    color: sombre.texteSecondaire,
     fontSize: 20,
+    lineHeight: 28,
     textAlign: 'center',
     maxWidth: 420,
   },
   raccourcis: { alignItems: 'center', gap: 12 },
   question: {
     fontFamily: polices.texteMoyen,
-    color: couleurs.texteSecondaire,
+    color: sombre.texteSecondaire,
     fontSize: tailles.texte,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
   },
   // 6 tuiles sur une ligne sur grand écran (6 × 132 + 5 × 8), 3 + 3 sur téléphone : jamais de tuile isolée.
   tuiles: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, maxWidth: 840 },
   tuile: {
     width: 112,
     minHeight: 88,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: couleurs.primaire,
+    borderRadius: rayons.s,
+    backgroundColor: sombre.carte,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
@@ -103,8 +99,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   tuileLarge: { width: 132, minHeight: 100 },
-  tuileAppuyee: { backgroundColor: couleurs.carte },
-  tuileTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: tailles.texte, textAlign: 'center' },
+  tuileAppuyee: { backgroundColor: '#14506A' },
+  tuileTexte: { fontFamily: polices.texteMoyen, color: sombre.texte, fontSize: tailles.texte, textAlign: 'center' },
   bouton: {
     flexDirection: 'row',
     gap: 12,
@@ -112,15 +108,15 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 420,
     minHeight: 64,
-    borderRadius: 32,
-    backgroundColor: couleurs.primaire,
+    borderRadius: rayons.s,
+    backgroundColor: sombre.primaire,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  boutonTexte: { fontFamily: polices.titre, color: couleurs.fond, fontSize: 24 },
+  boutonTexte: { fontFamily: polices.titre, color: sombre.surPrimaire, fontSize: 22 },
   mention: {
     fontFamily: polices.texte,
-    color: couleurs.texteSecondaire,
+    color: sombre.texteSecondaire,
     fontSize: tailles.texte,
     textAlign: 'center',
   },
