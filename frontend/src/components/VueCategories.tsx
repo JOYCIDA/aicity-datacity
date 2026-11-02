@@ -19,7 +19,7 @@ type Ligne = { code: string; libelle: string; nombre: number; prixMoyen: number 
 function Chiffre({ icone: Icone, valeur, libelle }: { icone: LucideIcon; valeur: number; libelle: string }) {
   return (
     <View style={styles.chiffre} accessible accessibilityLabel={`${valeur} ${libelle}`}>
-      <Icone size={24} color={couleurs.primaire} />
+      <Icone size={24} color={couleurs.lien} />
       <Text style={styles.chiffreValeur}>{valeur}</Text>
       <Text style={styles.chiffreLibelle}>{libelle}</Text>
     </View>
@@ -133,17 +133,17 @@ const styles = StyleSheet.create({
   ligne: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 12 },
   categorie: { width: 150, flexDirection: 'row', alignItems: 'center', gap: 8 },
   categorieTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: tailles.texte },
-  piste: { flexGrow: 1, flexBasis: 160, height: 44, borderRadius: 22, backgroundColor: couleurs.carte },
+  piste: { flexGrow: 1, flexBasis: 160, height: 44, borderRadius: 8, backgroundColor: couleurs.carte },
   barre: {
     minWidth: 150, // le nombre d'activités reste lisible même pour une petite catégorie
     maxWidth: '100%',
     height: 44,
-    borderRadius: 22,
+    borderRadius: 8,
     backgroundColor: couleurs.primaire,
     justifyContent: 'center',
     paddingHorizontal: 14,
   },
-  barreTexte: { fontFamily: polices.texteMoyen, color: couleurs.fond, fontSize: tailles.texte },
+  barreTexte: { fontFamily: polices.texteMoyen, color: couleurs.surPrimaire, fontSize: tailles.texte },
   prix: {
     width: 150,
     flexDirection: 'row',
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 12,
     minHeight: 32,
-    borderRadius: 16,
+    borderRadius: 8,
     backgroundColor: couleurs.carte,
   },
   prixVide: { backgroundColor: 'transparent' },
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
     padding: 16,
-    borderRadius: 24,
+    borderRadius: 12,
     backgroundColor: couleurs.carte,
   },
   chiffreValeur: { fontFamily: polices.titre, color: couleurs.texte, fontSize: 36 },

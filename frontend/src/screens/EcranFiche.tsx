@@ -1,4 +1,4 @@
-import { Clock, ExternalLink, MapPin, Navigation, Share2, Tag, type LucideIcon } from 'lucide-react-native';
+import { ArrowUpRight, Navigation, Share2 } from 'lucide-react-native';
 import {
   View,
   Text,
@@ -11,8 +11,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Activite } from '../types/activite';
-import { colors } from '../theme/tokens';
-import { polices, tailles } from '../theme';
+import { couleurs, polices } from '../theme';
 import { formaterPrix, formaterDistance } from '../utils/format';
 import { ICONES_CATEGORIE } from '../components/Icones';
 import MentionFrancais from '../components/MentionFrancais';
@@ -31,22 +30,13 @@ type Props = {
 const PARTAGE_DISPONIBLE =
   Platform.OS !== 'web' || (typeof navigator !== 'undefined' && typeof navigator.share === 'function');
 
-function Tuile({ icone: Icone, libelle, valeur, accent = false }: {
-  icone: LucideIcon;
-  libelle: string;
-  valeur: string;
-  accent?: boolean;
-}) {
+// Une ligne d'information : libellé à gauche, valeur à droite, séparées par un trait fin.
+function Ligne({ libelle, valeur }: { libelle: string; valeur: string }) {
   const d = useDesign();
   return (
-    <View style={styles.tuile} accessible accessibilityLabel={`${libelle} : ${valeur}`}>
-      <View style={[styles.tuileIcone, accent && styles.tuileIconeAccent]}>
-        <Icone size={d.px(20)} color={colors.night} />
-      </View>
-      <View style={styles.tuileTextes}>
-        <Text style={[styles.tuileLibelle, { fontSize: d.texte.surtitre }]}>{libelle}</Text>
-        <Text style={[styles.tuileValeur, { fontSize: d.texte.corps }]}>{valeur}</Text>
-      </View>
+    <View style={[styles.ligne, { paddingVertical: d.px(14) }]} accessible accessibilityLabel={`${libelle} : ${valeur}`}>
+      <Text style={[styles.ligneLibelle, { fontSize: d.px(15), width: d.px(110) }]}>{libelle}</Text>
+      <Text style={[styles.ligneValeur, { fontSize: d.px(16), lineHeight: d.px(23) }]}>{valeur}</Text>
     </View>
   );
 }
@@ -54,11 +44,12 @@ function Tuile({ icone: Icone, libelle, valeur, accent = false }: {
 export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) {
   const t = useTextes();
   const d = useDesign();
-  // Photo à gauche sur ordinateur ; au-dessus sur téléphone et sur la borne (écran vertical).
   const large = d.mode === 'bureau';
-  const photo = large ? styles.photoLarge : [styles.photo, { height: d.mode === 'borne' ? 560 : 220 }];
   const IconeCategorie = ICONES_CATEGORIE[activite.categorie];
   const itineraire = `https://www.google.com/maps/dir/?api=1&destination=${activite.lat},${activite.lng}&travelmode=walking`;
+  const hauteurPhoto = large ? 420 : d.mode === 'borne' ? 640 : 280;
+  // Sur téléphone et borne, la photo va d'un bord à l'autre ; le texte garde une marge.
+  const marge = large ? 0 : d.px(20);
 
   const partager = async () => {
     try {
@@ -72,230 +63,175 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
     }
   };
 
-  return (
-    <ScrollView style={styles.ecran} contentContainerStyle={[styles.page, large && styles.pageLarge]}>
-      {activite.photo_url ? (
-        <View style={photo}>
-          <Image
-            source={{ uri: activite.photo_url }}
-            resizeMode="cover"
-            accessibilityLabel={activite.photo_alt ?? t.fiche.photo(activite.titre)}
-            style={styles.image}
-          />
-          {activite.photo_credit && (
-            <Text style={styles.credit} accessibilityLabel={t.fiche.credit(activite.photo_credit)}>
-              © {activite.photo_credit}
-            </Text>
-          )}
-        </View>
-      ) : (
-        <View style={[photo, styles.sansPhoto]}>
-          {IconeCategorie && <IconeCategorie size={64} color={colors.teal} />}
-        </View>
-      )}
-
-      <View style={styles.contenu}>
-        <View style={styles.pastilles}>
-          <View style={styles.pastille}>
-            {IconeCategorie && <IconeCategorie size={16} color={colors.night} />}
-            <Text style={[styles.pastilleTexte, { fontSize: d.texte.surtitre }]}>{activite.categorieLibelle}</Text>
-          </View>
-          {activite.non_traduit && <MentionFrancais />}
-        </View>
-        <Text accessibilityRole="header" style={[styles.titre, { fontSize: d.texte.affiche, lineHeight: d.texte.affiche * 1.15 }]}>
-          {activite.titre}
+  const action = (
+    <View style={[styles.action, large && styles.actionLarge, { padding: large ? d.px(24) : 0, gap: d.px(16) }]}>
+      <View>
+        <Text style={[styles.prix, { fontSize: d.px(26) }]}>{formaterPrix(activite.prix, t)}</Text>
+        <Text style={[styles.secondaire, { fontSize: d.px(16), marginTop: d.px(2) }]}>
+          {t.aPied(activite.trajet_min)} · {formaterDistance(activite.distance_m)}
         </Text>
-        <Text style={[styles.sousTitre, { fontSize: d.texte.choix }]}>{activite.lieu}</Text>
+      </View>
+      <Pressable
+        onPress={() => Linking.openURL(itineraire)}
+        accessibilityRole="link"
+        accessibilityLabel={t.fiche.yAllerA11y}
+        style={({ pressed }) => [styles.yAller, { minHeight: d.px(56) }, pressed && styles.appuye]}
+      >
+        <Navigation size={d.px(20)} color={couleurs.surPrimaire} />
+        <Text style={[styles.yAllerTexte, { fontSize: d.px(18) }]}>{t.fiche.yAller}</Text>
+      </Pressable>
+      {PARTAGE_DISPONIBLE && (
+        <Pressable
+          onPress={partager}
+          accessibilityRole="button"
+          accessibilityLabel={t.fiche.partager}
+          style={({ pressed }) => [styles.secondaireBouton, { minHeight: d.px(48) }, pressed && styles.appuye]}
+        >
+          <Share2 size={d.px(18)} color={couleurs.texte} />
+          <Text style={[styles.secondaireBoutonTexte, { fontSize: d.px(16) }]}>{t.fiche.partager}</Text>
+        </Pressable>
+      )}
+    </View>
+  );
 
-        <View style={styles.pourquoi}>
-          <Text accessibilityRole="header" style={[styles.pourquoiTitre, { fontSize: d.texte.intertitre }]}>
-            {t.fiche.pourquoi}
-          </Text>
-          <Text style={[styles.texte, { fontSize: d.texte.corps, lineHeight: d.texte.corps * 1.5 }]}>{activite.explication}</Text>
-        </View>
-
-        <View style={styles.tuiles}>
-          <Tuile icone={MapPin} libelle={t.fiche.lieu} valeur={activite.adresse ?? activite.lieu} />
-          <Tuile icone={Clock} libelle={t.fiche.horaire} valeur={activite.horaires} />
-          <Tuile icone={Tag} libelle={t.fiche.prix} valeur={formaterPrix(activite.prix, t)} />
-          <Tuile
-            icone={Navigation}
-            accent
-            libelle={t.fiche.distance}
-            valeur={`${formaterDistance(activite.distance_m)} · ${t.aPied(activite.trajet_min)}`}
-          />
-        </View>
-
-        {activite.description && (
-          <View>
-            <Text accessibilityRole="header" style={[styles.sectionTitre, { fontSize: d.texte.intertitre }]}>
-              {t.fiche.description}
+  return (
+    <ScrollView style={styles.ecran} contentContainerStyle={[styles.page, large && { padding: d.px(32) }]}>
+      <View style={[styles.colonne, large && styles.colonneLarge]}>
+        <View>
+          {activite.photo_url ? (
+            <Image
+              source={{ uri: activite.photo_url }}
+              resizeMode="cover"
+              accessibilityLabel={activite.photo_alt ?? t.fiche.photo(activite.titre)}
+              style={[styles.photo, large && styles.photoLarge, { height: hauteurPhoto }]}
+            />
+          ) : (
+            <View style={[styles.photo, large && styles.photoLarge, styles.sansPhoto, { height: hauteurPhoto }]}>
+              {IconeCategorie && <IconeCategorie size={d.px(56)} color={couleurs.texteSecondaire} />}
+            </View>
+          )}
+          {activite.photo_credit && (
+            <Text style={[styles.credit, { fontSize: d.px(13), marginHorizontal: marge }]}>
+              {t.fiche.credit(activite.photo_credit)}
             </Text>
-            <Text style={[styles.texte, { fontSize: d.texte.corps, lineHeight: d.texte.corps * 1.5 }]}>{activite.description}</Text>
-          </View>
-        )}
-
-        <View style={styles.actions}>
-          <Pressable
-            onPress={() => Linking.openURL(itineraire)}
-            accessibilityRole="link"
-            accessibilityLabel={t.fiche.yAllerA11y}
-            style={styles.yAller}
-          >
-            <Navigation size={24} color={colors.night} />
-            <Text style={[styles.yAllerTexte, { fontSize: d.px(22) }]}>{t.fiche.yAller}</Text>
-          </Pressable>
-          {PARTAGE_DISPONIBLE && (
-            <Pressable
-              onPress={partager}
-              accessibilityRole="button"
-              accessibilityLabel={t.fiche.partager}
-              style={styles.partager}
-            >
-              <Share2 size={20} color={colors.night} />
-              <Text style={[styles.partagerTexte, { fontSize: d.texte.corps }]}>{t.fiche.partager}</Text>
-            </Pressable>
           )}
         </View>
 
-        {activite.source_url && (
-          <Pressable
-            onPress={() => Linking.openURL(activite.source_url!)}
-            accessibilityRole="link"
-            accessibilityLabel={t.fiche.voirSur(activite.source)}
-            style={styles.lien}
-          >
-            <Text style={[styles.lienTexte, { fontSize: d.texte.corps }]}>{t.fiche.voirSur(activite.source)}</Text>
-            <ExternalLink size={18} color={colors.night} />
-          </Pressable>
-        )}
+        <View style={[styles.corps, large && styles.corpsLarge, { paddingHorizontal: marge, marginTop: d.px(24) }]}>
+          <View style={styles.principal}>
+            <View style={styles.categorie}>
+              <Text style={[styles.categorieTexte, { fontSize: d.px(15) }]}>{activite.categorieLibelle}</Text>
+              {activite.non_traduit && <MentionFrancais />}
+            </View>
+            <Text
+              accessibilityRole="header"
+              style={[styles.titre, { fontSize: d.px(large ? 40 : 30), lineHeight: d.px(large ? 46 : 36) }]}
+            >
+              {activite.titre}
+            </Text>
+            <Text style={[styles.secondaire, { fontSize: d.px(17), marginTop: d.px(6) }]}>{activite.lieu}</Text>
 
-        {SIGNALEMENT_ACTIF && (
-          <Pressable
-            onPress={onSignaler}
-            accessibilityRole="button"
-            accessibilityLabel={t.fiche.signaler}
-            style={styles.lien}
-          >
-            <Text style={[styles.lienTexte, { fontSize: d.texte.corps }]}>{t.fiche.signaler}</Text>
-          </Pressable>
-        )}
+            <View style={[styles.pourquoi, { marginTop: d.px(24), padding: d.px(16) }]}>
+              <Text style={[styles.pourquoiTitre, { fontSize: d.px(15) }]}>{t.fiche.pourquoi}</Text>
+              <Text style={[styles.texte, { fontSize: d.px(16), lineHeight: d.px(24) }]}>{activite.explication}</Text>
+            </View>
 
-        <Text style={[styles.source, { fontSize: d.texte.surtitre }]}>{t.sourceMaj(activite.source, activite.date_maj)}</Text>
+            {!large && <View style={{ marginTop: d.px(24) }}>{action}</View>}
 
-        <BoutonTerminer onPress={onTerminer} clair />
+            <View style={[styles.lignes, { marginTop: d.px(28) }]}>
+              <Ligne libelle={t.fiche.lieu} valeur={activite.adresse ?? activite.lieu} />
+              <Ligne libelle={t.fiche.horaire} valeur={activite.horaires} />
+            </View>
+
+            {activite.description && (
+              <View style={{ marginTop: d.px(32) }}>
+                <Text accessibilityRole="header" style={[styles.intertitre, { fontSize: d.px(20), marginBottom: d.px(8) }]}>
+                  {t.fiche.description}
+                </Text>
+                <Text style={[styles.texte, { fontSize: d.px(16), lineHeight: d.px(26) }]}>{activite.description}</Text>
+              </View>
+            )}
+
+            <View style={[styles.pied, { marginTop: d.px(32), gap: d.px(12) }]}>
+              {activite.source_url && (
+                <Pressable
+                  onPress={() => Linking.openURL(activite.source_url!)}
+                  accessibilityRole="link"
+                  accessibilityLabel={t.fiche.voirSur(activite.source)}
+                  style={styles.lien}
+                >
+                  <Text style={[styles.lienTexte, { fontSize: d.px(16) }]}>{t.fiche.voirSur(activite.source)}</Text>
+                  <ArrowUpRight size={d.px(18)} color={couleurs.texte} />
+                </Pressable>
+              )}
+              {SIGNALEMENT_ACTIF && (
+                <Pressable onPress={onSignaler} accessibilityRole="button" accessibilityLabel={t.fiche.signaler} style={styles.lien}>
+                  <Text style={[styles.lienTexte, { fontSize: d.px(16) }]}>{t.fiche.signaler}</Text>
+                </Pressable>
+              )}
+              <Text style={[styles.secondaire, { fontSize: d.px(14) }]}>{t.sourceMaj(activite.source, activite.date_maj)}</Text>
+              <BoutonTerminer onPress={onTerminer} />
+            </View>
+          </View>
+
+          {large && <View style={styles.cote}>{action}</View>}
+        </View>
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  ecran: { flex: 1, backgroundColor: colors.background },
-  page: { padding: 16, paddingBottom: 32, gap: 20 },
-  pageLarge: { flexDirection: 'row', alignItems: 'flex-start', padding: 24, gap: 32 },
-  photo: { width: '100%', height: 220, borderRadius: 24, overflow: 'hidden' },
-  // Format paysage : la photo reste entière à l'écran, sans recadrage excessif.
-  photoLarge: { width: '40%', aspectRatio: 4 / 3, borderRadius: 24, overflow: 'hidden' },
-  image: { width: '100%', height: '100%' },
-  // Bandeau sombre en bas de la photo : lisible quelle que soit l'image.
-  credit: {
-    position: 'absolute',
-    right: 0,
-    bottom: 0,
-    left: 0,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: 'rgba(8, 43, 56, 0.8)',
-    color: colors.nightForeground,
-    fontFamily: polices.texte,
-    fontSize: tailles.petit,
-  },
-  sansPhoto: { backgroundColor: colors.muted, alignItems: 'center', justifyContent: 'center' },
-  contenu: { flex: 1, gap: 16 },
-  pastilles: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  pastille: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    gap: 6,
-    backgroundColor: colors.tealLight,
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  pastilleTexte: { fontFamily: polices.texteMoyen, fontSize: tailles.petit, color: colors.night },
-  titre: { fontFamily: polices.titre, color: colors.night, fontSize: 32, lineHeight: 38 },
-  sousTitre: { fontFamily: polices.texte, color: colors.mutedForeground, fontSize: 18, marginTop: -8 },
-  pourquoi: {
-    borderWidth: 2,
-    borderColor: colors.teal,
-    borderRadius: 24,
-    padding: 16,
-    gap: 6,
-  },
-  pourquoiTitre: { fontFamily: polices.titre, color: colors.night, fontSize: 20 },
-  texte: { fontFamily: polices.texte, color: colors.night, fontSize: tailles.texte, lineHeight: 24 },
-  tuiles: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  tuile: {
-    // 2 colonnes sur grand écran (comme la maquette), 1 sur téléphone.
-    flexGrow: 1,
-    flexBasis: '40%',
-    minWidth: 220,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-    backgroundColor: colors.muted,
-    borderRadius: 24,
-    padding: 16,
-  },
-  tuileIcone: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tuileIconeAccent: { backgroundColor: colors.teal },
-  tuileTextes: { flex: 1, gap: 2 },
-  tuileLibelle: { fontFamily: polices.texte, color: colors.night, fontSize: tailles.petit },
-  tuileValeur: { fontFamily: polices.texteMoyen, color: colors.night, fontSize: tailles.texte },
-  sectionTitre: { fontFamily: polices.titre, color: colors.night, fontSize: 20, marginBottom: 6 },
-  actions: { flexDirection: 'row', gap: 12, flexWrap: 'wrap' },
+  ecran: { flex: 1, backgroundColor: couleurs.fond },
+  page: { paddingBottom: 48 },
+  colonne: { width: '100%' },
+  colonneLarge: { maxWidth: 1120, alignSelf: 'center' },
+  photo: { width: '100%', backgroundColor: couleurs.carte },
+  photoLarge: { borderRadius: 16 },
+  sansPhoto: { alignItems: 'center', justifyContent: 'center' },
+  credit: { fontFamily: polices.texte, color: couleurs.texteSecondaire, marginTop: 8, textAlign: 'right' },
+  corps: {},
+  corpsLarge: { flexDirection: 'row', alignItems: 'flex-start', gap: 56 },
+  principal: { flex: 1 },
+  cote: { width: 340 },
+  categorie: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
+  categorieTexte: { fontFamily: polices.texteMoyen, color: couleurs.texteSecondaire },
+  titre: { fontFamily: polices.titre, color: couleurs.texte, letterSpacing: -0.6 },
+  secondaire: { fontFamily: polices.texte, color: couleurs.texteSecondaire },
+  texte: { fontFamily: polices.texte, color: couleurs.texte },
+  intertitre: { fontFamily: polices.titre, color: couleurs.texte, letterSpacing: -0.2 },
+  pourquoi: { backgroundColor: couleurs.carte, borderRadius: 12, gap: 4 },
+  pourquoiTitre: { fontFamily: polices.titre, color: couleurs.texte },
+  lignes: { borderTopWidth: 1, borderColor: couleurs.trait },
+  ligne: { flexDirection: 'row', gap: 16, borderBottomWidth: 1, borderColor: couleurs.trait },
+  ligneLibelle: { fontFamily: polices.texte, color: couleurs.texteSecondaire },
+  ligneValeur: { flex: 1, fontFamily: polices.texteMoyen, color: couleurs.texte },
+  action: {},
+  actionLarge: { borderWidth: 1, borderColor: couleurs.trait, borderRadius: 16, backgroundColor: '#FFFFFF' },
+  prix: { fontFamily: polices.titre, color: couleurs.texte, letterSpacing: -0.4 },
   yAller: {
-    flexGrow: 1,
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 10,
-    minHeight: 64,
-    borderRadius: 32,
-    backgroundColor: colors.teal,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
+    borderRadius: 12,
+    backgroundColor: couleurs.primaire,
+    paddingHorizontal: 20,
   },
-  yAllerTexte: { fontFamily: polices.titre, color: colors.night, fontSize: 22 },
-  partager: {
+  yAllerTexte: { fontFamily: polices.titre, color: couleurs.surPrimaire },
+  secondaireBouton: {
     flexDirection: 'row',
-    gap: 8,
-    minHeight: 64,
-    borderRadius: 32,
-    backgroundColor: colors.muted,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  partagerTexte: { fontFamily: polices.texteMoyen, color: colors.night, fontSize: tailles.texte },
-  lien: {
-    flexDirection: 'row',
     gap: 8,
-    minHeight: tailles.zoneMin,
-    borderWidth: 2,
-    borderColor: colors.teal,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: couleurs.trait,
+    paddingHorizontal: 20,
   },
-  lienTexte: { fontFamily: polices.texteMoyen, color: colors.night, fontSize: tailles.texte },
-  source: { fontFamily: polices.texte, color: colors.mutedForeground, fontSize: tailles.petit },
+  secondaireBoutonTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte },
+  appuye: { opacity: 0.85 },
+  pied: { alignItems: 'flex-start' },
+  lien: { flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 44 },
+  lienTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, textDecorationLine: 'underline' },
 });
