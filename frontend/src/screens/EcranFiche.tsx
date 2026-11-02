@@ -15,6 +15,7 @@ import { colors } from '../theme/tokens';
 import { polices, tailles } from '../theme';
 import { formaterPrix, formaterDistance } from '../utils/format';
 import { ICONES_CATEGORIE } from '../components/Icones';
+import MentionFrancais from '../components/MentionFrancais';
 import { useTextes } from '../i18n';
 import { SIGNALEMENT_ACTIF } from '../config';
 import { useDesign } from '../design';
@@ -94,9 +95,12 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
       )}
 
       <View style={styles.contenu}>
-        <View style={styles.pastille}>
-          {IconeCategorie && <IconeCategorie size={16} color={colors.night} />}
-          <Text style={[styles.pastilleTexte, { fontSize: d.texte.surtitre }]}>{activite.categorieLibelle}</Text>
+        <View style={styles.pastilles}>
+          <View style={styles.pastille}>
+            {IconeCategorie && <IconeCategorie size={16} color={colors.night} />}
+            <Text style={[styles.pastilleTexte, { fontSize: d.texte.surtitre }]}>{activite.categorieLibelle}</Text>
+          </View>
+          {activite.non_traduit && <MentionFrancais />}
         </View>
         <Text accessibilityRole="header" style={[styles.titre, { fontSize: d.texte.affiche, lineHeight: d.texte.affiche * 1.15 }]}>
           {activite.titre}
@@ -190,7 +194,8 @@ const styles = StyleSheet.create({
   page: { padding: 16, paddingBottom: 32, gap: 20 },
   pageLarge: { flexDirection: 'row', alignItems: 'flex-start', padding: 24, gap: 32 },
   photo: { width: '100%', height: 220, borderRadius: 24, overflow: 'hidden' },
-  photoLarge: { width: '38%', aspectRatio: 3 / 4, borderRadius: 24, overflow: 'hidden' },
+  // Format paysage : la photo reste entière à l'écran, sans recadrage excessif.
+  photoLarge: { width: '40%', aspectRatio: 4 / 3, borderRadius: 24, overflow: 'hidden' },
   image: { width: '100%', height: '100%' },
   // Bandeau sombre en bas de la photo : lisible quelle que soit l'image.
   credit: {
@@ -207,6 +212,7 @@ const styles = StyleSheet.create({
   },
   sansPhoto: { backgroundColor: colors.muted, alignItems: 'center', justifyContent: 'center' },
   contenu: { flex: 1, gap: 16 },
+  pastilles: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   pastille: {
     flexDirection: 'row',
     alignItems: 'center',

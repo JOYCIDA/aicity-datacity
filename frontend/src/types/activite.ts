@@ -8,6 +8,7 @@ export type Activite = {
   photo_url: string | null;
   photo_credit: string | null; // à afficher sous la photo (droit d'auteur)
   photo_alt: string | null; // description lue par les lecteurs d'écran
+  non_traduit: boolean; // anglais demandé mais contenu resté en français : on l'indique
   lieu: string;
   adresse: string | null;
   lat: number;

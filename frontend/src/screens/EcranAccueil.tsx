@@ -40,7 +40,7 @@ export default function EcranAccueil({ categories, onRaccourci, onCommencer }: P
                     onPress={() => onRaccourci(c.valeur)}
                     accessibilityRole="button"
                     accessibilityLabel={t.accueil.raccourciA11y(c.libelle)}
-                    style={({ pressed }) => [styles.tuile, pressed && styles.tuileAppuyee]}
+                    style={({ pressed }) => [styles.tuile, !petitEcran && styles.tuileLarge, pressed && styles.tuileAppuyee]}
                   >
                     {Icone && <Icone size={28} color={couleurs.texte} />}
                     <Text style={styles.tuileTexte}>{c.libelle}</Text>
@@ -88,7 +88,8 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     textTransform: 'uppercase',
   },
-  tuiles: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, maxWidth: 720 },
+  // 6 tuiles sur une ligne sur grand écran (6 × 132 + 5 × 8), 3 + 3 sur téléphone : jamais de tuile isolée.
+  tuiles: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, maxWidth: 840 },
   tuile: {
     width: 112,
     minHeight: 88,
@@ -101,6 +102,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 4,
   },
+  tuileLarge: { width: 132, minHeight: 100 },
   tuileAppuyee: { backgroundColor: couleurs.carte },
   tuileTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: tailles.texte, textAlign: 'center' },
   bouton: {
