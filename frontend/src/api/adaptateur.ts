@@ -36,6 +36,7 @@ export function versActivite(
     photo_url: offre.photoUrl,
     photo_credit: offre.photoCredit ?? null,
     photo_alt: offre.photoAlt ?? null,
+    non_traduit: langue === 'EN' && offre.traduit === false,
     lieu: offre.lieu,
     adresse: offre.adresse,
     lat: offre.latitude,
