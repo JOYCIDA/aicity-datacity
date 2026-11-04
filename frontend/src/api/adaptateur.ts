@@ -2,7 +2,7 @@ import { QuestionApi, ResultatApi } from './client';
 import { Activite } from '../types/activite';
 import { Choix, Questions } from '../types/questions';
 import { Langue, TEXTES } from '../i18n';
-import { formaterDate, formaterHoraires } from '../utils/format';
+import { formaterDate, formaterHoraires, protegerUnites } from '../utils/format';
 
 export function versQuestions(api: QuestionApi[], langue: Langue): Questions {
   const question = (id: QuestionApi['id']) => {
@@ -41,7 +41,7 @@ export function versActivite(
     adresse: offre.adresse,
     lat: offre.latitude,
     lng: offre.longitude,
-    horaires: formaterHoraires(offre.horaires, offre.debut, offre.fin, t),
+    horaires: protegerUnites(formaterHoraires(offre.horaires, offre.debut, offre.fin, t)),
     debut_iso: offre.debut,
     fin_iso: offre.fin,
     duree_min: offre.dureeMinutes,
@@ -51,6 +51,6 @@ export function versActivite(
     source: t.sources[offre.source] ?? offre.source,
     source_url: offre.sourceUrl,
     date_maj: formaterDate(offre.majLe, t),
-    explication,
+    explication: protegerUnites(explication),
   };
 }

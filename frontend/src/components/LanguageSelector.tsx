@@ -27,7 +27,7 @@ export default function LanguageSelector({ active, onChange }: Props) {
             onPress={() => onChange?.(lang)}
             style={[styles.option, { minWidth: d.px(44), minHeight: d.px(44) }, isActive && styles.optionActive]}
           >
-            <Text style={[styles.label, { fontSize: d.texte.corps }, isActive && styles.labelActive]}>{lang}</Text>
+            <Text style={[d.typo('corpsFort'), styles.label, isActive && styles.labelActive]}>{lang}</Text>
           </Pressable>
         );
       })}
@@ -56,7 +56,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: fonts.bodyBold,
-    fontSize: textSize.sm,
     color: colors.nightForeground,
   },
   labelActive: {

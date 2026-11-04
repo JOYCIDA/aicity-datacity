@@ -1,6 +1,6 @@
 import { LogOut } from 'lucide-react-native';
 import { Pressable, Text, StyleSheet } from 'react-native';
-import { couleurs, polices, rayons, tailles } from '../theme';
+import { couleurs, rayons, tailles } from '../theme';
 import { useTextes } from '../i18n';
 import { useDesign } from '../design';
 
@@ -24,7 +24,7 @@ export default function BoutonTerminer({ onPress }: Props) {
       ]}
     >
       <LogOut size={d.px(18)} color={couleurs.texte} />
-      <Text style={[styles.texte, { fontSize: d.texte.corps }]}>{t.fin.terminer}</Text>
+      <Text style={[d.typo('corpsFort'), styles.texte]}>{t.fin.terminer}</Text>
     </Pressable>
   );
 }
@@ -40,5 +40,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: couleurs.champ,
   },
-  texte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: tailles.texte },
+  texte: { color: couleurs.texte },
 });
