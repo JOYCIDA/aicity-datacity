@@ -5,7 +5,10 @@ import { ecarterCoordonneesDouteuses } from '../adapters/qualite.js';
 import { page } from '../utils/dto.js';
 import { conflict } from '../utils/errors.js';
 
-const TAILLE_LOT = 100;
+// Lot réduit : sur une base distante (Neon), 100 upserts dépassaient le délai de transaction.
+const TAILLE_LOT = 25;
+// Délais de la transaction d'un lot (5 s par défaut, trop court avec la latence d'une base distante).
+const OPTIONS_TRANSACTION = { maxWait: 30_000, timeout: 60_000 } as const;
 // Au-delà, un rapport EN_COURS est considéré comme abandonné (processus tué en plein import).
 const DUREE_MAX_IMPORT_MS = 2 * 60 * 60 * 1000;
 
@@ -189,6 +192,7 @@ async function enregistrer(adapter: SourceAdapter, offres: Prisma.OffreUnchecked
           update: { ...champs, ...traductionsPerimees },
         });
       }),
+      OPTIONS_TRANSACTION,
     );
     for (const o of lot) {
       if (existants.has(o.idExterne!)) nbMisAJour++;
