@@ -16,6 +16,18 @@ export type Utilisateur = {
   entreprise?: { id: string; nom: string; statut: StatutCompte; motifRefus: string | null } | null;
 };
 
+export type Entreprise = {
+  id: string;
+  nom: string;
+  typeActivite: string;
+  adresse: string;
+  email: string;
+  statut: StatutCompte;
+  motifRefus: string | null;
+  creeLe: string;
+  justificatifFourni: boolean;
+};
+
 type ReponseAuth = { token: string; utilisateur: Utilisateur };
 
 export class ErreurApi extends Error {
@@ -105,4 +117,15 @@ export const api = {
     }),
 
   moi: () => requete<{ utilisateur: Utilisateur }>('/auth/moi').then((r) => r.utilisateur),
+
+  profil: () => requete<{ entreprise: Entreprise }>('/entreprise/profil').then((r) => r.entreprise),
+
+  // Justificatif (Kbis, avis SIRENE…) : PDF, JPEG, PNG ou WebP, 5 Mo au maximum.
+  envoyerJustificatif: (fichier: File) => {
+    const formulaire = new FormData();
+    formulaire.append('justificatif', fichier);
+    return requete<{ entreprise: Entreprise }>('/entreprise/justificatif', { method: 'POST', body: formulaire }).then(
+      (r) => r.entreprise,
+    );
+  },
 };

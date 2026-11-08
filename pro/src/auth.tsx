@@ -7,6 +7,7 @@ type EtatAuth = {
   sessionExpiree: boolean;
   ouvrirSession: (token: string) => Promise<Utilisateur>;
   fermerSession: () => void;
+  rafraichir: () => Promise<void>; // relit le compte (après un changement de statut)
 };
 
 const AuthContexte = createContext<EtatAuth | null>(null);
@@ -30,6 +31,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return moi;
   }, []);
 
+  const rafraichir = useCallback(async () => {
+    setUtilisateur(await api.moi());
+  }, []);
+
   useEffect(() => {
     quandSessionExpire(() => {
       jeton.effacer();
@@ -46,8 +51,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const valeur = useMemo(
-    () => ({ utilisateur, chargement, sessionExpiree, ouvrirSession, fermerSession }),
-    [utilisateur, chargement, sessionExpiree, ouvrirSession, fermerSession],
+    () => ({ utilisateur, chargement, sessionExpiree, ouvrirSession, fermerSession, rafraichir }),
+    [utilisateur, chargement, sessionExpiree, ouvrirSession, fermerSession, rafraichir],
   );
   return <AuthContexte.Provider value={valeur}>{children}</AuthContexte.Provider>;
 }

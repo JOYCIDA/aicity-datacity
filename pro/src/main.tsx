@@ -7,10 +7,12 @@ import '@fontsource/instrument-sans/600.css';
 import '@fontsource/space-grotesk/700.css';
 import './styles.css';
 import { AuthProvider } from './auth';
+import { EspacePro } from './composants/EspacePro';
 import { Protegee } from './composants/Protegee';
 import Connexion from './pages/Connexion';
 import Inscription from './pages/Inscription';
 import Introuvable from './pages/Introuvable';
+import MonCompte from './pages/MonCompte';
 import MotDePasseOublie from './pages/MotDePasseOublie';
 import TableauDeBord from './pages/TableauDeBord';
 
@@ -22,14 +24,17 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/connexion" element={<Connexion />} />
           <Route path="/inscription" element={<Inscription />} />
           <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
+          {/* Espace connecté : barre latérale commune à toutes ces pages */}
           <Route
-            path="/"
             element={
               <Protegee>
-                <TableauDeBord />
+                <EspacePro />
               </Protegee>
             }
-          />
+          >
+            <Route index element={<TableauDeBord />} />
+            <Route path="compte" element={<MonCompte />} />
+          </Route>
           <Route path="*" element={<Introuvable />} />
         </Routes>
       </AuthProvider>
