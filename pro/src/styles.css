@@ -507,3 +507,25 @@ a {
   gap: var(--e-m);
   margin-top: var(--e-s);
 }
+
+/* Lien secondaire (mot de passe oublié, retour) : zone cliquable de 44 px de haut */
+.lien-discret {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-xs);
+  align-self: flex-start;
+  min-height: 44px;
+  margin: calc(-1 * var(--e-s)) 0;
+  font-size: 14px;
+  line-height: 20px;
+}
+.lien-retour {
+  margin: 0;
+}
+.etapes {
+  margin: 0;
+  padding-left: var(--e-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-s);
+}
