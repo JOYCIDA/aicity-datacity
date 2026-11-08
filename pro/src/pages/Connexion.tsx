@@ -101,8 +101,13 @@ export default function Connexion() {
           required
           value={motDePasse}
           onChange={(e) => setMotDePasse(e.target.value)}
-          aide="Mot de passe oublié ? Contactez l’administration AiCity."
         />
+        <Link
+          to={email.trim() ? `/mot-de-passe-oublie?email=${encodeURIComponent(email.trim())}` : '/mot-de-passe-oublie'}
+          className="lien-discret"
+        >
+          Mot de passe oublié ?
+        </Link>
         <button type="submit" className="bouton bouton-primaire bouton-large" disabled={enCours} aria-busy={enCours}>
           {enCours ? 'Connexion…' : 'Se connecter'}
         </button>

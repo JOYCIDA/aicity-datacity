@@ -11,6 +11,7 @@ import { Protegee } from './composants/Protegee';
 import Connexion from './pages/Connexion';
 import Inscription from './pages/Inscription';
 import Introuvable from './pages/Introuvable';
+import MotDePasseOublie from './pages/MotDePasseOublie';
 import TableauDeBord from './pages/TableauDeBord';
 
 createRoot(document.getElementById('root')!).render(
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path="/connexion" element={<Connexion />} />
           <Route path="/inscription" element={<Inscription />} />
+          <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
           <Route
             path="/"
             element={
