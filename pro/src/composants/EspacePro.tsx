@@ -37,7 +37,7 @@ export function EspacePro() {
           <ul className="menu">
             {MENU.map(({ chemin, libelle, icone: Icone }) => (
               <li key={chemin}>
-                <NavLink to={chemin} end className="menu-lien">
+                <NavLink to={chemin} end={chemin === '/'} className="menu-lien">
                   <Icone size={20} aria-hidden="true" />
                   {libelle}
                 </NavLink>

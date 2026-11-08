@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, Pause, Play, Plus } from 'lucide-react';
 import { api, ErreurApi, type Offre, type Page, type StatutOffre } from '../api';
 import { useAuth } from '../auth';
 import { Alerte } from '../composants/Alerte';
@@ -37,7 +37,11 @@ export default function MesOffres() {
   const numero = Math.max(1, Number(parametres.get('page')) || 1);
   const [resultat, setResultat] = useState<Page<Offre> | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
-  const [message, setMessage] = useState<{ type: 'succes' | 'erreur'; texte: string } | null>(null);
+  // Message laissé par la page « Nouvelle offre » après un envoi réussi.
+  const annonce = (useLocation().state as { annonce?: string } | null)?.annonce;
+  const [message, setMessage] = useState<{ type: 'succes' | 'erreur'; texte: string } | null>(
+    annonce ? { type: 'succes', texte: annonce } : null,
+  );
   const [enCours, setEnCours] = useState<string | null>(null); // id de l'offre en cours de changement
 
   const charger = useCallback(() => {
@@ -97,6 +101,12 @@ export default function MesOffres() {
               : ' '}
           </p>
         </div>
+        {compteActif && (
+          <Link to="/offres/nouvelle" className="bouton bouton-primaire">
+            <Plus size={18} aria-hidden="true" />
+            Nouvelle offre
+          </Link>
+        )}
       </header>
 
       {!compteActif && (
