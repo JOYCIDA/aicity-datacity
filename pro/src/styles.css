@@ -442,6 +442,8 @@ a {
 @media (max-width: 900px) {
   .auth {
     grid-template-columns: 1fr;
+    /* Le bandeau de marque prend sa hauteur naturelle, le formulaire le reste. */
+    grid-template-rows: auto 1fr;
   }
   .auth-atouts,
   .auth-pied {
@@ -528,4 +530,343 @@ a {
   display: flex;
   flex-direction: column;
   gap: var(--e-s);
+}
+
+/* ——— Espace connecté : barre latérale + contenu ——— */
+.espace {
+  display: grid;
+  grid-template-columns: 264px 1fr;
+  min-height: 100vh;
+}
+.barre {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-right: 1px solid var(--trait);
+}
+.barre-logo {
+  padding: var(--e-xl);
+  border-bottom: 1px solid var(--trait);
+}
+.menu {
+  list-style: none;
+  margin: 0;
+  padding: var(--e-m);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-xs);
+}
+.menu-lien {
+  display: flex;
+  align-items: center;
+  gap: var(--e-m);
+  min-height: 44px;
+  padding: 0 var(--e-m);
+  border-radius: var(--rayon);
+  color: var(--texte-secondaire);
+  font-weight: 500;
+  text-decoration: none;
+}
+.menu-lien:hover {
+  background: var(--fond);
+  color: var(--texte);
+}
+/* Page active : fond + trait à gauche + texte foncé (pas seulement la couleur) */
+.menu-lien.active {
+  background: var(--fond);
+  color: var(--texte);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--primaire);
+}
+.barre-compte {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--e-m);
+  padding: var(--e-l);
+  border-top: 1px solid var(--trait);
+}
+.barre-compte-texte {
+  flex: 1;
+  min-width: 0;
+}
+.barre-compte-texte p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pastille {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--nuit);
+  color: var(--sur-nuit);
+  font-weight: 600;
+  font-size: 14px;
+}
+.bouton-icone {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--rayon);
+  background: transparent;
+  color: var(--texte-secondaire);
+  cursor: pointer;
+}
+.bouton-icone:hover {
+  background: var(--fond);
+  color: var(--texte);
+}
+.lien-evitement {
+  position: absolute;
+  left: var(--e-l);
+  top: -100px;
+  z-index: 10;
+  padding: var(--e-s) var(--e-l);
+  background: var(--nuit);
+  color: var(--sur-nuit);
+  border-radius: var(--rayon);
+}
+.lien-evitement:focus {
+  top: var(--e-l);
+}
+.espace-contenu {
+  min-width: 0;
+  outline: none;
+}
+
+@media (max-width: 900px) {
+  .espace {
+    grid-template-columns: 1fr;
+  }
+  .barre {
+    position: static;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--trait);
+  }
+  .barre-logo {
+    padding: var(--e-l);
+    border-bottom: 0;
+  }
+  .menu {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-top: 0;
+  }
+  .barre-compte {
+    margin-top: 0;
+  }
+}
+
+/* ——— Pages de l'espace ——— */
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--e-xxxl) var(--e-xxl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-xl);
+}
+.page-entete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--e-l);
+}
+.page-entete .secondaire {
+  margin-top: var(--e-s);
+}
+.bloc {
+  padding: var(--e-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-l);
+}
+.grille-deux {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: var(--e-xl);
+  align-items: start;
+}
+.motif {
+  font-style: italic;
+  margin-bottom: var(--e-s);
+}
+@media (max-width: 720px) {
+  .page {
+    padding: var(--e-xl) var(--e-l);
+  }
+}
+
+/* Statut : texte + pastille de couleur (jamais la couleur seule) */
+.statut {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-s);
+  min-height: 32px;
+  padding: 0 var(--e-m);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.statut::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.statut-actif {
+  background: var(--succes-fond);
+  color: var(--succes);
+}
+.statut-en_attente {
+  background: var(--alerte-fond);
+  color: var(--alerte);
+}
+.statut-refuse,
+.statut-suspendu {
+  background: var(--erreur-fond);
+  color: var(--erreur);
+}
+
+/* Avancement du dossier */
+.progression {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--e-l);
+}
+.progression-etape {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-s);
+  padding-top: var(--e-m);
+  border-top: 4px solid var(--trait);
+}
+.progression-pastille {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--champ);
+  color: var(--texte-secondaire);
+  font-size: 14px;
+  font-weight: 600;
+}
+.etape-fait {
+  border-top-color: var(--succes);
+}
+.etape-fait .progression-pastille {
+  background: var(--succes);
+  border-color: var(--succes);
+  color: #fff;
+}
+.etape-en-cours {
+  border-top-color: var(--primaire);
+}
+.etape-en-cours .progression-pastille {
+  border-color: var(--texte);
+  color: var(--texte);
+}
+.etape-en-cours .t-corps {
+  font-weight: 600;
+}
+.etape-erreur {
+  border-top-color: var(--erreur);
+}
+.etape-erreur .progression-pastille {
+  background: var(--erreur);
+  border-color: var(--erreur);
+  color: #fff;
+}
+.etape-a-venir .t-corps {
+  color: var(--texte-secondaire);
+}
+@media (max-width: 720px) {
+  .progression {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Liste d'informations : libellé / valeur, séparés par un trait */
+.lignes {
+  margin: 0;
+}
+.ligne {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: var(--e-l);
+  padding: var(--e-m) 0;
+  border-bottom: 1px solid var(--trait);
+}
+.ligne:last-child {
+  border-bottom: 0;
+}
+.ligne dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Dépôt de fichier */
+.depot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--e-s);
+  padding: var(--e-xl);
+  border: 2px dashed var(--champ);
+  border-radius: var(--rayon);
+  background: var(--fond);
+  text-align: center;
+}
+.depot-survol {
+  border-color: var(--texte);
+  background: #eaf3f5;
+}
+.depot-icone {
+  color: var(--lien);
+}
+.depot .bouton {
+  margin-top: var(--e-s);
+}
+.depot:focus-within label {
+  outline: 3px solid var(--lien);
+  outline-offset: 2px;
+}
+.fichier {
+  display: flex;
+  align-items: center;
+  gap: var(--e-m);
+  padding: var(--e-m) var(--e-l);
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon);
+}
+.fichier-texte {
+  flex: 1;
+  min-width: 0;
+}
+.fichier-texte p {
+  overflow-wrap: anywhere;
+}
+
+.lien-fleche {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-xs);
+  min-height: 44px;
 }
