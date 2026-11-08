@@ -4,7 +4,7 @@ import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import AiCityLogo from '../components/AiCityLogo';
 import CitySkyline from '../components/CitySkyline';
 import { RETOUR_ACCUEIL_SECONDES } from '../config';
-import { sombre, polices, rayons, tailles } from '../theme';
+import { sombre, rayons, typo } from '../theme';
 import { useTextes } from '../i18n';
 
 type Props = {
@@ -65,12 +65,10 @@ export default function EcranFin({ onAccueil }: Props) {
 const styles = StyleSheet.create({
   ecran: { flex: 1, backgroundColor: sombre.fond },
   page: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', padding: 16, gap: 16 },
-  titre: { fontFamily: polices.titre, color: sombre.texte, fontSize: 36, letterSpacing: -0.6, textAlign: 'center' },
+  titre: { ...typo.affiche, color: sombre.texte, textAlign: 'center' },
   texte: {
-    fontFamily: polices.texte,
+    ...typo.corps,
     color: sombre.texteSecondaire,
-    fontSize: 18,
-    lineHeight: 26,
     textAlign: 'center',
     maxWidth: 460,
   },
@@ -84,12 +82,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 8,
   },
-  compteurChiffre: { fontFamily: polices.titre, color: sombre.texte, fontSize: 40 },
+  compteurChiffre: { ...typo.affiche, color: sombre.texte, fontVariant: ['tabular-nums'] },
   retourAuto: {
-    fontFamily: polices.texte,
+    ...typo.corps,
     color: sombre.texteSecondaire,
-    fontSize: tailles.texte,
     textAlign: 'center',
+    fontVariant: ['tabular-nums'],
   },
   bouton: {
     flexDirection: 'row',
@@ -102,7 +100,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 8,
   },
-  boutonTexte: { fontFamily: polices.titre, color: sombre.surPrimaire, fontSize: 20 },
+  boutonTexte: { ...typo.sousTitre, color: sombre.surPrimaire },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -112,5 +110,5 @@ const styles = StyleSheet.create({
     borderRadius: rayons.s,
     backgroundColor: sombre.carte,
   },
-  badgeTexte: { flexShrink: 1, fontFamily: polices.texte, color: sombre.texteSecondaire, fontSize: tailles.petit },
+  badgeTexte: { flexShrink: 1, ...typo.legende, color: sombre.texteSecondaire },
 });

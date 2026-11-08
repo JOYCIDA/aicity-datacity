@@ -2,7 +2,7 @@ import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } fr
 import AiCityLogo from '../components/AiCityLogo';
 import CitySkyline from '../components/CitySkyline';
 import { ICONES_CATEGORIE } from '../components/Icones';
-import { sombre, polices, rayons, tailles } from '../theme';
+import { sombre, polices, rayons, typo } from '../theme';
 import { useTextes } from '../i18n';
 import { Choix } from '../types/questions';
 
@@ -72,19 +72,15 @@ const styles = StyleSheet.create({
   page: { flexGrow: 1, padding: 16, gap: 20, justifyContent: 'center' },
   centre: { alignItems: 'center', gap: 12 },
   accroche: {
+    ...typo.sousTitre,
     fontFamily: polices.texte,
-    color: sombre.texteSecondaire,
-    fontSize: 20,
     lineHeight: 28,
+    color: sombre.texteSecondaire,
     textAlign: 'center',
     maxWidth: 420,
   },
   raccourcis: { alignItems: 'center', gap: 12 },
-  question: {
-    fontFamily: polices.texteMoyen,
-    color: sombre.texteSecondaire,
-    fontSize: tailles.texte,
-  },
+  question: { ...typo.corpsFort, color: sombre.texteSecondaire },
   // 6 tuiles sur une ligne sur grand écran (6 × 132 + 5 × 8), 3 + 3 sur téléphone : jamais de tuile isolée.
   tuiles: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, maxWidth: 840 },
   tuile: {
@@ -100,7 +96,7 @@ const styles = StyleSheet.create({
   },
   tuileLarge: { width: 132, minHeight: 100 },
   tuileAppuyee: { backgroundColor: '#14506A' },
-  tuileTexte: { fontFamily: polices.texteMoyen, color: sombre.texte, fontSize: tailles.texte, textAlign: 'center' },
+  tuileTexte: { ...typo.corpsFort, color: sombre.texte, textAlign: 'center' },
   bouton: {
     flexDirection: 'row',
     gap: 12,
@@ -113,11 +109,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  boutonTexte: { fontFamily: polices.titre, color: sombre.surPrimaire, fontSize: 22 },
-  mention: {
-    fontFamily: polices.texte,
-    color: sombre.texteSecondaire,
-    fontSize: tailles.texte,
-    textAlign: 'center',
-  },
+  boutonTexte: { ...typo.sousTitre, color: sombre.surPrimaire },
+  mention: { ...typo.corps, color: sombre.texteSecondaire, textAlign: 'center' },
 });

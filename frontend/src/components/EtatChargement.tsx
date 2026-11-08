@@ -1,5 +1,5 @@
 import { View, Text, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
-import { couleurs, polices, tailles } from '../theme';
+import { couleurs, tailles, typo } from '../theme';
 import { useTextes } from '../i18n';
 import { Message } from '../design';
 
@@ -37,7 +37,7 @@ export default function EtatChargement({ message, erreur, onReessayer }: Props) 
 
 const styles = StyleSheet.create({
   chargement: { alignItems: 'center', gap: 12, marginTop: 48 },
-  message: { fontFamily: polices.texte, color: couleurs.texteSecondaire, fontSize: tailles.texte },
+  message: { ...typo.corps, color: couleurs.texteSecondaire },
   bouton: {
     alignSelf: 'flex-start',
     minHeight: tailles.zoneMin + 12,
@@ -47,5 +47,5 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 16,
   },
-  boutonTexte: { fontFamily: polices.titre, color: couleurs.surPrimaire, fontSize: 18 },
+  boutonTexte: { ...typo.sousTitre, color: couleurs.surPrimaire },
 });

@@ -1,7 +1,7 @@
 import { Languages } from 'lucide-react-native';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors } from '../theme/tokens';
-import { polices, tailles } from '../theme';
+import { polices, typo } from '../theme';
 import { useTextes } from '../i18n';
 
 // Petite mention « FR » quand l'anglais est demandé mais que l'offre n'est pas encore traduite.
@@ -28,5 +28,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  texte: { fontFamily: polices.texteMoyen, fontSize: tailles.petit, color: colors.night },
+  texte: { ...typo.legende, fontFamily: polices.texteMoyen, color: colors.night },
 });

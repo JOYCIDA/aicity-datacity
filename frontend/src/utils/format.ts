@@ -1,14 +1,24 @@
 import { Textes } from '../i18n';
 
+// Espaces insécables : un nombre ne se sépare jamais de son unité, ni un séparateur du mot qui le précède.
+const INSECABLE = ' ';
+export const SEP = `${INSECABLE}· `;
+
+// Texte venu du backend (explication, horaires) : on y protège les « 66 min », « 10 € », « 1,2 km ».
+export function protegerUnites(texte: string): string {
+  return texte.replace(/(d) (min|h|m|km|€)(?=[s.,;:!?)]|$)/g, `$1${INSECABLE}$2`);
+}
+
 export function formaterPrix(prix: number | null, t: Textes): string {
   if (prix === null) return t.prixInconnu;
   if (prix === 0) return t.gratuit;
-  return t.locale === 'fr-FR' ? `${String(prix).replace('.', ',')} €` : `€${prix}`;
+  return t.locale === 'fr-FR' ? `${String(prix).replace('.', ',')}${INSECABLE}€` : `€${prix}`;
 }
 
-export function formaterDistance(metres: number): string {
-  if (metres < 1000) return `${metres} m`;
-  return `${(metres / 1000).toFixed(1).replace('.', ',')} km`;
+export function formaterDistance(metres: number, t: Textes): string {
+  if (metres < 1000) return `${metres}${INSECABLE}m`;
+  const km = (metres / 1000).toFixed(1);
+  return `${t.locale === 'fr-FR' ? km.replace('.', ',') : km}${INSECABLE}km`;
 }
 
 export function formaterDate(iso: string, t: Textes): string {

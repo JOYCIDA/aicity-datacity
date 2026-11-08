@@ -11,12 +11,12 @@ import { Apparition, Squelette } from '../animations';
 import { recommander, ErreurApi } from '../api/client';
 import { versActivite } from '../api/adaptateur';
 import { obtenirPosition, Position, RemarquePosition } from '../utils/position';
-import { formaterPrix } from '../utils/format';
+import { formaterPrix, SEP } from '../utils/format';
 import { useLangue, useTextes } from '../i18n';
 import { Activite } from '../types/activite';
 import { Reponses } from '../types/parcours';
 import { Questions } from '../types/questions';
-import { couleurs, polices, rayons, tailles } from '../theme';
+import { couleurs, espace, polices, rayons, tailles, typo } from '../theme';
 
 export type Recherche = {
   activites: Activite[];
@@ -93,7 +93,7 @@ export default function EcranResultats({
         t.resultats.jusqua(formaterPrix(reponses.budget, t));
   const resume = [questions.durees.find((d) => d.valeur === reponses.duree)?.libelle, libelleBudget]
     .filter(Boolean)
-    .join(' · ');
+    .join(SEP);
 
   const n = recherche?.activites.length ?? 0;
   // Aucun résultat : on propose la durée suivante parmi celles du backend.
@@ -142,12 +142,12 @@ export default function EcranResultats({
       ) : (
         <>
           <View style={styles.entete}>
-            <Text accessibilityRole="header" style={[styles.titre, { fontSize: d.texte.titre }]}>
+            <Text accessibilityRole="header" style={[d.typo('titre'), styles.titre]}>
               {n === 0 ? t.resultats.aucune : t.resultats.trouvees(n)}
             </Text>
             <BoutonTerminer onPress={onTerminer} />
           </View>
-          <Text style={[styles.resume, { fontSize: d.texte.corps }]}>{resume}</Text>
+          <Text style={[d.typo('corps'), styles.resume]}>{resume}</Text>
           {recherche.remarquePosition && <Message type="info" texte={t.position[recherche.remarquePosition]} />}
           {recherche.elargie && n > 0 && <Message type="info" texte={t.resultats.elargie} />}
 
@@ -183,7 +183,7 @@ export default function EcranResultats({
                   >
                     <Text
                       numberOfLines={1}
-                      style={[styles.basculeTexte, { fontSize: large ? d.texte.corps : 14 }, vueAffichee === v && styles.basculeTexteActif]}
+                      style={[large ? d.typo('corpsFort') : d.typo('legende'), styles.basculeTexte, vueAffichee === v && styles.basculeTexteActif]}
                     >
                       {t.carte[v]}
                     </Text>
@@ -225,14 +225,10 @@ export default function EcranResultats({
 
 const styles = StyleSheet.create({
   page: { flex: 1 },
-  entete: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-  titre: { flexShrink: 1, fontFamily: polices.titre, color: couleurs.texte, fontSize: 28, letterSpacing: -0.5 },
-  resume: {
-    fontFamily: polices.texte,
-    color: couleurs.texteSecondaire,
-    fontSize: tailles.texte,
-    marginTop: 6,
-  },
+  // Titre et « Terminer » sur la même ligne, même sur téléphone : le titre passe à la ligne, pas le bouton.
+  entete: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: espace.l },
+  titre: { flexShrink: 1, color: couleurs.texte },
+  resume: { color: couleurs.texteSecondaire, marginTop: espace.xs },
   deuxColonnes: { flex: 1, flexDirection: 'row', gap: 16, marginTop: 16 },
   empile: { flex: 1, gap: 16, marginTop: 16 },
   carteHaute: { height: '42%' },
@@ -243,7 +239,7 @@ const styles = StyleSheet.create({
   // flexBasis plutôt que flex: 0 (qui donne une largeur nulle sur le web).
   colonneListe: { flexGrow: 0, flexShrink: 0, flexBasis: 460, marginTop: 0 },
   liste: { width: '100%', maxWidth: 760, alignSelf: 'center' },
-  sources: { fontFamily: polices.texte, color: couleurs.texteSecondaire, fontSize: tailles.petit, marginTop: 16 },
+  sources: { ...typo.legende, color: couleurs.texteSecondaire, marginTop: espace.l },
   bascule: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -268,14 +264,9 @@ const styles = StyleSheet.create({
   basculeEtroite: { alignSelf: 'stretch', flexWrap: 'nowrap', gap: 2 },
   basculeBoutonEtroit: { flex: 1, minWidth: 0 },
   basculeActif: { backgroundColor: '#FFFFFF', borderColor: couleurs.trait },
-  basculeTexte: { fontFamily: polices.texteMoyen, color: couleurs.texteSecondaire, fontSize: tailles.texte },
+  basculeTexte: { fontFamily: polices.texteMoyen, color: couleurs.texteSecondaire },
   basculeTexteActif: { fontFamily: polices.titre, color: couleurs.texte },
-  vide: {
-    fontFamily: polices.texte,
-    color: couleurs.texte,
-    fontSize: tailles.texte,
-    marginTop: 24,
-  },
+  vide: { ...typo.corps, color: couleurs.texte, marginTop: espace.xl },
   bouton: {
     alignSelf: 'flex-start',
     minHeight: tailles.zoneMin + 12,
@@ -285,5 +276,5 @@ const styles = StyleSheet.create({
     borderRadius: rayons.s,
     marginTop: 16,
   },
-  boutonTexte: { fontFamily: polices.titre, color: couleurs.surPrimaire, fontSize: 18 },
+  boutonTexte: { ...typo.sousTitre, color: couleurs.surPrimaire },
 });

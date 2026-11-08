@@ -60,7 +60,7 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
         <>
           <View style={styles.confidentialite}>
             <ShieldCheck size={d.px(18)} color={couleurs.lien} />
-            <Text style={[styles.confidentialiteTexte, { fontSize: d.texte.surtitre }]}>{t.budget.confidentialite}</Text>
+            <Text style={[d.typo('legende'), styles.confidentialiteTexte]}>{t.budget.confidentialite}</Text>
           </View>
           <Bouton libelle={t.budget.voirResultats} a11y={t.budget.voirResultatsA11y} onPress={suivant} />
         </>
@@ -87,8 +87,8 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
       </View>
 
       {saisieLibre && (
-        <View style={{ marginTop: espace.s }}>
-          <Text nativeID="libelle-montant" style={[styles.champLibelle, { fontSize: d.texte.corps }]}>
+        <View style={{ marginTop: espace.l }}>
+          <Text nativeID="libelle-montant" style={[d.typo('corpsFort'), styles.champLibelle]}>
             {saisieLibre.libelle} ({saisieLibre.unite})
           </Text>
           <TextInput
@@ -101,7 +101,7 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
             accessibilityLabelledBy="libelle-montant"
             style={[
               styles.champ,
-              { minHeight: d.px(56), fontSize: d.texte.choix },
+              { minHeight: d.px(56), fontSize: d.typo('corps').fontSize },
               texte !== '' && !texteInvalide && styles.champActif,
             ]}
           />
@@ -124,17 +124,17 @@ export default function EcranBudget({ choix, saisieLibre, valeur, onChoisir, onS
 }
 
 const styles = StyleSheet.create({
-  champLibelle: { fontFamily: polices.texteMoyen, color: couleurs.texte, marginBottom: espace.s },
+  champLibelle: { color: couleurs.texte, marginBottom: espace.s },
   champ: {
     borderWidth: 1,
     borderColor: couleurs.champ,
     borderRadius: rayons.s,
     backgroundColor: '#FFFFFF',
     paddingHorizontal: espace.l,
-    fontFamily: polices.texteMoyen,
+    fontFamily: polices.texte,
     color: couleurs.texte,
   },
   champActif: { borderColor: couleurs.texte },
   confidentialite: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: espace.s },
-  confidentialiteTexte: { flexShrink: 1, fontFamily: polices.texte, color: couleurs.texteSecondaire },
+  confidentialiteTexte: { flexShrink: 1, color: couleurs.texteSecondaire },
 });
