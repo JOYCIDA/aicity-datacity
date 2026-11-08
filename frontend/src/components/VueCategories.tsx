@@ -6,7 +6,7 @@ import { ICONES_CATEGORIE } from './Icones';
 import { chargerOffresAutour, ErreurApi, OffreApi } from '../api/client';
 import { distanceM, Position } from '../utils/position';
 import { formaterDistance, formaterPrix } from '../utils/format';
-import { couleurs, polices, tailles } from '../theme';
+import { couleurs, polices, tailles, typo } from '../theme';
 import { useLangue, useTextes } from '../i18n';
 
 type Props = {
@@ -72,7 +72,7 @@ export default function VueCategories({ position, rayonM }: Props) {
       <Text accessibilityRole="header" style={styles.titre}>
         {t.categories.titre}
       </Text>
-      <Text style={styles.sousTitre}>{t.categories.sousTitre(formaterDistance(rayonM))}</Text>
+      <Text style={styles.sousTitre}>{t.categories.sousTitre(formaterDistance(rayonM, t))}</Text>
 
       <View style={[styles.corps, large && styles.corpsLarge]}>
         <View style={styles.barres}>
@@ -125,14 +125,14 @@ export default function VueCategories({ position, rayonM }: Props) {
 const styles = StyleSheet.create({
   panneau: { flex: 1, marginTop: 16 },
   contenu: { gap: 8, paddingBottom: 24 },
-  titre: { fontFamily: polices.titre, color: couleurs.texte, fontSize: 22 },
-  sousTitre: { fontFamily: polices.texte, color: couleurs.texteSecondaire, fontSize: tailles.texte },
+  titre: { ...typo.titre, color: couleurs.texte },
+  sousTitre: { ...typo.corps, color: couleurs.texteSecondaire },
   corps: { gap: 16, marginTop: 8 },
   corpsLarge: { flexDirection: 'row', alignItems: 'flex-start' },
   barres: { flex: 1, gap: 12 },
   ligne: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 12 },
   categorie: { width: 150, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  categorieTexte: { fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: tailles.texte },
+  categorieTexte: { ...typo.corpsFort, color: couleurs.texte },
   piste: { flexGrow: 1, flexBasis: 160, height: 44, borderRadius: 8, backgroundColor: couleurs.carte },
   barre: {
     minWidth: 150, // le nombre d'activités reste lisible même pour une petite catégorie
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 14,
   },
-  barreTexte: { fontFamily: polices.texteMoyen, color: couleurs.surPrimaire, fontSize: tailles.texte },
+  barreTexte: { ...typo.corpsFort, color: couleurs.surPrimaire, fontVariant: ['tabular-nums'] },
   prix: {
     width: 150,
     flexDirection: 'row',
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     backgroundColor: couleurs.carte,
   },
   prixVide: { backgroundColor: 'transparent' },
-  prixTexte: { fontFamily: polices.texte, color: couleurs.texte, fontSize: tailles.petit },
+  prixTexte: { ...typo.legende, color: couleurs.texte },
   chiffres: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   chiffresLarge: { flexDirection: 'column', width: 200 },
   chiffre: {
@@ -167,6 +167,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: couleurs.carte,
   },
-  chiffreValeur: { fontFamily: polices.titre, color: couleurs.texte, fontSize: 36 },
-  chiffreLibelle: { fontFamily: polices.texte, color: couleurs.texteSecondaire, fontSize: tailles.texte, textAlign: 'center' },
+  chiffreValeur: { ...typo.affiche, color: couleurs.texte, fontVariant: ['tabular-nums'] },
+  chiffreLibelle: { ...typo.corps, color: couleurs.texteSecondaire, textAlign: 'center' },
 });

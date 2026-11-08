@@ -81,7 +81,7 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
         ))}
       </View>
 
-      <Text nativeID="libelle-autre" style={[styles.champLibelle, { fontSize: d.texte.corps }]}>
+      <Text nativeID="libelle-autre" style={[d.typo('corpsFort'), styles.champLibelle]}>
         {t.interets.autreLibelle}
       </Text>
       <View style={styles.ligne}>
@@ -95,7 +95,7 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
           placeholderTextColor={couleurs.texteSecondaire}
           accessibilityLabel={t.interets.autreA11y}
           accessibilityLabelledBy="libelle-autre"
-          style={[styles.champ, { minHeight: d.px(56), fontSize: d.texte.choix }]}
+          style={[styles.champ, { minHeight: d.px(56), fontSize: d.typo('corps').fontSize }]}
         />
         <Pressable
           onPress={comprendre}
@@ -108,7 +108,7 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
           {enCours ? <ActivityIndicator color={couleurs.surPrimaire} /> : <ArrowRight size={d.px(24)} color={couleurs.surPrimaire} />}
         </Pressable>
       </View>
-      <Text style={[styles.note, { fontSize: d.texte.surtitre }]}>{t.interets.phraseNonEnregistree}</Text>
+      <Text style={[d.typo('legende'), styles.note]}>{t.interets.phraseNonEnregistree}</Text>
       {retour && <Message type={retour.ok ? 'succes' : 'erreur'} texte={retour.message} />}
 
       {aEssaye && valeurs.length === 0 && <Message type="erreur" texte={t.interets.erreur} />}
@@ -117,9 +117,9 @@ export default function EcranInterets({ choix, valeurs, onBasculer, onAjouter, o
 }
 
 const styles = StyleSheet.create({
-  grille: { flexDirection: 'row', flexWrap: 'wrap', columnGap: espace.m, marginBottom: espace.l },
+  grille: { flexDirection: 'row', flexWrap: 'wrap', columnGap: espace.s, marginBottom: espace.xl },
   case: { flexGrow: 1, flexBasis: 240 },
-  champLibelle: { fontFamily: polices.texteMoyen, color: couleurs.texte, marginBottom: espace.s },
+  champLibelle: { color: couleurs.texte, marginBottom: espace.s },
   ligne: { flexDirection: 'row', gap: espace.s },
   champ: {
     flex: 1,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     borderRadius: rayons.s,
     backgroundColor: '#FFFFFF',
     paddingHorizontal: espace.l,
-    fontFamily: polices.texteMoyen,
+    fontFamily: polices.texte,
     color: couleurs.texte,
   },
   valider: {
@@ -138,5 +138,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   appuye: { opacity: 0.85 },
-  note: { fontFamily: polices.texte, color: couleurs.texteSecondaire, marginTop: espace.s },
+  note: { color: couleurs.texteSecondaire, marginTop: espace.s },
 });

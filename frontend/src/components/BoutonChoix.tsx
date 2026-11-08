@@ -1,6 +1,6 @@
 import { Check, type LucideIcon } from 'lucide-react-native';
 import { Pressable, Text, View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
-import { couleurs, espace, polices, rayons } from '../theme';
+import { couleurs, espace, rayons } from '../theme';
 import { useDesign } from '../design';
 import { vibrer } from '../animations';
 
@@ -35,7 +35,7 @@ export default function BoutonChoix({ libelle, selectionne, onPress, multiple = 
       ]}
     >
       {Icone && <Icone size={d.px(22)} color={couleurs.texte} strokeWidth={1.75} />}
-      <Text style={[styles.texte, { fontSize: d.texte.choix }, selectionne && styles.texteSelectionne]}>{libelle}</Text>
+      <Text style={[d.typo('corpsFort'), styles.texte]}>{libelle}</Text>
       {/* La coche : la sélection ne repose pas que sur la couleur. */}
       <View
         style={[
@@ -69,8 +69,7 @@ const styles = StyleSheet.create({
   },
   selectionne: { borderColor: couleurs.texte, backgroundColor: couleurs.carte },
   appuye: { backgroundColor: couleurs.carte },
-  texte: { flex: 1, fontFamily: polices.texteMoyen, color: couleurs.texte },
-  texteSelectionne: { fontFamily: polices.titre },
+  texte: { flex: 1, color: couleurs.texte },
   coche: {
     borderWidth: 2,
     borderColor: couleurs.champ,

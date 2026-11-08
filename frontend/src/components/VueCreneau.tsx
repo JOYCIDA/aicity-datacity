@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { Activite } from '../types/activite';
-import { couleurs, polices, tailles } from '../theme';
+import { couleurs, polices, typo } from '../theme';
 
 // Plage d'ouverture du lieu, un ton plus soutenu que la piste.
 const OUVERTURE = '#D3E0E3';
@@ -117,25 +117,25 @@ const styles = StyleSheet.create({
   libelle: { width: 200, flexDirection: 'row', alignItems: 'center', gap: 8 },
   ligneEtroite: { flexDirection: 'column', alignItems: 'stretch', gap: 6 },
   libelleEtroit: { width: '100%' },
-  libelleTexte: { flex: 1, fontFamily: polices.texteMoyen, color: couleurs.texte, fontSize: tailles.texte },
+  libelleTexte: { flex: 1, ...typo.corpsFort, color: couleurs.texte },
   axe: { flex: 1, height: 22 },
   graduation: {
     position: 'absolute',
     width: 60,
     marginLeft: -30,
     textAlign: 'center',
-    fontFamily: polices.texte,
+    ...typo.legende,
     color: couleurs.texteSecondaire,
-    fontSize: tailles.petit,
+    fontVariant: ['tabular-nums'],
   },
   graduationDebut: { marginLeft: 0, textAlign: 'left' },
   graduationFin: { marginLeft: -60, textAlign: 'right' },
   piste: { flexGrow: 1, height: 44, borderRadius: 8, backgroundColor: couleurs.carte },
   ouverture: { position: 'absolute', top: 0, bottom: 0, borderRadius: 8, backgroundColor: OUVERTURE },
   barre: { position: 'absolute', top: 4, bottom: 4, borderRadius: 6, backgroundColor: couleurs.primaire },
-  maintenant: { fontFamily: polices.texteMoyen, color: couleurs.lien, fontSize: tailles.petit },
+  maintenant: { ...typo.legende, fontFamily: polices.texteMoyen, color: couleurs.lien, fontVariant: ['tabular-nums'] },
   legende: { flexDirection: 'row', flexWrap: 'wrap', gap: 20, marginTop: 8 },
   legendeElement: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   pastille: { width: 16, height: 16, borderRadius: 4 },
-  legendeTexte: { fontFamily: polices.texte, color: couleurs.texteSecondaire, fontSize: tailles.texte },
+  legendeTexte: { ...typo.corps, color: couleurs.texteSecondaire },
 });

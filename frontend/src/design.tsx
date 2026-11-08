@@ -1,8 +1,8 @@
 // Briques de mise en page partagées par tous les écrans (système de design).
 import { ReactNode } from 'react';
 import { AlertCircle, CheckCircle2, ChevronRight, Info, type LucideIcon } from 'lucide-react-native';
-import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
-import { couleurs, espace, modeEcran, polices, rayons, tailles, type Mode } from './theme';
+import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions, type TextStyle } from 'react-native';
+import { couleurs, espace, modeEcran, polices, rayons, typo, typoGrandEcran, type Mode, type NomTexte } from './theme';
 import { vibrer } from './animations';
 
 // Facteur d'agrandissement : la borne se lit à un mètre, le reste à 30 cm.
@@ -21,13 +21,15 @@ export function useDesign() {
   return {
     mode,
     px,
-    texte: {
-      surtitre: px(tailles.petit),
-      corps: px(tailles.texte),
-      choix: px(18),
-      intertitre: px(20),
-      titre: px(mode === 'telephone' ? 28 : 34),
-      affiche: px(mode === 'telephone' ? 34 : 44),
+    // Style de texte de l'échelle (theme.ts), à la taille de l'écran.
+    typo: (nom: NomTexte): TextStyle => {
+      const s = mode === 'telephone' ? typo[nom] : { ...typo[nom], ...typoGrandEcran[nom] };
+      return {
+        fontFamily: s.fontFamily,
+        fontSize: px(s.fontSize),
+        lineHeight: px(s.lineHeight),
+        letterSpacing: s.letterSpacing * f,
+      };
     },
     marge: mode === 'telephone' ? espace.l : px(espace.xxl),
     largeur: (l: 'etroite' | 'large') => LARGEUR[l][mode],
@@ -69,18 +71,18 @@ type PropsEntete = { etape: number; surtitre: string; titre: string; aide: strin
 export function EnteteQuestion({ etape, surtitre, titre, aide, etapeA11y }: PropsEntete) {
   const d = useDesign();
   return (
-    <View style={{ gap: espace.s, marginBottom: d.px(espace.xl) }}>
+    <View style={{ marginBottom: d.px(espace.xl) }}>
       <View style={styles.progression} accessible accessibilityLabel={etapeA11y}>
         {[1, 2, 3].map((n) => (
           <View key={n} style={[styles.segment, n <= etape && styles.segmentActif]} />
         ))}
-        <Text style={[styles.compteur, { fontSize: d.texte.surtitre }]}>{etape} / 3</Text>
+        <Text style={[d.typo('legende'), styles.compteur]}>{etape} / 3</Text>
       </View>
-      <Text style={[styles.surtitre, { fontSize: d.texte.surtitre, marginTop: espace.m }]}>{surtitre}</Text>
-      <Text accessibilityRole="header" style={[styles.titre, { fontSize: d.texte.titre, lineHeight: d.texte.titre * 1.2 }]}>
+      <Text style={[d.typo('legende'), styles.surtitre, { marginTop: d.px(espace.xl) }]}>{surtitre}</Text>
+      <Text accessibilityRole="header" style={[d.typo('titre'), styles.titre, { marginTop: d.px(espace.xs) }]}>
         {titre}
       </Text>
-      <Text style={[styles.aide, { fontSize: d.texte.corps }]}>{aide}</Text>
+      <Text style={[d.typo('corps'), styles.aide, { marginTop: d.px(espace.s) }]}>{aide}</Text>
     </View>
   );
 }
@@ -112,7 +114,7 @@ export function Bouton({ libelle, onPress, a11y, icone = ChevronRight, variante 
         pressed && styles.appuye,
       ]}
     >
-      <Text style={[styles.boutonTexte, { fontSize: d.texte.choix }, !primaire && styles.boutonTexteSecondaire]}>
+      <Text style={[d.typo('sousTitre'), styles.boutonTexte, !primaire && styles.boutonTexteSecondaire]}>
         {libelle}
       </Text>
       {Icone && <Icone size={d.px(20)} color={primaire ? couleurs.surPrimaire : couleurs.texte} />}
@@ -133,8 +135,9 @@ export function Message({ type, texte }: { type: 'erreur' | 'info' | 'succes'; t
   const couleur = type === 'erreur' ? couleurs.erreur : type === 'succes' ? couleurs.lien : couleurs.texteSecondaire;
   return (
     <View style={styles.message} accessibilityRole={type === 'info' ? 'text' : 'alert'}>
-      <Icone size={d.px(20)} color={couleur} />
-      <Text style={[styles.messageTexte, { fontSize: d.texte.corps, color: type === 'succes' ? couleurs.texte : couleur }]}>
+      {/* Icône centrée sur la première ligne de texte (interligne 24, icône 20). */}
+      <Icone size={d.px(20)} color={couleur} style={{ marginTop: d.px(2) }} />
+      <Text style={[d.typo('corpsFort'), styles.messageTexte, { color: type === 'succes' ? couleurs.texte : couleur }]}>
         {texte}
       </Text>
     </View>
@@ -156,10 +159,10 @@ const styles = StyleSheet.create({
   progression: { flexDirection: 'row', alignItems: 'center', gap: espace.s },
   segment: { flex: 1, height: 4, borderRadius: 2, backgroundColor: couleurs.trait },
   segmentActif: { backgroundColor: couleurs.texte },
-  compteur: { fontFamily: polices.texteMoyen, color: couleurs.texteSecondaire, marginLeft: espace.xs },
+  compteur: { fontFamily: polices.texteMoyen, color: couleurs.texteSecondaire, marginLeft: espace.xs, fontVariant: ['tabular-nums'] },
   surtitre: { fontFamily: polices.texteMoyen, color: couleurs.texteSecondaire },
-  titre: { fontFamily: polices.titre, color: couleurs.texte, letterSpacing: -0.5 },
-  aide: { fontFamily: polices.texte, color: couleurs.texteSecondaire },
+  titre: { color: couleurs.texte },
+  aide: { color: couleurs.texteSecondaire },
   bouton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -169,9 +172,9 @@ const styles = StyleSheet.create({
   },
   boutonPrimaire: { backgroundColor: couleurs.primaire },
   boutonSecondaire: { borderWidth: 1, borderColor: couleurs.champ },
-  boutonTexte: { fontFamily: polices.titre, color: couleurs.surPrimaire },
+  boutonTexte: { color: couleurs.surPrimaire },
   boutonTexteSecondaire: { color: couleurs.texte },
   appuye: { opacity: 0.85 },
   message: { flexDirection: 'row', alignItems: 'flex-start', gap: espace.s, marginTop: espace.s },
-  messageTexte: { flex: 1, fontFamily: polices.texteMoyen },
+  messageTexte: { flex: 1 },
 });

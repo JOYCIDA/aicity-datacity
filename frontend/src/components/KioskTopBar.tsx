@@ -43,7 +43,7 @@ export default function KioskTopBar({
             ]}
           >
             <ChevronLeft size={d.px(22)} color={backColor} />
-            <Text style={[styles.backLabel, { color: backColor, fontSize: d.texte.corps }]}>{t.retour}</Text>
+            <Text style={[d.typo('corpsFort'), styles.backLabel, { color: backColor }]}>{t.retour}</Text>
           </Pressable>
         )}
       </View>
@@ -93,6 +93,5 @@ const styles = StyleSheet.create({
   },
   backLabel: {
     fontFamily: fonts.bodyBold,
-    fontSize: textSize.sm,
   },
 });

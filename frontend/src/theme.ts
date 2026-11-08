@@ -30,6 +30,29 @@ export const polices = {
   texteMoyen: 'InstrumentSans_500Medium',
 };
 
+// Échelle typographique : six styles, et rien d'autre. Interlignes sur une grille de 4 px.
+// Valeurs téléphone ; `useDesign().typo` agrandit affiche et titre sur ordinateur, et tout sur la borne.
+export type NomTexte = 'affiche' | 'titre' | 'sousTitre' | 'corps' | 'corpsFort' | 'legende';
+type SpecTexte = { fontFamily: string; fontSize: number; lineHeight: number; letterSpacing: number };
+
+export const typo: Record<NomTexte, SpecTexte> = {
+  affiche: { fontFamily: polices.titre, fontSize: 32, lineHeight: 38, letterSpacing: -0.6 },
+  titre: { fontFamily: polices.titre, fontSize: 24, lineHeight: 30, letterSpacing: -0.4 },
+  sousTitre: { fontFamily: polices.titre, fontSize: 18, lineHeight: 24, letterSpacing: -0.2 },
+  corps: { fontFamily: polices.texte, fontSize: 16, lineHeight: 24, letterSpacing: 0 },
+  corpsFort: { fontFamily: polices.texteMoyen, fontSize: 16, lineHeight: 24, letterSpacing: 0 },
+  legende: { fontFamily: polices.texte, fontSize: 14, lineHeight: 20, letterSpacing: 0 },
+};
+
+// Sur grand écran, seuls les deux plus grands styles grandissent.
+export const typoGrandEcran: Partial<Record<NomTexte, Partial<SpecTexte>>> = {
+  affiche: { fontSize: 40, lineHeight: 48, letterSpacing: -0.8 },
+  titre: { fontSize: 28, lineHeight: 36, letterSpacing: -0.5 },
+};
+
+// Largeur de lecture confortable d'un paragraphe (environ 70 caractères en corps 16).
+export const LARGEUR_LECTURE = 680;
+
 export const tailles = {
   texte: 16, // texte courant (accessibilité)
   petit: 14, // surtitres seulement
