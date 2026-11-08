@@ -1,0 +1,531 @@
+/* AiCity Pro — système visuel aligné sur l'appli citoyen (frontend/src/theme.ts) :
+   mêmes couleurs, même police, même échelle de six styles de texte. */
+
+:root {
+  /* Couleurs (contrastes vérifiés sur --fond et --surface) */
+  --fond: #f6f8f8;
+  --surface: #ffffff;
+  --texte: #0b2530; /* 15,6:1 */
+  --texte-secondaire: #52656c; /* 6:1 */
+  --primaire: #42a8b7; /* fond des boutons principaux, jamais en texte */
+  --sur-primaire: #0b2530; /* texte sur --primaire : 5,7:1 */
+  --lien: #1f6f7c; /* accent en texte ou en icône : 5,7:1 */
+  --trait: #e2e8ea;
+  --champ: #7e8f95; /* bordure des champs : 3,3:1 */
+  --nuit: #082b38;
+  --sur-nuit: #fffdf8;
+  --sur-nuit-secondaire: rgba(255, 253, 248, 0.75);
+  --erreur: #b42318;
+  --erreur-fond: #fef3f2;
+  --alerte: #8a4b00;
+  --alerte-fond: #fff6e5;
+  --succes: #1b6e3c;
+  --succes-fond: #ecf7ef;
+
+  /* Typographie : six styles, interlignes sur une grille de 4 px */
+  --police: 'Instrument Sans', system-ui, sans-serif;
+  --police-logo: 'Space Grotesk', var(--police);
+
+  /* Espacements et rayons */
+  --e-xs: 4px;
+  --e-s: 8px;
+  --e-m: 12px;
+  --e-l: 16px;
+  --e-xl: 24px;
+  --e-xxl: 32px;
+  --e-xxxl: 48px;
+  --rayon: 12px;
+  --rayon-m: 16px;
+
+  color-scheme: light;
+  font-family: var(--police);
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--texte);
+  background: var(--fond);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--fond);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+/* Échelle typographique */
+.t-affiche {
+  font-size: 40px;
+  line-height: 48px;
+  font-weight: 600;
+  letter-spacing: -0.8px;
+}
+.t-titre {
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+.t-sous-titre {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+.t-corps {
+  font-size: 16px;
+  line-height: 24px;
+}
+.t-corps-fort {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+}
+.t-legende {
+  font-size: 14px;
+  line-height: 20px;
+}
+.secondaire {
+  color: var(--texte-secondaire);
+}
+.chiffres {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 720px) {
+  .t-affiche {
+    font-size: 32px;
+    line-height: 38px;
+    letter-spacing: -0.6px;
+  }
+  .t-titre {
+    font-size: 24px;
+    line-height: 30px;
+    letter-spacing: -0.4px;
+  }
+}
+
+/* Focus visible au clavier, partout */
+:focus-visible {
+  outline: 3px solid var(--lien);
+  outline-offset: 2px;
+}
+
+a {
+  color: var(--lien);
+  font-weight: 500;
+  text-underline-offset: 3px;
+}
+
+/* ——— Boutons ——— */
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e-s);
+  min-height: 48px;
+  padding: 0 var(--e-xl);
+  border-radius: var(--rayon);
+  border: 1px solid transparent;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+.bouton-primaire {
+  background: var(--primaire);
+  color: var(--sur-primaire);
+}
+.bouton-primaire:hover {
+  background: #3a97a5;
+}
+.bouton-secondaire {
+  background: var(--surface);
+  color: var(--texte);
+  border-color: var(--champ);
+}
+.bouton-secondaire:hover {
+  background: var(--fond);
+}
+.bouton[disabled] {
+  opacity: 0.6;
+  cursor: progress;
+}
+.bouton-large {
+  width: 100%;
+}
+
+/* ——— Champs de formulaire ——— */
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-s);
+}
+.champ-libelle {
+  font-weight: 500;
+}
+.obligatoire {
+  color: var(--erreur);
+  margin-left: 2px;
+}
+.champ-saisie {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.champ input,
+.champ select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--e-l);
+  border: 1px solid var(--champ);
+  border-radius: var(--rayon);
+  background: var(--surface);
+  color: var(--texte);
+  font: inherit;
+}
+.champ input::placeholder {
+  color: var(--texte-secondaire);
+}
+.champ input:focus-visible {
+  outline-offset: 0;
+}
+.champ input[aria-invalid='true'] {
+  border-color: var(--erreur);
+}
+.champ-aide {
+  color: var(--texte-secondaire);
+  font-size: 14px;
+  line-height: 20px;
+}
+.champ-erreur {
+  display: flex;
+  gap: var(--e-xs);
+  align-items: flex-start;
+  color: var(--erreur);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+.champ-erreur svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.champ-bouton-oeil {
+  position: absolute;
+  right: 4px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--texte-secondaire);
+  cursor: pointer;
+}
+.champ-saisie input.avec-oeil {
+  padding-right: 52px;
+}
+
+/* Force du mot de passe : barres + mot (jamais la couleur seule) */
+.force {
+  display: flex;
+  align-items: center;
+  gap: var(--e-s);
+}
+.force-barres {
+  display: flex;
+  gap: var(--e-xs);
+}
+.force-barres span {
+  width: 32px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--trait);
+}
+.force-barres span.pleine {
+  background: var(--texte);
+}
+
+/* Suggestions (type d'activité) */
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-s);
+}
+.suggestion {
+  min-height: 36px;
+  padding: 0 var(--e-m);
+  border: 1px solid var(--trait);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--texte);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.suggestion[aria-pressed='true'] {
+  border-color: var(--texte);
+  background: var(--fond);
+  font-weight: 500;
+}
+
+/* Case à cocher */
+.case {
+  display: flex;
+  gap: var(--e-m);
+  align-items: flex-start;
+}
+.case input {
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--nuit);
+  flex-shrink: 0;
+}
+
+/* ——— Messages ——— */
+.alerte {
+  display: flex;
+  gap: var(--e-m);
+  align-items: flex-start;
+  padding: var(--e-l);
+  border-radius: var(--rayon);
+  border: 1px solid;
+}
+.alerte svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.alerte-erreur {
+  background: var(--erreur-fond);
+  border-color: #f4c7c3;
+  color: var(--erreur);
+}
+.alerte-alerte {
+  background: var(--alerte-fond);
+  border-color: #f0d8a8;
+  color: var(--alerte);
+}
+.alerte-succes {
+  background: var(--succes-fond);
+  border-color: #bfe3cb;
+  color: var(--succes);
+}
+.alerte-info {
+  background: var(--surface);
+  border-color: var(--trait);
+  color: var(--texte);
+}
+
+/* ——— Carte ——— */
+.carte {
+  background: var(--surface);
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon-m);
+}
+
+/* ——— Logo ——— */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-s);
+  text-decoration: none;
+  color: inherit;
+}
+.logo-mot {
+  font-family: var(--police-logo);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+}
+.logo-mot .accent {
+  color: var(--primaire);
+}
+.logo-pro {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  padding: 0 var(--e-s);
+  border-radius: 6px;
+  border: 1px solid currentColor;
+  opacity: 0.85;
+}
+
+/* ——— Pages de connexion et d'inscription ——— */
+.auth {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  min-height: 100vh;
+}
+.auth-marque {
+  background: var(--nuit);
+  color: var(--sur-nuit);
+  padding: var(--e-xxl) var(--e-xxl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-xxl);
+}
+.auth-marque .secondaire {
+  color: var(--sur-nuit-secondaire);
+}
+.auth-atouts {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-xl);
+}
+.auth-atouts li {
+  display: flex;
+  gap: var(--e-m);
+}
+.auth-atouts svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--primaire);
+}
+.auth-pied {
+  margin-top: auto;
+}
+.auth-principal {
+  display: flex;
+  justify-content: center;
+  padding: var(--e-xxxl) var(--e-xl);
+}
+.auth-colonne {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-xl);
+}
+.formulaire {
+  padding: var(--e-xxl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-xl);
+}
+.formulaire fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-l);
+}
+.formulaire legend {
+  padding: 0;
+  margin-bottom: var(--e-l);
+}
+.separateur {
+  height: 1px;
+  background: var(--trait);
+  border: 0;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .auth {
+    grid-template-columns: 1fr;
+  }
+  .auth-atouts,
+  .auth-pied {
+    display: none;
+  }
+  .auth-marque {
+    padding: var(--e-xl);
+    gap: var(--e-l);
+  }
+  .formulaire {
+    padding: var(--e-xl);
+  }
+}
+
+/* Texte réservé aux lecteurs d'écran */
+.lecteur-ecran {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ——— Pages simples (erreurs, accès réservé) ——— */
+.page-simple {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.page-simple-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-l);
+  padding: var(--e-l) var(--e-xxl);
+  background: var(--surface);
+  border-bottom: 1px solid var(--trait);
+}
+.page-simple-contenu {
+  flex: 1;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--e-xxxl) var(--e-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e-l);
+  text-align: center;
+}
+.page-simple-icone {
+  color: var(--texte-secondaire);
+}
+.page-simple-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--e-m);
+  margin-top: var(--e-s);
+}
+
+/* Lien secondaire (mot de passe oublié, retour) : zone cliquable de 44 px de haut */
+.lien-discret {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-xs);
+  align-self: flex-start;
+  min-height: 44px;
+  margin: calc(-1 * var(--e-s)) 0;
+  font-size: 14px;
+  line-height: 20px;
+}
+.lien-retour {
+  margin: 0;
+}
+.etapes {
+  margin: 0;
+  padding-left: var(--e-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-s);
+}
