@@ -3,6 +3,7 @@ import { Check, FileText, UploadCloud, X } from 'lucide-react';
 import { api, ErreurApi, type Entreprise, type StatutCompte } from '../api';
 import { useAuth } from '../auth';
 import { Alerte } from '../composants/Alerte';
+import { formaterDateHeure, formaterTaille } from '../format';
 
 const TYPES_ACCEPTES = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
 const TAILLE_MAX = 5 * 1024 * 1024;
@@ -13,15 +14,6 @@ export const LIBELLES_STATUT: Record<StatutCompte, string> = {
   REFUSE: 'Refusé',
   SUSPENDU: 'Suspendu',
 };
-
-function formaterDate(iso: string) {
-  const d = new Date(iso);
-  return `${d.toLocaleDateString('fr-FR')} à ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
-}
-
-function formaterTaille(octets: number) {
-  return octets < 1024 * 1024 ? `${Math.max(1, Math.round(octets / 1024))} Ko` : `${(octets / 1024 / 1024).toFixed(1).replace('.', ',')} Mo`;
-}
 
 type EtatEtape = 'fait' | 'en-cours' | 'erreur' | 'a-venir';
 
@@ -241,7 +233,7 @@ export default function MonCompte() {
     ['Type d’activité', entreprise.typeActivite],
     ['Adresse', entreprise.adresse],
     ['E-mail', entreprise.email],
-    ['Compte créé le', formaterDate(entreprise.creeLe)],
+    ['Compte créé le', formaterDateHeure(entreprise.creeLe)],
     ['Justificatif', entreprise.justificatifFourni ? 'Reçu' : 'Pas encore envoyé'],
   ];
 

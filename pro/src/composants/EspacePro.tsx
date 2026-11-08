@@ -1,11 +1,12 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { CircleUserRound, LayoutDashboard, LogOut, type LucideIcon } from 'lucide-react';
+import { CircleUserRound, LayoutDashboard, LogOut, Tag, type LucideIcon } from 'lucide-react';
 import { useAuth } from '../auth';
 import { Logo } from './Logo';
 
 // Seules les pages déjà construites figurent dans le menu : jamais de lien vers une page vide.
 const MENU: { chemin: string; libelle: string; icone: LucideIcon }[] = [
   { chemin: '/', libelle: 'Tableau de bord', icone: LayoutDashboard },
+  { chemin: '/offres', libelle: 'Mes offres', icone: Tag },
   { chemin: '/compte', libelle: 'Mon compte', icone: CircleUserRound },
 ];
 

@@ -28,6 +28,34 @@ export type Entreprise = {
   justificatifFourni: boolean;
 };
 
+export type StatutOffre = 'EN_ATTENTE' | 'VALIDE' | 'REFUSE' | 'EN_PAUSE' | 'EXPIREE';
+
+export type Offre = {
+  id: string;
+  titre: string;
+  description: string | null;
+  lieu: string;
+  adresse: string | null;
+  latitude: number;
+  longitude: number;
+  debut: string;
+  fin: string | null;
+  horaires: string | null;
+  dureeMinutes: number;
+  prix: number | null;
+  gratuit: boolean;
+  photoUrl: string | null;
+  photoCredit: string | null;
+  photoAlt: string | null;
+  statut: StatutOffre;
+  motifRefus: string | null;
+  creeLe: string;
+  majLe: string;
+  categorie: { code: string; libelleFr: string; libelleEn: string };
+};
+
+export type Page<T> = { elements: T[]; total: number; page: number; taille: number };
+
 type ReponseAuth = { token: string; utilisateur: Utilisateur };
 
 export class ErreurApi extends Error {
@@ -128,4 +156,17 @@ export const api = {
       (r) => r.entreprise,
     );
   },
+
+  offres: (q: { statut?: StatutOffre; page: number; taille: number }) => {
+    const params = new URLSearchParams({ page: String(q.page), taille: String(q.taille) });
+    if (q.statut) params.set('statut', q.statut);
+    return requete<Page<Offre>>(`/entreprise/offres?${params}`);
+  },
+
+  // Pause et réactivation : seulement entre VALIDE et EN_PAUSE (règle du backend).
+  changerStatutOffre: (id: string, statut: 'EN_PAUSE' | 'VALIDE') =>
+    requete<{ offre: Offre }>(`/entreprise/offres/${id}/statut`, {
+      method: 'PATCH',
+      body: JSON.stringify({ statut }),
+    }).then((r) => r.offre),
 };

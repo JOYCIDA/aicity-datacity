@@ -870,3 +870,170 @@ a {
   gap: var(--e-xs);
   min-height: 44px;
 }
+
+/* ——— Mes offres ——— */
+.filtres {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-s);
+}
+.filtre {
+  min-height: 40px;
+  padding: 0 var(--e-l);
+  border: 1px solid var(--trait);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--texte-secondaire);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+.filtre:hover {
+  color: var(--texte);
+  border-color: var(--champ);
+}
+/* Filtre actif : fond foncé + texte clair (pas seulement une nuance) */
+.filtre[aria-pressed='true'] {
+  background: var(--nuit);
+  border-color: var(--nuit);
+  color: var(--sur-nuit);
+}
+.tableau-cadre {
+  overflow-x: auto;
+}
+.tableau {
+  width: 100%;
+  border-collapse: collapse;
+}
+.tableau th {
+  padding: var(--e-m) var(--e-l);
+  text-align: left;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--texte-secondaire);
+  border-bottom: 1px solid var(--trait);
+  white-space: nowrap;
+}
+.tableau td {
+  padding: var(--e-l);
+  vertical-align: top;
+  border-bottom: 1px solid var(--trait);
+}
+.tableau tbody tr:last-child td {
+  border-bottom: 0;
+}
+.ligne-refusee {
+  background: var(--erreur-fond);
+}
+.cellule-offre {
+  display: flex;
+  gap: var(--e-m);
+  min-width: 240px;
+}
+.motif-refus {
+  margin-top: var(--e-xs);
+  color: var(--erreur);
+  font-style: italic;
+}
+.cellule-actions {
+  text-align: right;
+  white-space: nowrap;
+}
+.vignette {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--fond);
+}
+.vignette-vide {
+  display: grid;
+  place-items: center;
+  color: var(--texte-secondaire);
+}
+.bouton-petit {
+  min-height: 40px;
+  padding: 0 var(--e-m);
+  font-size: 14px;
+}
+.statut-offre-valide {
+  background: var(--succes-fond);
+  color: var(--succes);
+}
+.statut-offre-en_attente {
+  background: var(--alerte-fond);
+  color: var(--alerte);
+}
+.statut-offre-refuse {
+  background: #fde3e1;
+  color: var(--erreur);
+}
+.statut-offre-en_pause,
+.statut-offre-expiree {
+  background: var(--fond);
+  color: var(--texte-secondaire);
+}
+.statut {
+  white-space: nowrap;
+}
+.bloc-vide {
+  padding: var(--e-xxl);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--e-s);
+}
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-m);
+}
+.pagination-boutons {
+  display: flex;
+  align-items: center;
+  gap: var(--e-s);
+}
+.bouton-icone[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Sur petit écran, chaque offre devient une fiche : libellé de colonne devant chaque valeur. */
+@media (max-width: 720px) {
+  .tableau thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+  .tableau,
+  .tableau tbody,
+  .tableau tr,
+  .tableau td {
+    display: block;
+  }
+  .tableau tr {
+    padding: var(--e-l);
+    border-bottom: 1px solid var(--trait);
+  }
+  .tableau td {
+    padding: var(--e-xs) 0;
+    border: 0;
+  }
+  .tableau td[data-libelle]:not([data-libelle='Offre'])::before {
+    content: attr(data-libelle) ' : ';
+    color: var(--texte-secondaire);
+  }
+  .cellule-actions {
+    text-align: left;
+    padding-top: var(--e-m) !important;
+  }
+}
