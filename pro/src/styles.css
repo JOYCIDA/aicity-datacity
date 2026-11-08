@@ -1037,3 +1037,219 @@ a {
     padding-top: var(--e-m) !important;
   }
 }
+
+/* ——— Formulaire « Nouvelle offre » ——— */
+.champ textarea {
+  width: 100%;
+  padding: var(--e-m) var(--e-l);
+  border: 1px solid var(--champ);
+  border-radius: var(--rayon);
+  background: var(--surface);
+  color: var(--texte);
+  font: inherit;
+  resize: vertical;
+}
+.champ textarea[aria-invalid='true'] {
+  border-color: var(--erreur);
+}
+.champ-pied {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--e-l);
+}
+.compteur {
+  margin-left: auto;
+  white-space: nowrap;
+}
+.champ fieldset,
+fieldset.champ {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+fieldset.champ legend {
+  padding: 0;
+  margin-bottom: var(--e-s);
+}
+.formulaire-et-apercu {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: var(--e-xxl);
+  align-items: start;
+}
+.formulaire-offre {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-xl);
+}
+.section-formulaire {
+  overflow: hidden;
+}
+.section-entete {
+  display: flex;
+  gap: var(--e-m);
+  align-items: flex-start;
+  padding: var(--e-l) var(--e-xl);
+  border-bottom: 1px solid var(--trait);
+}
+.section-numero {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--nuit);
+  color: var(--sur-nuit);
+  font-size: 14px;
+  font-weight: 600;
+}
+.section-corps {
+  padding: var(--e-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-l);
+}
+.grille-champs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--e-l);
+}
+/* Tuiles de catégorie : vrais boutons radio, la sélection se voit par la bordure ET le fond */
+/* 3 colonnes (2 lignes pleines) sur petit écran, 6 sur une ligne sinon : jamais de tuile isolée */
+.tuiles-categorie {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--e-s);
+}
+.tuile-categorie {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e-xs);
+  min-height: 80px;
+  padding: var(--e-s);
+  border: 2px solid var(--trait);
+  border-radius: var(--rayon);
+  background: var(--surface);
+  font-weight: 500;
+  cursor: pointer;
+}
+.tuile-categorie input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.tuile-categorie:hover {
+  border-color: var(--champ);
+}
+.tuile-categorie:has(input:checked) {
+  border-color: var(--texte);
+  background: var(--fond);
+  font-weight: 600;
+}
+.tuile-categorie:has(input:focus-visible) {
+  outline: 3px solid var(--lien);
+  outline-offset: 2px;
+}
+.champ-ancre {
+  outline: none;
+}
+.champ .bouton {
+  align-self: flex-start;
+}
+.suggestions-adresse {
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon);
+  margin: 0;
+  padding: var(--e-m);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-xs);
+}
+.suggestions-adresse legend {
+  padding: 0 var(--e-xs);
+}
+.suggestion-adresse {
+  display: flex;
+  align-items: center;
+  gap: var(--e-s);
+  min-height: 44px;
+  padding: 0 var(--e-m);
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--texte);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.suggestion-adresse:hover {
+  background: var(--fond);
+}
+.carte-lieu {
+  height: 280px;
+  border-radius: var(--rayon);
+  overflow: hidden;
+  border: 1px solid var(--trait);
+  z-index: 0;
+  position: relative;
+}
+.actions-formulaire {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--e-m);
+}
+.apercu {
+  position: sticky;
+  top: var(--e-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-s);
+}
+.apercu-carte {
+  overflow: hidden;
+}
+.apercu-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--fond);
+}
+.apercu-photo-vide {
+  display: grid;
+  place-items: center;
+  color: var(--texte-secondaire);
+}
+.apercu-texte {
+  padding: var(--e-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-xs);
+}
+.apercu-ligne {
+  display: flex;
+  align-items: center;
+  gap: var(--e-xs);
+}
+@media (max-width: 1100px) {
+  .formulaire-et-apercu {
+    grid-template-columns: 1fr;
+  }
+  .apercu {
+    position: static;
+    max-width: 360px;
+  }
+}
+@media (min-width: 1000px) {
+  .tuiles-categorie {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}

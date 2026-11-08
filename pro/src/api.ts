@@ -54,7 +54,30 @@ export type Offre = {
   categorie: { code: string; libelleFr: string; libelleEn: string };
 };
 
-export type Page<T> = { elements: T[]; total: number; page: number; taille: number };
+// Données envoyées à la création (backend/src/schemas/offre.schema.ts).
+export type NouvelleOffre = {
+  categorieCode: string;
+  titre: string;
+  description: string | null;
+  lieu: string;
+  adresse: string | null;
+  latitude: number;
+  longitude: number;
+  debut: string;
+  fin: string | null;
+  horaires: string | null;
+  dureeMinutes: number;
+  prix: number | null;
+  gratuit: boolean;
+  photoUrl: string | null;
+  photoCredit: string | null;
+  photoAlt: string | null;
+  titreEn: string | null;
+  descriptionEn: string | null;
+  lieuEn: string | null;
+};
+
+export type Page<T> ={ elements: T[]; total: number; page: number; taille: number };
 
 type ReponseAuth = { token: string; utilisateur: Utilisateur };
 
@@ -162,6 +185,9 @@ export const api = {
     if (q.statut) params.set('statut', q.statut);
     return requete<Page<Offre>>(`/entreprise/offres?${params}`);
   },
+
+  creerOffre: (donnees: NouvelleOffre) =>
+    requete<{ offre: Offre }>('/entreprise/offres', { method: 'POST', body: JSON.stringify(donnees) }).then((r) => r.offre),
 
   // Pause et réactivation : seulement entre VALIDE et EN_PAUSE (règle du backend).
   changerStatutOffre: (id: string, statut: 'EN_PAUSE' | 'VALIDE') =>
