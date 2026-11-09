@@ -36,6 +36,27 @@ function Recentrer({ position }: { position: Position }) {
   return null;
 }
 
+// Carte en lecture seule (page de détail d'une offre).
+export function CartePosition({ position, libelle }: { position: Position; libelle: string }) {
+  return (
+    <div className="carte-lieu" role="img" aria-label={libelle}>
+      <MapContainer
+        center={[position.latitude, position.longitude]}
+        zoom={16}
+        scrollWheelZoom={false}
+        keyboard={false}
+        style={{ height: '100%' }}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <Marker position={[position.latitude, position.longitude]} icon={REPERE} keyboard={false} />
+      </MapContainer>
+    </div>
+  );
+}
+
 type Props = {
   adresse: string;
   position: Position | null;

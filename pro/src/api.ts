@@ -47,6 +47,9 @@ export type Offre = {
   photoUrl: string | null;
   photoCredit: string | null;
   photoAlt: string | null;
+  titreEn: string | null;
+  descriptionEn: string | null;
+  lieuEn: string | null;
   statut: StatutOffre;
   motifRefus: string | null;
   creeLe: string;
@@ -185,6 +188,14 @@ export const api = {
     if (q.statut) params.set('statut', q.statut);
     return requete<Page<Offre>>(`/entreprise/offres?${params}`);
   },
+
+  offre: (id: string) => requete<{ offre: Offre }>(`/entreprise/offres/${id}`).then((r) => r.offre),
+
+  // N'envoyer que les champs changés : un titre renvoyé efface sa traduction anglaise.
+  modifierOffre: (id: string, changements: Partial<NouvelleOffre>) =>
+    requete<{ offre: Offre }>(`/entreprise/offres/${id}`, { method: 'PATCH', body: JSON.stringify(changements) }).then(
+      (r) => r.offre,
+    ),
 
   creerOffre: (donnees: NouvelleOffre) =>
     requete<{ offre: Offre }>('/entreprise/offres', { method: 'POST', body: JSON.stringify(donnees) }).then((r) => r.offre),

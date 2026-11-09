@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Pause, Play, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Pencil, Play, Plus } from 'lucide-react';
 import { api, ErreurApi, type Offre, type Page, type StatutOffre } from '../api';
 import { useAuth } from '../auth';
 import { Alerte } from '../composants/Alerte';
@@ -175,7 +175,9 @@ export default function MesOffres() {
                     <div className="cellule-offre">
                       <Vignette offre={offre} />
                       <div>
-                        <p className="t-corps-fort">{offre.titre}</p>
+                        <Link to={`/offres/${offre.id}`} className="lien-offre t-corps-fort">
+                          {offre.titre}
+                        </Link>
                         <p className="t-legende secondaire">{offre.lieu}</p>
                         {offre.statut === 'REFUSE' && offre.motifRefus && (
                           <p className="t-legende motif-refus">
@@ -197,6 +199,16 @@ export default function MesOffres() {
                     <span className={`statut statut-offre-${offre.statut.toLowerCase()}`}>{LIBELLES_STATUT_OFFRE[offre.statut]}</span>
                   </td>
                   <td className="cellule-actions">
+                    {offre.statut === 'REFUSE' && compteActif && (
+                      <Link
+                        to={`/offres/${offre.id}/modifier`}
+                        className="bouton bouton-primaire bouton-petit"
+                        aria-label={`Corriger « ${offre.titre} »`}
+                      >
+                        <Pencil size={16} aria-hidden="true" />
+                        Corriger
+                      </Link>
+                    )}
                     {(offre.statut === 'VALIDE' || offre.statut === 'EN_PAUSE') && compteActif && (
                       <button
                         type="button"
