@@ -7,10 +7,16 @@ import '@fontsource/instrument-sans/600.css';
 import '@fontsource/space-grotesk/700.css';
 import './styles.css';
 import { AuthProvider } from './auth';
+import { EspacePro } from './composants/EspacePro';
 import { Protegee } from './composants/Protegee';
 import Connexion from './pages/Connexion';
+import DetailOffre from './pages/DetailOffre';
 import Inscription from './pages/Inscription';
 import Introuvable from './pages/Introuvable';
+import MesOffres from './pages/MesOffres';
+import ModifierOffre from './pages/ModifierOffre';
+import MonCompte from './pages/MonCompte';
+import NouvelleOffre from './pages/NouvelleOffre';
 import MotDePasseOublie from './pages/MotDePasseOublie';
 import TableauDeBord from './pages/TableauDeBord';
 
@@ -22,14 +28,21 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/connexion" element={<Connexion />} />
           <Route path="/inscription" element={<Inscription />} />
           <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
+          {/* Espace connecté : barre latérale commune à toutes ces pages */}
           <Route
-            path="/"
             element={
               <Protegee>
-                <TableauDeBord />
+                <EspacePro />
               </Protegee>
             }
-          />
+          >
+            <Route index element={<TableauDeBord />} />
+            <Route path="offres" element={<MesOffres />} />
+            <Route path="offres/nouvelle" element={<NouvelleOffre />} />
+            <Route path="offres/:id" element={<DetailOffre />} />
+            <Route path="offres/:id/modifier" element={<ModifierOffre />} />
+            <Route path="compte" element={<MonCompte />} />
+          </Route>
           <Route path="*" element={<Introuvable />} />
         </Routes>
       </AuthProvider>
