@@ -80,7 +80,17 @@ export type NouvelleOffre = {
   lieuEn: string | null;
 };
 
-export type Page<T> ={ elements: T[]; total: number; page: number; taille: number };
+type Compteurs = { offres: number; vues: number; recommandations: number; favoris: number };
+
+export type Statistiques = {
+  periode: { du: string; au: string; jours: number };
+  totaux: Compteurs;
+  parStatut: (Compteurs & { statut: StatutOffre })[];
+  // Seuls les jours avec de l'activité sont renvoyés.
+  parJour: { jour: string; vues: number; recommandations: number; favoris: number }[];
+};
+
+export type Page<T> = { elements: T[]; total: number; page: number; taille: number };
 
 type ReponseAuth = { token: string; utilisateur: Utilisateur };
 
@@ -188,6 +198,9 @@ export const api = {
     if (q.statut) params.set('statut', q.statut);
     return requete<Page<Offre>>(`/entreprise/offres?${params}`);
   },
+
+  // Compteurs agrégés sur les `jours` derniers jours (aucune donnée individuelle de citoyen).
+  statistiques: (jours: number) => requete<Statistiques>(`/entreprise/statistiques?jours=${jours}`),
 
   offre: (id: string) => requete<{ offre: Offre }>(`/entreprise/offres/${id}`).then((r) => r.offre),
 

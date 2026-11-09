@@ -21,6 +21,7 @@
   --alerte-fond: #fff6e5;
   --succes: #1b6e3c;
   --succes-fond: #ecf7ef;
+  --graphique: #00889c; /* barres de graphique : 4,2:1 sur blanc, saturation suffisante (validé) */
 
   /* Typographie : six styles, interlignes sur une grille de 4 px */
   --police: 'Instrument Sans', system-ui, sans-serif;
@@ -1330,3 +1331,159 @@ fieldset.champ legend {
   }
 }
 
+
+/* ——— Tableau de bord ——— */
+.barre-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-m);
+}
+.bloc-entete {
+  padding: var(--e-l) var(--e-xl);
+  border-bottom: 1px solid var(--trait);
+}
+.segments {
+  display: inline-flex;
+  padding: var(--e-xs);
+  gap: var(--e-xs);
+  border-radius: var(--rayon);
+  background: #e9eef0;
+}
+.segment {
+  min-height: 36px;
+  padding: 0 var(--e-m);
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--texte-secondaire);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.segment[aria-pressed='true'] {
+  background: var(--surface);
+  color: var(--texte);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(8, 43, 56, 0.12);
+}
+.tuiles-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--e-l);
+}
+.tuile-stat {
+  padding: var(--e-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-xs);
+}
+.tuile-valeur {
+  font-size: 36px;
+  line-height: 44px;
+  font-weight: 600;
+  letter-spacing: -0.8px;
+}
+.liste-a-faire {
+  margin: var(--e-xs) 0 0;
+  padding-left: var(--e-l);
+}
+.liste-offres {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.liste-offres li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--e-l);
+  padding: var(--e-m) var(--e-xl);
+  border-bottom: 1px solid var(--trait);
+}
+.liste-offres li:last-child {
+  border-bottom: 0;
+}
+@media (max-width: 720px) {
+  .liste-offres li {
+    grid-template-columns: 1fr auto;
+  }
+  .liste-offres li .chiffres {
+    display: none;
+  }
+}
+
+/* Graphique : barres fines, grille discrète, texte jamais dans la couleur des données */
+.graphique {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-l);
+}
+.graphique-entete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--e-s);
+}
+.graphique-zone {
+  position: relative;
+}
+.graphique-zone svg {
+  font-size: 12px;
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.graphique-grille {
+  stroke: var(--trait);
+  stroke-width: 1;
+}
+.graphique-axe {
+  stroke: var(--champ);
+  stroke-width: 1;
+}
+.graphique-texte {
+  fill: var(--texte-secondaire);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.graphique-barre {
+  fill: var(--graphique);
+}
+.graphique-barre-active {
+  fill: var(--nuit);
+}
+.graphique-bulle {
+  position: absolute;
+  top: 0;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  padding: var(--e-s) var(--e-m);
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--trait);
+  box-shadow: 0 4px 12px rgba(8, 43, 56, 0.12);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.graphique-tableau summary {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--lien);
+  font-weight: 500;
+  cursor: pointer;
+}
+.tableau-simple {
+  max-width: 360px;
+}
+.tableau-simple td,
+.tableau-simple th {
+  padding: var(--e-s) var(--e-l);
+}
