@@ -10,9 +10,11 @@ import { AuthProvider } from './auth';
 import { EspacePro } from './composants/EspacePro';
 import { Protegee } from './composants/Protegee';
 import Connexion from './pages/Connexion';
+import DetailOffre from './pages/DetailOffre';
 import Inscription from './pages/Inscription';
 import Introuvable from './pages/Introuvable';
 import MesOffres from './pages/MesOffres';
+import ModifierOffre from './pages/ModifierOffre';
 import MonCompte from './pages/MonCompte';
 import NouvelleOffre from './pages/NouvelleOffre';
 import MotDePasseOublie from './pages/MotDePasseOublie';
@@ -37,6 +39,8 @@ createRoot(document.getElementById('root')!).render(
             <Route index element={<TableauDeBord />} />
             <Route path="offres" element={<MesOffres />} />
             <Route path="offres/nouvelle" element={<NouvelleOffre />} />
+            <Route path="offres/:id" element={<DetailOffre />} />
+            <Route path="offres/:id/modifier" element={<ModifierOffre />} />
             <Route path="compte" element={<MonCompte />} />
           </Route>
           <Route path="*" element={<Introuvable />} />
