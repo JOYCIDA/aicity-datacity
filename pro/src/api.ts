@@ -16,6 +16,72 @@ export type Utilisateur = {
   entreprise?: { id: string; nom: string; statut: StatutCompte; motifRefus: string | null } | null;
 };
 
+export type Entreprise = {
+  id: string;
+  nom: string;
+  typeActivite: string;
+  adresse: string;
+  email: string;
+  statut: StatutCompte;
+  motifRefus: string | null;
+  creeLe: string;
+  justificatifFourni: boolean;
+};
+
+export type StatutOffre = 'EN_ATTENTE' | 'VALIDE' | 'REFUSE' | 'EN_PAUSE' | 'EXPIREE';
+
+export type Offre = {
+  id: string;
+  titre: string;
+  description: string | null;
+  lieu: string;
+  adresse: string | null;
+  latitude: number;
+  longitude: number;
+  debut: string;
+  fin: string | null;
+  horaires: string | null;
+  dureeMinutes: number;
+  prix: number | null;
+  gratuit: boolean;
+  photoUrl: string | null;
+  photoCredit: string | null;
+  photoAlt: string | null;
+  titreEn: string | null;
+  descriptionEn: string | null;
+  lieuEn: string | null;
+  statut: StatutOffre;
+  motifRefus: string | null;
+  creeLe: string;
+  majLe: string;
+  categorie: { code: string; libelleFr: string; libelleEn: string };
+};
+
+// Données envoyées à la création (backend/src/schemas/offre.schema.ts).
+export type NouvelleOffre = {
+  categorieCode: string;
+  titre: string;
+  description: string | null;
+  lieu: string;
+  adresse: string | null;
+  latitude: number;
+  longitude: number;
+  debut: string;
+  fin: string | null;
+  horaires: string | null;
+  dureeMinutes: number;
+  prix: number | null;
+  gratuit: boolean;
+  photoUrl: string | null;
+  photoCredit: string | null;
+  photoAlt: string | null;
+  titreEn: string | null;
+  descriptionEn: string | null;
+  lieuEn: string | null;
+};
+
+export type Page<T> ={ elements: T[]; total: number; page: number; taille: number };
+
 type ReponseAuth = { token: string; utilisateur: Utilisateur };
 
 export class ErreurApi extends Error {
@@ -105,4 +171,39 @@ export const api = {
     }),
 
   moi: () => requete<{ utilisateur: Utilisateur }>('/auth/moi').then((r) => r.utilisateur),
+
+  profil: () => requete<{ entreprise: Entreprise }>('/entreprise/profil').then((r) => r.entreprise),
+
+  // Justificatif (Kbis, avis SIRENE…) : PDF, JPEG, PNG ou WebP, 5 Mo au maximum.
+  envoyerJustificatif: (fichier: File) => {
+    const formulaire = new FormData();
+    formulaire.append('justificatif', fichier);
+    return requete<{ entreprise: Entreprise }>('/entreprise/justificatif', { method: 'POST', body: formulaire }).then(
+      (r) => r.entreprise,
+    );
+  },
+
+  offres: (q: { statut?: StatutOffre; page: number; taille: number }) => {
+    const params = new URLSearchParams({ page: String(q.page), taille: String(q.taille) });
+    if (q.statut) params.set('statut', q.statut);
+    return requete<Page<Offre>>(`/entreprise/offres?${params}`);
+  },
+
+  offre: (id: string) => requete<{ offre: Offre }>(`/entreprise/offres/${id}`).then((r) => r.offre),
+
+  // N'envoyer que les champs changés : un titre renvoyé efface sa traduction anglaise.
+  modifierOffre: (id: string, changements: Partial<NouvelleOffre>) =>
+    requete<{ offre: Offre }>(`/entreprise/offres/${id}`, { method: 'PATCH', body: JSON.stringify(changements) }).then(
+      (r) => r.offre,
+    ),
+
+  creerOffre: (donnees: NouvelleOffre) =>
+    requete<{ offre: Offre }>('/entreprise/offres', { method: 'POST', body: JSON.stringify(donnees) }).then((r) => r.offre),
+
+  // Pause et réactivation : seulement entre VALIDE et EN_PAUSE (règle du backend).
+  changerStatutOffre: (id: string, statut: 'EN_PAUSE' | 'VALIDE') =>
+    requete<{ offre: Offre }>(`/entreprise/offres/${id}/statut`, {
+      method: 'PATCH',
+      body: JSON.stringify({ statut }),
+    }).then((r) => r.offre),
 };
