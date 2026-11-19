@@ -640,9 +640,78 @@ a {
 .lien-evitement:focus {
   top: var(--e-l);
 }
+.espace-colonne {
+  min-width: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 .espace-contenu {
+  flex: 1;
   min-width: 0;
   outline: none;
+}
+
+/* ——— Pied de page et page « Vie privée » ——— */
+.pied {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-s) var(--e-l);
+  padding: var(--e-s) var(--e-xxl);
+  border-top: 1px solid var(--trait);
+  background: var(--surface);
+}
+.pied-lien {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-xs);
+  min-height: 44px;
+}
+.auth-vie-privee {
+  text-align: center;
+}
+.page-lecture {
+  flex: 1;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--e-xxxl) var(--e-xl);
+}
+.vie-privee {
+  padding: var(--e-xxl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-xl);
+}
+.vie-privee > * {
+  max-width: 600px; /* longueur de ligne confortable */
+}
+.vie-privee-entete {
+  display: flex;
+  align-items: center;
+  gap: var(--e-m);
+}
+.vie-privee-icone {
+  flex-shrink: 0;
+  color: var(--lien);
+}
+.vie-privee-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-xs);
+}
+@media (max-width: 600px) {
+  .pied {
+    padding: var(--e-s) var(--e-l);
+  }
+  .vie-privee {
+    padding: var(--e-xl);
+  }
+  .page-lecture {
+    padding: var(--e-xl) var(--e-l);
+  }
 }
 
 @media (max-width: 900px) {

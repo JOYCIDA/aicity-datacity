@@ -2,6 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { CircleUserRound, LayoutDashboard, LogOut, Tag, type LucideIcon } from 'lucide-react';
 import { useAuth } from '../auth';
 import { Logo } from './Logo';
+import { PiedDePage } from './PiedDePage';
 
 // Seules les pages déjà construites figurent dans le menu : jamais de lien vers une page vide.
 const MENU: { chemin: string; libelle: string; icone: LucideIcon }[] = [
@@ -58,9 +59,12 @@ export function EspacePro() {
           </button>
         </div>
       </aside>
-      <main id="contenu" className="espace-contenu" tabIndex={-1}>
-        <Outlet />
-      </main>
+      <div className="espace-colonne">
+        <main id="contenu" className="espace-contenu" tabIndex={-1}>
+          <Outlet />
+        </main>
+        <PiedDePage />
+      </div>
     </div>
   );
 }

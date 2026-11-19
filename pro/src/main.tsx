@@ -19,6 +19,7 @@ import MonCompte from './pages/MonCompte';
 import NouvelleOffre from './pages/NouvelleOffre';
 import MotDePasseOublie from './pages/MotDePasseOublie';
 import TableauDeBord from './pages/TableauDeBord';
+import ViePrivee from './pages/ViePrivee';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -28,6 +29,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/connexion" element={<Connexion />} />
           <Route path="/inscription" element={<Inscription />} />
           <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
+          <Route path="/vie-privee" element={<ViePrivee />} />
           {/* Espace connecté : barre latérale commune à toutes ces pages */}
           <Route
             element={
