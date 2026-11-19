@@ -81,6 +81,14 @@ export default function App() {
     setEtape('fin');
   }, []);
   const retourAccueil = useCallback(() => setEtape('accueil'), []);
+  // « Revenir au début » : même effacement que Terminer, mais sans passer par l'écran de fin.
+  const recommencer = useCallback(() => {
+    oublierSession();
+    setReponses({ interets: [] });
+    setRecherche(null);
+    setActiviteChoisie(null);
+    setEtape('accueil');
+  }, []);
 
   // Borne laissée seule : sans aucun toucher pendant INACTIVITE_FIN_MS, la session se termine.
   const minuteur = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -145,6 +153,7 @@ export default function App() {
               // L'écran de fin a déjà son grand logo : pas de doublon en haut.
               showLogo={etape !== 'fin'}
               onBack={() => precedent && setEtape(precedent)}
+              onRecommencer={enParcours ? recommencer : undefined}
               lang={langue}
               onLangChange={changerLangue}
             />
