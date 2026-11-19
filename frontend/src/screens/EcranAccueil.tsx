@@ -1,8 +1,10 @@
-import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions, Linking } from 'react-native';
+import { ArrowUpRight } from 'lucide-react-native';
 import AiCityLogo from '../components/AiCityLogo';
 import CitySkyline from '../components/CitySkyline';
 import { ICONES_CATEGORIE } from '../components/Icones';
-import { sombre, polices, rayons, typo } from '../theme';
+import { PRO_URL } from '../config';
+import { modeEcran, sombre, polices, rayons, typo } from '../theme';
 import { useTextes } from '../i18n';
 import { Choix } from '../types/questions';
 
@@ -15,7 +17,9 @@ type Props = {
 export default function EcranAccueil({ categories, onRaccourci, onCommencer }: Props) {
   const t = useTextes();
   // Sur téléphone, un logo plus petit laisse le bouton Commencer visible sans défiler.
-  const petitEcran = useWindowDimensions().width < 600;
+  const { width, height } = useWindowDimensions();
+  const petitEcran = width < 600;
+  const borne = modeEcran(width, height) === 'borne';
 
   return (
     <View style={styles.ecran}>
@@ -60,6 +64,23 @@ export default function EcranAccueil({ categories, onRaccourci, onCommencer }: P
         </Pressable>
 
         <Text style={styles.mention}>{t.accueil.mention}</Text>
+
+        {/* Lien vers l'espace entreprise : pas sur la borne, où personne ne gère son établissement. */}
+        {!borne && (
+          <View style={styles.pro}>
+            <Text style={styles.proTexte}>{t.accueil.entreprise}</Text>
+            <Pressable
+              onPress={() => Linking.openURL(PRO_URL).catch(() => {})}
+              accessibilityRole="link"
+              accessibilityLabel={t.accueil.espaceProA11y}
+              hitSlop={8}
+              style={({ pressed }) => [styles.proLien, pressed && styles.proLienAppuye]}
+            >
+              <Text style={styles.proLienTexte}>{t.accueil.espacePro}</Text>
+              <ArrowUpRight size={16} color={sombre.texte} strokeWidth={2} />
+            </Pressable>
+          </View>
+        )}
       </ScrollView>
 
       <CitySkyline />
@@ -111,4 +132,10 @@ const styles = StyleSheet.create({
   },
   boutonTexte: { ...typo.sousTitre, color: sombre.surPrimaire },
   mention: { ...typo.corps, color: sombre.texteSecondaire, textAlign: 'center' },
+  pro: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', columnGap: 6 },
+  proTexte: { ...typo.legende, color: sombre.texteSecondaire },
+  // 44 px de haut : zone tactile suffisante pour un lien texte.
+  proLien: { flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 44, paddingHorizontal: 4, borderRadius: rayons.s },
+  proLienAppuye: { backgroundColor: sombre.carte },
+  proLienTexte: { ...typo.legende, fontFamily: polices.texteMoyen, color: sombre.texte, textDecorationLine: 'underline' },
 });
