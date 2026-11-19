@@ -138,14 +138,17 @@ export default function App() {
           }}
         >
           <StatusBar style="light" />
-          <KioskTopBar
-            showBack={precedent !== undefined}
-            // L'accueil et l'écran de fin ont déjà leur grand logo : pas de doublon en haut.
-            showLogo={etape !== 'fin' && etape !== 'accueil'}
-            onBack={() => precedent && setEtape(precedent)}
-            lang={langue}
-            onLangChange={changerLangue}
-          />
+          {/* Pas de barre sur l'accueil : il a déjà son grand logo et son grand choix de langue. */}
+          {etape !== 'accueil' && (
+            <KioskTopBar
+              showBack={precedent !== undefined}
+              // L'écran de fin a déjà son grand logo : pas de doublon en haut.
+              showLogo={etape !== 'fin'}
+              onBack={() => precedent && setEtape(precedent)}
+              lang={langue}
+              onLangChange={changerLangue}
+            />
+          )}
 
           {/* Chaque changement d'écran rejoue l'apparition (clé = étape). */}
           <Apparition key={etape} style={{ flex: 1 }}>
@@ -153,11 +156,20 @@ export default function App() {
             {etape === 'accueil' && (
               <EcranAccueil
                 categories={questions?.categories ?? null}
+                erreur={
+                  erreurQuestions === null
+                    ? null
+                    : erreurQuestions instanceof ErreurApi
+                      ? erreurQuestions.message
+                      : t.erreurs.generique
+                }
+                onReessayer={chargerLesQuestions}
+                langue={langue}
+                onLangue={changerLangue}
                 onRaccourci={(categorie) => {
                   setReponses({ ...reponses, interets: [categorie] });
                   setEtape('duree');
                 }}
-                onCommencer={() => setEtape('duree')}
               />
             )}
 

@@ -8,7 +8,6 @@ const FR = {
   nomLangue: 'Français',
   accueil: {
     accroche: 'Trouve une activité près de toi en moins de 2 minutes.',
-    commencer: 'Commencer',
     mention: 'Aucun compte. Aucune inscription. Session effacée à la fin.',
     choixLangue: 'Langue',
     queCherchesTu: 'Que cherches-tu ?',
@@ -150,7 +149,6 @@ const EN: Textes = {
   nomLangue: 'English',
   accueil: {
     accroche: 'Find an activity near you in less than 2 minutes.',
-    commencer: 'Start',
     mention: 'No account. No sign-up. Session erased at the end.',
     choixLangue: 'Language',
     queCherchesTu: 'What are you looking for?',
