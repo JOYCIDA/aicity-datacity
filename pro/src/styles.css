@@ -1201,6 +1201,11 @@ fieldset.champ legend {
   z-index: 0;
   position: relative;
 }
+.formulaire-compact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-l);
+}
 .actions-formulaire {
   display: flex;
   flex-wrap: wrap;
