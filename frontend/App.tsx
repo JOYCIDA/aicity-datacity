@@ -20,7 +20,7 @@ import { INACTIVITE_FIN_MS } from './src/config';
 import EtatChargement from './src/components/EtatChargement';
 import KioskTopBar from './src/components/KioskTopBar';
 import { Apparition } from './src/animations';
-import { chargerQuestions, definirLangue, ErreurApi, oublierSession, QuestionApi } from './src/api/client';
+import { chargerQuestions, definirLangue, ErreurApi, oublierSession, QuestionApi, signalerVue } from './src/api/client';
 import { versQuestions } from './src/api/adaptateur';
 import { couleurs } from './src/theme';
 import { Reponses } from './src/types/parcours';
@@ -223,6 +223,7 @@ export default function App() {
                 }}
                 onOuvrir={(activite) => {
                   setActiviteChoisie(activite);
+                  signalerVue(activite.id); // compte une vue pour l'entreprise
                   setEtape('fiche');
                 }}
                 onTerminer={terminer}

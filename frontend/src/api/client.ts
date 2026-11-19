@@ -165,6 +165,12 @@ export async function chargerOffresAutour(latitude: number, longitude: number, r
   return offres;
 }
 
+// Ouverture d'une fiche : le backend compte une vue anonyme (statistiques des entreprises dans
+// AiCity Pro). Appel discret : un échec ne bloque jamais l'affichage de la fiche.
+export function signalerVue(offreId: string): void {
+  requete(`/citoyen/offres/${encodeURIComponent(offreId)}?langue=${langue}`).catch(() => {});
+}
+
 export function recommander(criteres: Criteres): Promise<ReponseRecommandations> {
   return avecSession(() =>
     requete<ReponseRecommandations>('/citoyen/recommandations', {
