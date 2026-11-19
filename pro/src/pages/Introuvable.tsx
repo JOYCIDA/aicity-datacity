@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { FileQuestion } from 'lucide-react';
 import { Logo } from '../composants/Logo';
+import { PiedDePage } from '../composants/PiedDePage';
 
 export default function Introuvable() {
   return (
@@ -18,6 +19,7 @@ export default function Introuvable() {
           </Link>
         </div>
       </main>
+      <PiedDePage />
     </div>
   );
 }
