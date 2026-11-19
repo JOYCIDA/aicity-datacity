@@ -1,5 +1,5 @@
-import { ChevronLeft } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ChevronLeft, House } from 'lucide-react-native';
+import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { colors, fonts, radius, textSize } from '../theme/tokens';
 import { useTextes } from '../i18n';
@@ -14,6 +14,7 @@ type Props = {
   lang: Lang;
   onLangChange?: (lang: Lang) => void;
   onBack?: () => void;
+  onRecommencer?: () => void; // affiche le bouton « Revenir au début »
 };
 
 export default function KioskTopBar({
@@ -23,14 +24,17 @@ export default function KioskTopBar({
   lang,
   onLangChange,
   onBack,
+  onRecommencer,
 }: Props) {
   const t = useTextes();
   const d = useDesign();
   const backColor = dark ? colors.nightForeground : colors.night;
+  // Sur téléphone, Retour + Début + logo + langues ne tiennent pas : Retour garde seulement sa flèche.
+  const etroit = useWindowDimensions().width < 480;
 
   return (
     <View style={[styles.container, { minHeight: d.px(64), paddingHorizontal: d.marge }, dark ? styles.dark : styles.light]}>
-      <View style={styles.side}>
+      <View style={[styles.side, styles.sideStart]}>
         {showBack && (
           <Pressable
             accessibilityRole="button"
@@ -43,7 +47,22 @@ export default function KioskTopBar({
             ]}
           >
             <ChevronLeft size={d.px(22)} color={backColor} />
-            <Text style={[d.typo('corpsFort'), styles.backLabel, { color: backColor }]}>{t.retour}</Text>
+            {!etroit && <Text style={[d.typo('corpsFort'), styles.backLabel, { color: backColor }]}>{t.retour}</Text>}
+          </Pressable>
+        )}
+        {/* Icône seule pour tenir sur téléphone ; le nom complet est lu par le lecteur d'écran. */}
+        {onRecommencer && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t.recommencerA11y}
+            onPress={onRecommencer}
+            style={({ pressed }) => [
+              styles.home,
+              { width: d.px(44), height: d.px(44), backgroundColor: dark ? colors.cardDark : colors.muted },
+              pressed && { opacity: 0.8 },
+            ]}
+          >
+            <House size={d.px(20)} color={backColor} />
           </Pressable>
         )}
       </View>
@@ -78,6 +97,16 @@ const styles = StyleSheet.create({
   },
   side: {
     flex: 1,
+  },
+  sideStart: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  home: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.xl,
   },
   sideEnd: {
     alignItems: 'flex-end',
