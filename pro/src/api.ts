@@ -184,6 +184,12 @@ export const api = {
 
   profil: () => requete<{ entreprise: Entreprise }>('/entreprise/profil').then((r) => r.entreprise),
 
+  // Seuls les champs changés sont envoyés (au moins un).
+  modifierProfil: (changements: Partial<Pick<Entreprise, 'nom' | 'typeActivite' | 'adresse'>>) =>
+    requete<{ entreprise: Entreprise }>('/entreprise/profil', { method: 'PATCH', body: JSON.stringify(changements) }).then(
+      (r) => r.entreprise,
+    ),
+
   // Justificatif (Kbis, avis SIRENE…) : PDF, JPEG, PNG ou WebP, 5 Mo au maximum.
   envoyerJustificatif: (fichier: File) => {
     const formulaire = new FormData();

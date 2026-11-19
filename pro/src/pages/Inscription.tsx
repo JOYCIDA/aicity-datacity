@@ -5,9 +5,8 @@ import { api, ErreurApi } from '../api';
 import { useAuth } from '../auth';
 import { Alerte } from '../composants/Alerte';
 import { Champ } from '../composants/Champ';
+import { TYPES_ACTIVITE } from '../composants/Etablissement';
 import { MiseEnPageAuth } from '../composants/MiseEnPageAuth';
-
-const TYPES_ACTIVITE = ['Musée', 'Restaurant', 'Café', 'Salle de sport', 'Commerce', 'Association', 'Théâtre', 'Cinéma', 'Parc / Jardin'];
 
 type Valeurs = {
   email: string;
