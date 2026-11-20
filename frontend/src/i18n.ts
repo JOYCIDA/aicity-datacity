@@ -8,7 +8,6 @@ const FR = {
   nomLangue: 'Français',
   accueil: {
     accroche: 'Trouve une activité près de toi en moins de 2 minutes.',
-    commencer: 'Commencer',
     mention: 'Aucun compte. Aucune inscription. Session effacée à la fin.',
     choixLangue: 'Langue',
     queCherchesTu: 'Que cherches-tu ?',
@@ -18,6 +17,8 @@ const FR = {
     espaceProA11y: 'Publier tes offres sur AiCity Pro, l’espace entreprise. S’ouvre dans le navigateur.',
   },
   retour: 'Retour',
+  recommencer: 'Revenir au début',
+  recommencerA11y: 'Revenir au début : efface tes choix',
   suivant: 'Suivant',
   suivantA11y: 'Suivant',
   reessayer: 'Réessayer',
@@ -150,7 +151,6 @@ const EN: Textes = {
   nomLangue: 'English',
   accueil: {
     accroche: 'Find an activity near you in less than 2 minutes.',
-    commencer: 'Start',
     mention: 'No account. No sign-up. Session erased at the end.',
     choixLangue: 'Language',
     queCherchesTu: 'What are you looking for?',
@@ -160,6 +160,8 @@ const EN: Textes = {
     espaceProA11y: 'Publish your offers on AiCity Pro, the business space. Opens in the browser.',
   },
   retour: 'Back',
+  recommencer: 'Back to start',
+  recommencerA11y: 'Back to start: clears your choices',
   suivant: 'Next',
   suivantA11y: 'Next',
   reessayer: 'Try again',
