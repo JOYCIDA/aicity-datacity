@@ -3,6 +3,7 @@ import { Link, Navigate, useLocation } from 'react-router-dom';
 import { ShieldX } from 'lucide-react';
 import { useAuth } from '../auth';
 import { Logo } from './Logo';
+import { PiedDePage } from './PiedDePage';
 
 // Pages réservées : sans session, on part vers la connexion en gardant la page demandée.
 export function Protegee({ children }: { children: ReactNode }) {
@@ -45,6 +46,7 @@ function EspaceReserve() {
           </Link>
         </div>
       </main>
+      <PiedDePage />
     </div>
   );
 }

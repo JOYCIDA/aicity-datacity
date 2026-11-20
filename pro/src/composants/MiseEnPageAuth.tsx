@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import type { LucideIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ShieldCheck, type LucideIcon } from 'lucide-react';
 import { Logo } from './Logo';
 
 type Atout = { icone: LucideIcon; titre: string; texte: string };
@@ -40,7 +41,15 @@ export function MiseEnPageAuth({
         <p className="auth-pied t-legende secondaire">Projet DataCity · EFREI Paris</p>
       </aside>
       <main className="auth-principal">
-        <div className="auth-colonne">{children}</div>
+        <div className="auth-colonne">
+          {children}
+          <p className="auth-vie-privee t-legende">
+            <Link to="/vie-privee" className="pied-lien">
+              <ShieldCheck size={14} aria-hidden="true" />
+              Données et vie privée
+            </Link>
+          </p>
+        </div>
       </main>
     </div>
   );
