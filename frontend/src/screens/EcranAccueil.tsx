@@ -1,22 +1,28 @@
-import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions, Linking } from 'react-native';
-import { ArrowUpRight } from 'lucide-react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions, Linking, ActivityIndicator } from 'react-native';
+import { ArrowUpRight, Globe } from 'lucide-react-native';
 import AiCityLogo from '../components/AiCityLogo';
 import CitySkyline from '../components/CitySkyline';
 import { ICONES_CATEGORIE } from '../components/Icones';
 import { PRO_URL } from '../config';
 import { modeEcran, sombre, polices, rayons, typo } from '../theme';
-import { useTextes } from '../i18n';
+import { Langue, LANGUES, TEXTES, useTextes } from '../i18n';
 import { Choix } from '../types/questions';
 
 type Props = {
   categories: Choix<string>[] | null; // null tant que les questions ne sont pas chargées
+  erreur: string | null; // chargement des questions échoué
+  onReessayer: () => void;
   onRaccourci: (categorie: string) => void;
-  onCommencer: () => void;
+  langue: Langue;
+  onLangue: (langue: Langue) => void;
 };
 
-export default function EcranAccueil({ categories, onRaccourci, onCommencer }: Props) {
+// Écrit dans les deux langues : un touriste doit le reconnaître avant d'avoir changé de langue.
+const TITRE_LANGUE = 'Langue · Language';
+
+export default function EcranAccueil({ categories, erreur, onReessayer, onRaccourci, langue, onLangue }: Props) {
   const t = useTextes();
-  // Sur téléphone, un logo plus petit laisse le bouton Commencer visible sans défiler.
+  // Sur téléphone, un logo plus petit laisse les envies visibles sans défiler.
   const { width, height } = useWindowDimensions();
   const petitEcran = width < 600;
   const borne = modeEcran(width, height) === 'borne';
@@ -27,6 +33,33 @@ export default function EcranAccueil({ categories, onRaccourci, onCommencer }: P
         <View style={styles.centre}>
           <AiCityLogo size={petitEcran ? 'md' : 'lg'} dark />
           <Text style={styles.accroche}>{t.accueil.accroche}</Text>
+        </View>
+
+        {/* Choix de langue en grand, avec le nom complet : le premier geste d'un visiteur étranger. */}
+        <View style={styles.langues}>
+          <View style={styles.languesTitre}>
+            <Globe size={18} color={sombre.texteSecondaire} strokeWidth={2} />
+            <Text style={styles.languesTitreTexte}>{TITRE_LANGUE}</Text>
+          </View>
+          <View style={styles.languesChoix} accessibilityRole="radiogroup" accessibilityLabel={TITRE_LANGUE}>
+            {LANGUES.map((l) => {
+              const active = l === langue;
+              return (
+                <Pressable
+                  key={l}
+                  onPress={() => onLangue(l)}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: active }}
+                  accessibilityLabel={TEXTES[l].nomLangue}
+                  style={({ pressed }) => [styles.langue, active && styles.langueActive, pressed && !active && styles.tuileAppuyee]}
+                >
+                  <Text style={[styles.langueTexte, active && styles.langueTexteActive]}>
+                    {TEXTES[l].nomLangue}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
 
         {categories && (
@@ -54,14 +87,20 @@ export default function EcranAccueil({ categories, onRaccourci, onCommencer }: P
           </View>
         )}
 
-        <Pressable
-          onPress={onCommencer}
-          accessibilityRole="button"
-          accessibilityLabel={t.accueil.commencer}
-          style={styles.bouton}
-        >
-          <Text style={styles.boutonTexte}>{t.accueil.commencer}</Text>
-        </Pressable>
+        {/* Sans envies chargées, pas de parcours possible : on attend ou on propose de réessayer. */}
+        {!categories && !erreur && <ActivityIndicator size="large" color={sombre.primaire} accessibilityLabel={t.chargementQuestions} />}
+        {!categories && erreur && (
+          <View style={styles.erreur} accessibilityLiveRegion="polite">
+            <Text style={styles.erreurTexte}>{erreur}</Text>
+            <Pressable
+              onPress={onReessayer}
+              accessibilityRole="button"
+              style={({ pressed }) => [styles.bouton, pressed && { opacity: 0.85 }]}
+            >
+              <Text style={styles.boutonTexte}>{t.reessayer}</Text>
+            </Pressable>
+          </View>
+        )}
 
         <Text style={styles.mention}>{t.accueil.mention}</Text>
 
@@ -100,6 +139,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     maxWidth: 420,
   },
+  langues: { alignItems: 'center', gap: 8 },
+  languesTitre: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  languesTitreTexte: { ...typo.corpsFort, color: sombre.texteSecondaire },
+  languesChoix: { flexDirection: 'row', gap: 8, backgroundColor: sombre.carte, borderRadius: rayons.s, padding: 4 },
+  langue: { minWidth: 132, minHeight: 52, paddingHorizontal: 16, borderRadius: rayons.s, alignItems: 'center', justifyContent: 'center' },
+  langueActive: { backgroundColor: sombre.primaire },
+  langueTexte: { ...typo.corpsFort, fontFamily: polices.titre, color: sombre.texte },
+  langueTexteActive: { color: sombre.surPrimaire },
+  erreur: { alignItems: 'center', gap: 12 },
+  erreurTexte: { ...typo.corps, color: sombre.texte, textAlign: 'center', maxWidth: 420 },
   raccourcis: { alignItems: 'center', gap: 12 },
   question: { ...typo.corpsFort, color: sombre.texteSecondaire },
   // 6 tuiles sur une ligne sur grand écran (6 × 132 + 5 × 8), 3 + 3 sur téléphone : jamais de tuile isolée.
