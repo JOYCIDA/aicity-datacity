@@ -3,7 +3,8 @@ import { Check, FileText, UploadCloud, X } from 'lucide-react';
 import { api, ErreurApi, type Entreprise, type StatutCompte } from '../api';
 import { useAuth } from '../auth';
 import { Alerte } from '../composants/Alerte';
-import { formaterDateHeure, formaterTaille } from '../format';
+import { Etablissement } from '../composants/Etablissement';
+import { formaterTaille } from '../format';
 
 const TYPES_ACCEPTES = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
 const TAILLE_MAX = 5 * 1024 * 1024;
@@ -228,15 +229,6 @@ export default function MonCompte() {
     );
   }
 
-  const infos: [string, string][] = [
-    ['Nom', entreprise.nom],
-    ['Type d’activité', entreprise.typeActivite],
-    ['Adresse', entreprise.adresse],
-    ['E-mail', entreprise.email],
-    ['Compte créé le', formaterDateHeure(entreprise.creeLe)],
-    ['Justificatif', entreprise.justificatifFourni ? 'Reçu' : 'Pas encore envoyé'],
-  ];
-
   return (
     <div className="page">
       <header className="page-entete">
@@ -281,19 +273,13 @@ export default function MonCompte() {
       </section>
 
       <div className="grille-deux">
-        <section className="carte bloc" aria-labelledby="titre-infos">
-          <h2 id="titre-infos" className="t-sous-titre">
-            Votre établissement
-          </h2>
-          <dl className="lignes">
-            {infos.map(([libelle, valeur]) => (
-              <div key={libelle} className="ligne">
-                <dt className="secondaire">{libelle}</dt>
-                <dd className="t-corps-fort chiffres">{valeur}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
+        <Etablissement
+          entreprise={entreprise}
+          onModifie={(mise) => {
+            setEntreprise(mise);
+            rafraichir().catch(() => {}); // le nom affiché dans la barre et l'accueil
+          }}
+        />
 
         <EnvoiJustificatif
           entreprise={entreprise}
