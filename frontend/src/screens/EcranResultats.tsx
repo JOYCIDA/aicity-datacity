@@ -107,7 +107,7 @@ export default function EcranResultats({
         renderItem={({ item, index }) => (
           // Cartes en cascade : 70 ms d'écart entre chacune.
           <Apparition delai={index * 70}>
-            <CarteActivite activite={item} numero={index + 1} onPress={() => onOuvrir(item)} />
+            <CarteActivite activite={item} numero={index + 1} vedette={index === 0} onPress={() => onOuvrir(item)} />
           </Apparition>
         )}
         contentContainerStyle={styles.liste}

@@ -56,7 +56,19 @@ export default function CarteGeo({ position, activites, onOuvrir }: PropsCarteGe
             eventHandlers={{ click: () => onOuvrir(a) }}
           >
             <Tooltip direction="top" offset={[0, -18]}>
-              {`${i + 1}. ${a.titre}`}
+              {/* Aperçu au survol : la photo aide à reconnaître l'activité sans ouvrir la fiche. */}
+              <div style={{ width: 180, whiteSpace: 'normal' }}>
+                {a.photo_url && (
+                  <img
+                    src={a.photo_url}
+                    alt=""
+                    style={{ display: 'block', width: 180, height: 110, objectFit: 'cover', borderRadius: 6, marginBottom: 6 }}
+                  />
+                )}
+                <span style={{ fontFamily: 'InstrumentSans_600SemiBold, sans-serif', fontSize: 13, lineHeight: '17px' }}>
+                  {`${i + 1}. ${a.titre}`}
+                </span>
+              </div>
             </Tooltip>
           </Marker>
         ))}
