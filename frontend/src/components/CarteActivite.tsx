@@ -11,39 +11,53 @@ type Props = {
   activite: Activite;
   numero?: number; // même numéro que la pastille sur la carte
   onPress?: () => void;
+  vedette?: boolean; // 1re proposition : grande photo au-dessus du texte
 };
 
 // Une ligne de liste : vignette à gauche, texte à droite, trait fin entre deux activités.
-export default function CarteActivite({ activite, numero, onPress }: Props) {
+export default function CarteActivite({ activite, numero, onPress, vedette = false }: Props) {
   const t = useTextes();
   const d = useDesign();
   const prix = formaterPrix(activite.prix, t);
   const distance = `${t.aPied(activite.trajet_min)}${SEP}${formaterDistance(activite.distance_m, t)}`;
   const IconeCategorie = ICONES_CATEGORIE[activite.categorie];
   const vignette = d.px(104);
+  // Vedette : photo sur toute la largeur de la carte, hauteur fixe pour garder la liste visible.
+  const taillePhoto = vedette ? { width: '100%' as const, height: d.px(200) } : { width: vignette, height: vignette };
 
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${numero ? `${numero}. ` : ''}${activite.titre}, ${activite.categorieLibelle}, ${activite.lieu}, ${activite.horaires}, ${prix}, ${distance}`}
-      style={({ pressed }) => [styles.carte, { paddingVertical: d.px(16), gap: d.px(16) }, pressed && styles.appuyee]}
+      style={({ pressed }) => [
+        styles.carte,
+        vedette && styles.carteVedette,
+        { paddingVertical: d.px(16), gap: vedette ? d.px(12) : d.px(16) },
+        pressed && styles.appuyee,
+      ]}
     >
-      <View>
+      <View style={vedette && styles.photoVedette}>
         {activite.photo_url ? (
           <Image
             source={{ uri: activite.photo_url }}
             resizeMode="cover"
-            style={[styles.photo, { width: vignette, height: vignette }]}
+            style={[styles.photo, taillePhoto]}
             accessible={false}
           />
         ) : (
-          <View style={[styles.photo, styles.sansPhoto, { width: vignette, height: vignette }]}>
+          <View style={[styles.photo, styles.sansPhoto, taillePhoto]}>
             {IconeCategorie && <IconeCategorie size={d.px(32)} color={couleurs.texteSecondaire} />}
           </View>
         )}
         {numero !== undefined && (
-          <View style={[styles.numero, { minWidth: d.px(24), minHeight: d.px(24), borderRadius: d.px(12) }]}>
+          <View
+            style={[
+              styles.numero,
+              vedette && styles.numeroVedette,
+              { minWidth: d.px(24), minHeight: d.px(24), borderRadius: d.px(12) },
+            ]}
+          >
             <Text style={[d.typo('legende'), styles.numeroTexte]}>{numero}</Text>
           </View>
         )}
@@ -54,7 +68,7 @@ export default function CarteActivite({ activite, numero, onPress }: Props) {
           <Text style={[d.typo('legende'), styles.secondaire]}>{activite.categorieLibelle}</Text>
           {activite.non_traduit && <MentionFrancais />}
         </View>
-        <Text style={[d.typo('corpsFort'), styles.titre]} numberOfLines={2}>
+        <Text style={[d.typo(vedette ? 'sousTitre' : 'corpsFort'), styles.titre]} numberOfLines={2}>
           {activite.titre}
         </Text>
         <Text style={[d.typo('corps'), styles.secondaire]} numberOfLines={1}>
@@ -81,7 +95,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: couleurs.trait,
   },
+  carteVedette: { flexDirection: 'column', alignItems: 'stretch' },
   appuyee: { backgroundColor: couleurs.carte },
+  photoVedette: { alignSelf: 'stretch' },
   photo: { borderRadius: 10, backgroundColor: couleurs.carte },
   sansPhoto: { alignItems: 'center', justifyContent: 'center' },
   numero: {
@@ -93,6 +109,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  numeroVedette: { top: 10, left: 10 },
   numeroTexte: { fontFamily: polices.titre, color: couleurs.fond, fontVariant: ['tabular-nums'] },
   contenu: { flex: 1 },
   entete: { flexDirection: 'row', alignItems: 'center', gap: 8 },
