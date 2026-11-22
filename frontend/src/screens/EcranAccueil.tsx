@@ -2,6 +2,8 @@ import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions, Lin
 import { ArrowUpRight, Globe } from 'lucide-react-native';
 import AiCityLogo from '../components/AiCityLogo';
 import CitySkyline from '../components/CitySkyline';
+import Decouvertes from '../components/Decouvertes';
+import { OffreApi } from '../api/client';
 import { ICONES_CATEGORIE } from '../components/Icones';
 import { PRO_URL } from '../config';
 import { modeEcran, sombre, polices, rayons, typo } from '../theme';
@@ -15,12 +17,13 @@ type Props = {
   onRaccourci: (categorie: string) => void;
   langue: Langue;
   onLangue: (langue: Langue) => void;
+  onDecouvrir: (offre: OffreApi) => void;
 };
 
 // Écrit dans les deux langues : un touriste doit le reconnaître avant d'avoir changé de langue.
 const TITRE_LANGUE = 'Langue · Language';
 
-export default function EcranAccueil({ categories, erreur, onReessayer, onRaccourci, langue, onLangue }: Props) {
+export default function EcranAccueil({ categories, erreur, onReessayer, onRaccourci, langue, onLangue, onDecouvrir }: Props) {
   const t = useTextes();
   // Sur téléphone, un logo plus petit laisse les envies visibles sans défiler.
   const { width, height } = useWindowDimensions();
@@ -117,6 +120,8 @@ export default function EcranAccueil({ categories, erreur, onReessayer, onRaccou
             </Pressable>
           </View>
         )}
+
+        <Decouvertes langue={langue} echelle={k} onOuvrir={onDecouvrir} />
 
         <Text style={[styles.mention, texte(styles.mention)]}>{t.accueil.mention}</Text>
 

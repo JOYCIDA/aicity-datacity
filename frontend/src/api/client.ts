@@ -165,6 +165,14 @@ export async function chargerOffresAutour(latitude: number, longitude: number, r
   return offres;
 }
 
+// Accueil « À découvrir » : une seule page d'offres autour d'un point.
+export async function chargerOffresDecouverte(latitude: number, longitude: number): Promise<OffreApi[]> {
+  const r = await requete<{ elements: OffreApi[] }>(
+    `/citoyen/offres?latitude=${latitude}&longitude=${longitude}&rayonM=3000&taille=200&page=1&langue=${langue}`,
+  );
+  return r.elements;
+}
+
 // Ouverture d'une fiche : le backend compte une vue anonyme (statistiques des entreprises dans
 // AiCity Pro). Appel discret : un échec ne bloque jamais l'affichage de la fiche.
 export function signalerVue(offreId: string): void {

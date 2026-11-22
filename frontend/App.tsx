@@ -20,8 +20,9 @@ import { INACTIVITE_FIN_MS } from './src/config';
 import EtatChargement from './src/components/EtatChargement';
 import KioskTopBar from './src/components/KioskTopBar';
 import { Apparition } from './src/animations';
-import { chargerQuestions, definirLangue, ErreurApi, oublierSession, QuestionApi, signalerVue } from './src/api/client';
-import { versQuestions } from './src/api/adaptateur';
+import { chargerQuestions, definirLangue, ErreurApi, OffreApi, oublierSession, QuestionApi, signalerVue } from './src/api/client';
+import { obtenirPosition } from './src/utils/position';
+import { versActiviteOffre, versQuestions } from './src/api/adaptateur';
 import { couleurs } from './src/theme';
 import { Reponses } from './src/types/parcours';
 import { Activite } from './src/types/activite';
@@ -47,6 +48,8 @@ export default function App() {
   const [etape, setEtape] = useState<Etape>('accueil');
   const [reponses, setReponses] = useState<Reponses>({ interets: [] });
   const [activiteChoisie, setActiviteChoisie] = useState<Activite | null>(null);
+  // Écran d'où la fiche a été ouverte : Retour y ramène.
+  const [origineFiche, setOrigineFiche] = useState<'resultats' | 'accueil'>('resultats');
   const [recherche, setRecherche] = useState<Recherche | null>(null);
   const [langue, setLangue] = useState<Langue>('FR');
   // Questions brutes du backend (FR et EN) ; on n'affiche que la langue choisie.
@@ -113,7 +116,7 @@ export default function App() {
     setLangue(l);
     // Les résultats affichés sont dans l'ancienne langue : on les recharge.
     setRecherche(null);
-    if (etape === 'fiche') setEtape('resultats');
+    if (etape === 'fiche') setEtape(origineFiche);
   };
 
   // Écran précédent pour le bouton Retour de la barre du haut (aucun sur l'accueil).
@@ -122,10 +125,19 @@ export default function App() {
     interets: 'duree',
     budget: 'interets',
     resultats: 'budget',
-    fiche: 'resultats',
+    fiche: origineFiche,
     signalement: 'fiche',
   };
   const precedent = PRECEDENT[etape];
+
+  // Carte « À découvrir » de l'accueil : la position (demandée ici, comme pour une recherche) donne le trajet.
+  const ouvrirDecouverte = async (offre: OffreApi) => {
+    const { position } = await obtenirPosition();
+    setActiviteChoisie(versActiviteOffre(offre, position, t.decouverte.explication, langue));
+    setOrigineFiche('accueil');
+    setEtape('fiche');
+    signalerVue(offre.id); // compte une vue pour l'entreprise
+  };
 
   const basculerInteret = (valeur: string) => {
     const interets = reponses.interets.includes(valeur)
@@ -175,6 +187,7 @@ export default function App() {
                 onReessayer={chargerLesQuestions}
                 langue={langue}
                 onLangue={changerLangue}
+                onDecouvrir={ouvrirDecouverte}
                 onRaccourci={(categorie) => {
                   setReponses({ ...reponses, interets: [categorie] });
                   setEtape('duree');
@@ -243,6 +256,7 @@ export default function App() {
                   setRecherche(null);
                 }}
                 onOuvrir={(activite) => {
+                  setOrigineFiche('resultats');
                   setActiviteChoisie(activite);
                   signalerVue(activite.id); // compte une vue pour l'entreprise
                   setEtape('fiche');

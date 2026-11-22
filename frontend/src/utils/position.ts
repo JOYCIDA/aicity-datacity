@@ -20,6 +20,24 @@ export function distanceM(a: Position, b: Position): number {
   return 2 * 6_371_000 * Math.asin(Math.sqrt(h));
 }
 
+// Même règle que le backend (RG14) : détour de 30 % à 5 km/h, minute entière supérieure.
+export function minutesAPied(metres: number): number {
+  return Math.ceil((metres * 1.3) / ((5 * 1000) / 60));
+}
+
+// Position sans rien demander : réelle seulement si l'accès est déjà autorisé (accueil).
+export async function positionSansDemander(): Promise<Position | null> {
+  try {
+    const { granted } = await Location.getForegroundPermissionsAsync();
+    if (!granted) return null;
+    const { coords } = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+    const position = { latitude: coords.latitude, longitude: coords.longitude };
+    return distanceM(position, POSITION_PAR_DEFAUT) > DISTANCE_MAX_PARIS_M ? null : position;
+  } catch {
+    return null;
+  }
+}
+
 // La position reste dans l'appli le temps de la recherche : elle n'est jamais stockée.
 export async function obtenirPosition(): Promise<ResultatPosition> {
   try {
