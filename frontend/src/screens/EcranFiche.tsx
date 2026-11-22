@@ -1,4 +1,5 @@
-import { ArrowUpRight, Navigation, Share2 } from 'lucide-react-native';
+import { useMemo } from 'react';
+import { ArrowUpRight, CalendarPlus, Navigation, Share2 } from 'lucide-react-native';
 import {
   View,
   Text,
@@ -20,6 +21,7 @@ import { SIGNALEMENT_ACTIF } from '../config';
 import { useDesign } from '../design';
 import BoutonTerminer from '../components/BoutonTerminer';
 import QrCode from '../components/QrCode';
+import { creneauAgenda, evenementQr, fichierIcs, lienGoogleAgenda, nomFichierIcs } from '../utils/agenda';
 
 type Props = {
   activite: Activite;
@@ -57,6 +59,28 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
   const marge = large ? 0 : d.px(espace.xl);
   // Paragraphes limités à une largeur de lecture confortable (~70 caractères).
   const lecture = { maxWidth: d.px(LARGEUR_LECTURE) };
+
+  // Créneau calculé une fois à l'ouverture de la fiche : départ maintenant, arrivée après le trajet.
+  const creneau = useMemo(() => creneauAgenda(activite), [activite]);
+  const heure = (x: Date) => x.toLocaleTimeString(t.locale, { hour: '2-digit', minute: '2-digit' });
+  const libelleCreneau = `${creneau.debut.toLocaleDateString(t.locale, { weekday: 'long', day: 'numeric', month: 'long' })}, ${heure(creneau.debut)} – ${heure(creneau.fin)}`;
+
+  const ajouterAgenda = () => {
+    if (Platform.OS === 'web') {
+      // Fichier .ics : le téléphone ou l'ordinateur propose de l'ouvrir dans son agenda.
+      const blob = new Blob([fichierIcs(activite, creneau, t.fiche.agendaNote)], { type: 'text/calendar;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const lien = document.createElement('a');
+      lien.href = url;
+      lien.download = nomFichierIcs(activite);
+      document.body.appendChild(lien);
+      lien.click();
+      lien.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    } else {
+      Linking.openURL(lienGoogleAgenda(activite, creneau, t.fiche.agendaNote));
+    }
+  };
 
   const partager = async () => {
     try {
@@ -101,6 +125,28 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
         >
           <Navigation size={d.px(20)} color={couleurs.surPrimaire} />
           <Text style={[d.typo('sousTitre'), styles.yAllerTexte]}>{t.fiche.yAller}</Text>
+        </Pressable>
+      )}
+      {d.mode === 'borne' ? (
+        <View style={[styles.qr, { padding: d.px(espace.l), gap: d.px(espace.l) }]}>
+          <QrCode valeur={evenementQr(activite, creneau)} taille={d.px(168)} accessibilityLabel={t.fiche.qrAgendaA11y} />
+          <View style={[styles.qrTextes, { gap: d.px(espace.xs) }]}>
+            <View style={[styles.qrTitre, { gap: d.px(espace.s) }]}>
+              <CalendarPlus size={d.px(20)} color={couleurs.lien} />
+              <Text style={[d.typo('sousTitre'), styles.texte]}>{t.fiche.qrAgendaTitre}</Text>
+            </View>
+            <Text style={[d.typo('corps'), styles.secondaire]}>{t.fiche.qrAgendaTexte(libelleCreneau)}</Text>
+          </View>
+        </View>
+      ) : (
+        <Pressable
+          onPress={ajouterAgenda}
+          accessibilityRole="button"
+          accessibilityLabel={`${t.fiche.agendaA11y} (${libelleCreneau})`}
+          style={({ pressed }) => [styles.secondaireBouton, { minHeight: d.px(48), gap: d.px(espace.s) }, pressed && styles.appuye]}
+        >
+          <CalendarPlus size={d.px(18)} color={couleurs.texte} />
+          <Text style={[d.typo('corpsFort'), styles.texte]}>{t.fiche.agenda}</Text>
         </Pressable>
       )}
       {PARTAGE_DISPONIBLE && (
