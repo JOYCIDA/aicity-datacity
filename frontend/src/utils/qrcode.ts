@@ -1,6 +1,6 @@
 // Générateur de QR code minimal (norme ISO/IEC 18004), sans dépendance.
-// Mode octet, correction d'erreur M (~15 %), versions 1 à 10 : jusqu'à 213 octets,
-// assez pour un lien d'itinéraire. Renvoie une grille de modules (true = noir).
+// Mode octet, correction d'erreur M (~15 %), versions 1 à 15 : jusqu'à 412 octets,
+// assez pour un lien d'itinéraire ou un événement d'agenda. Renvoie une grille de modules (true = noir).
 
 // Par version (index = version) : [taille d'un bloc court, nb de blocs courts, nb de blocs longs, octets de correction par bloc].
 const BLOCS_M: [number, number, number, number][] = [
@@ -15,15 +15,21 @@ const BLOCS_M: [number, number, number, number][] = [
   [38, 2, 2, 22],
   [36, 3, 2, 22],
   [43, 4, 1, 26],
+  [50, 1, 4, 30],
+  [36, 6, 2, 22],
+  [37, 8, 1, 22],
+  [40, 4, 5, 24],
+  [41, 5, 5, 24],
 ];
 
 // Centres des motifs d'alignement par version.
 const ALIGNEMENTS: number[][] = [
   [], [], [6, 18], [6, 22], [6, 26], [6, 30], [6, 34], [6, 22, 38], [6, 24, 42], [6, 26, 46], [6, 28, 50],
+  [6, 30, 54], [6, 32, 58], [6, 34, 62], [6, 26, 46, 66], [6, 26, 48, 70],
 ];
 
 // Bits de remplissage après les données, selon la version.
-const RESTE = [0, 0, 7, 7, 7, 7, 7, 0, 0, 0, 0];
+const RESTE = [0, 0, 7, 7, 7, 7, 7, 0, 0, 0, 0, 0, 0, 0, 3, 3];
 
 const capacite = (v: number) => {
   const [court, nbCourts, nbLongs] = BLOCS_M[v];
@@ -70,8 +76,8 @@ export function genererQr(texte: string): boolean[][] {
   // Plus petite version qui contient le texte (4 bits de mode + compteur + données).
   let version = 1;
   const bitsNecessaires = (v: number) => 4 + (v < 10 ? 8 : 16) + octets.length * 8;
-  while (version <= 10 && bitsNecessaires(version) > capacite(version) * 8) version++;
-  if (version > 10) throw new Error('Texte trop long pour le QR code');
+  while (version <= 15 && bitsNecessaires(version) > capacite(version) * 8) version++;
+  if (version > 15) throw new Error('Texte trop long pour le QR code');
 
   // Flux de bits : mode octet (0100), longueur, données, terminateur, octets de bourrage.
   const bits: number[] = [];
