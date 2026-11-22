@@ -19,6 +19,7 @@ import { useTextes } from '../i18n';
 import { SIGNALEMENT_ACTIF } from '../config';
 import { useDesign } from '../design';
 import BoutonTerminer from '../components/BoutonTerminer';
+import QrCode from '../components/QrCode';
 
 type Props = {
   activite: Activite;
@@ -79,15 +80,29 @@ export default function EcranFiche({ activite, onSignaler, onTerminer }: Props) 
           {formaterDistance(activite.distance_m, t)}
         </Text>
       </View>
-      <Pressable
-        onPress={() => Linking.openURL(itineraire)}
-        accessibilityRole="link"
-        accessibilityLabel={t.fiche.yAllerA11y}
-        style={({ pressed }) => [styles.yAller, { minHeight: d.px(56), gap: d.px(espace.s) }, pressed && styles.appuye]}
-      >
-        <Navigation size={d.px(20)} color={couleurs.surPrimaire} />
-        <Text style={[d.typo('sousTitre'), styles.yAllerTexte]}>{t.fiche.yAller}</Text>
-      </Pressable>
+      {/* Sur la borne, personne ne part avec l'écran : l'itinéraire passe sur le téléphone par QR code. */}
+      {d.mode === 'borne' ? (
+        <View style={[styles.qr, { padding: d.px(espace.l), gap: d.px(espace.l) }]}>
+          <QrCode valeur={itineraire} taille={d.px(168)} accessibilityLabel={t.fiche.qrA11y} />
+          <View style={[styles.qrTextes, { gap: d.px(espace.xs) }]}>
+            <View style={[styles.qrTitre, { gap: d.px(espace.s) }]}>
+              <Navigation size={d.px(20)} color={couleurs.lien} />
+              <Text style={[d.typo('sousTitre'), styles.texte]}>{t.fiche.qrTitre}</Text>
+            </View>
+            <Text style={[d.typo('corps'), styles.secondaire]}>{t.fiche.qrTexte}</Text>
+          </View>
+        </View>
+      ) : (
+        <Pressable
+          onPress={() => Linking.openURL(itineraire)}
+          accessibilityRole="link"
+          accessibilityLabel={t.fiche.yAllerA11y}
+          style={({ pressed }) => [styles.yAller, { minHeight: d.px(56), gap: d.px(espace.s) }, pressed && styles.appuye]}
+        >
+          <Navigation size={d.px(20)} color={couleurs.surPrimaire} />
+          <Text style={[d.typo('sousTitre'), styles.yAllerTexte]}>{t.fiche.yAller}</Text>
+        </Pressable>
+      )}
       {PARTAGE_DISPONIBLE && (
         <Pressable
           onPress={partager}
@@ -217,6 +232,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: espace.xl,
   },
   yAllerTexte: { color: couleurs.surPrimaire },
+  qr: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: couleurs.trait, borderRadius: rayons.s, backgroundColor: '#FFFFFF' },
+  qrTextes: { flex: 1 },
+  qrTitre: { flexDirection: 'row', alignItems: 'center' },
   secondaireBouton: {
     flexDirection: 'row',
     alignItems: 'center',
