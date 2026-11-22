@@ -15,11 +15,12 @@ type Props = {
   size?: Size;
   dark?: boolean;
   compact?: boolean; // sur une ligne, sans slogan (barre du haut)
-  echelle?: number; // agrandissement de la version compacte (borne)
+  echelle?: number; // agrandissement (borne)
 };
 
 export default function AiCityLogo({ size = 'md', dark = false, compact = false, echelle = 1 }: Props) {
-  const s = compact ? { icon: 30 * echelle, title: 22 * echelle, slogan: 0 } : sizes[size];
+  const base = compact ? { icon: 30, title: 22, slogan: 0 } : sizes[size];
+  const s = { icon: base.icon * echelle, title: base.title * echelle, slogan: base.slogan * echelle };
   const textColor = dark ? colors.nightForeground : colors.night;
 
   return (
