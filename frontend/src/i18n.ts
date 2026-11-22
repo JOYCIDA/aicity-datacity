@@ -16,6 +16,10 @@ const FR = {
     espacePro: 'Publie sur AiCity Pro',
     espaceProA11y: 'Publier tes offres sur AiCity Pro, l’espace entreprise. S’ouvre dans le navigateur.',
   },
+  decouverte: {
+    titre: 'À découvrir en ce moment',
+    explication: 'Une des activités à découvrir en ce moment autour de toi, choisie parmi celles qui ont une photo, dans des catégories variées.',
+  },
   retour: 'Retour',
   recommencer: 'Revenir au début',
   recommencerA11y: 'Revenir au début : efface tes choix',
@@ -161,6 +165,10 @@ const EN: Textes = {
     entreprise: 'Are you a business?',
     espacePro: 'Publish on AiCity Pro',
     espaceProA11y: 'Publish your offers on AiCity Pro, the business space. Opens in the browser.',
+  },
+  decouverte: {
+    titre: 'Discover right now',
+    explication: 'One of the activities to discover around you right now, picked among those with a photo, across varied categories.',
   },
   retour: 'Back',
   recommencer: 'Back to start',

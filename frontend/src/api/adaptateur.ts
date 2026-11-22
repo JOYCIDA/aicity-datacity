@@ -1,8 +1,9 @@
-import { QuestionApi, ResultatApi } from './client';
+import { OffreApi, QuestionApi, ResultatApi } from './client';
 import { Activite } from '../types/activite';
 import { Choix, Questions } from '../types/questions';
 import { Langue, TEXTES } from '../i18n';
 import { formaterDate, formaterHoraires, protegerUnites } from '../utils/format';
+import { distanceM as distanceEntre, minutesAPied, Position } from '../utils/position';
 
 export function versQuestions(api: QuestionApi[], langue: Langue): Questions {
   const question = (id: QuestionApi['id']) => {
@@ -22,8 +23,21 @@ export function versQuestions(api: QuestionApi[], langue: Langue): Questions {
   };
 }
 
-export function versActivite(
-  { offre, distanceM, trajetMinutes, explication }: ResultatApi,
+export function versActivite({ offre, distanceM, trajetMinutes, explication }: ResultatApi, langue: Langue): Activite {
+  return activiteDepuisOffre(offre, distanceM, trajetMinutes, explication, langue);
+}
+
+// Offre ouverte hors recherche (« À découvrir » de l'accueil) : distance calculée ici, avec la même règle que le backend.
+export function versActiviteOffre(offre: OffreApi, position: Position, explication: string, langue: Langue): Activite {
+  const distance = Math.round(distanceEntre(position, { latitude: offre.latitude, longitude: offre.longitude }));
+  return activiteDepuisOffre(offre, distance, minutesAPied(distance), explication, langue);
+}
+
+function activiteDepuisOffre(
+  offre: OffreApi,
+  distanceM: number,
+  trajetMinutes: number,
+  explication: string,
   langue: Langue,
 ): Activite {
   const t = TEXTES[langue];
